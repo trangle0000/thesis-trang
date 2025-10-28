@@ -4,7 +4,7 @@ These libraries provide the essential building blocks for process discovery, con
 
 | Library | Description | Website / Repo | Documentation |
 |----------|--------------|----------------|----------------|
-| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [processintelligence.solutions/pm4py](https://github.com/process-intelligence-solutions/pm4py) | [Docs](https://www.sciencedirect.com/science/article/pii/S2665963823000933) |
+| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [processintelligence.solutions/pm4py](https://github.com/process-intelligence-solutions/pm4py) | [Docs](https://www.sciencedirect.com/science/article/pii/S2665963823000933) [(https://processintelligence.solutions/pm4py/api?page=index.html)] |
 | **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://pm4py-source.readthedocs.io/en/latest/pm4py.streaming.html) 
 | **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AutomatedProcessImprovement/Simod?tab=readme-ov-file)
 | **PMLab** | Toolkit for process discovery and conformance checking for research. | [GitHub](https://github.com/pmlab/pmlab-full) 
@@ -16,24 +16,23 @@ Libraries and frameworks for applying Machine Learning and AI to predictive proc
 
 | Library | Description | Website / Repo | Docs / Paper |
 |----------|--------------|----------------|---------------|
-| **ML4ProM** | Combines process mining with machine learning for predictive monitoring. | [GitHub](https://github.com/ML4ProM) | [IEEE Paper](https://ieeexplore.ieee.org/document/8809623) |
-| **pm4pyml** | Extension of PM4Py integrating ML pipelines (scikit-learn). | [GitHub](https://github.com/pm4py/pm4py-ml) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
-| **PyCelonis API** | Python API for Celonis Process Intelligence and RPA integration. | [Celonis Docs](https://docs.celonis.com/en/python-api.html) | [Celonis Academy](https://academy.celonis.com/) |
-| **bpmn-python** | Extracts and manipulates BPMN process models (workflow automation). | [GitHub](https://github.com/NorthArrowResearch/bpmn-python) | [PyPI Docs](https://pypi.org/project/bpmn-python/) |
-| **Predictive Process Monitoring Toolkit (PPMT)** | ML-based prediction toolkit for completion time and deviation detection. | [GitHub](https://github.com/irhete/predictive-monitoring-benchmark) | [Paper](https://arxiv.org/abs/1901.05026) |
+| **ML4ProM** | Combines process mining with machine learning for predictive monitoring. | [GitHub]([https://github.com/ML4ProM](https://github.com/rizavelioglu/ml4prom)) | [Paper](https://dataninja.nrw/?page_id=2341) |
+| **pm4pyml** | Extension of PM4Py integrating ML pipelines (scikit-learn). | [Docs](https://pm4py-source.readthedocs.io/en/stable/index.html) |
+| **PyCelonis API** | Python API for Celonis Process Intelligence and RPA integration. | [Celonis Docs](https://docs.celonis.com/index.html?lang=en) | [Celonis Academy](https://celonis.github.io/pycelonis/2.0.1/) |
+| **bpmn-python** | Extracts and manipulates BPMN process models (workflow automation). | [GitHub](https://github.com/process-analytics/bpmn-visualization-pm4py) | [Paper](https://bpmn-python.readthedocs.io/en/latest/) |
+| **Predictive Process Monitoring Toolkit (PPMT)** | ML-based prediction toolkit for completion time and deviation detection. | [Paper](https://arxiv.org/abs/1901.05026) |
 
 ---
 
-# 3. Simulation, Optimization & Event Logs
+# 3. Optimization & Event Logs
 Tools and frameworks for simulating, optimizing, or generating process data for experiments.
 
 | Tool | Description | URL |
 |------|--------------|-----|
-| **BupaR (Python Wrapper)** | Process mining tools for event log analysis, originally in R. | [bupaverse.com](https://bupaverse.com/packages/bupar/) |
-| **SimPy** | Discrete-event simulation framework for modeling process behavior. | [simpy.readthedocs.io](https://simpy.readthedocs.io/) |
-| **BPSim** | Business Process Simulation standard compatible with BPMN and Simod. | [bpsim.org](https://www.bpsim.org/) |
-| **ProcessOptimizer (skopt)** | Library for Bayesian Optimization to tune process parameters. | [GitHub](https://github.com/scikit-optimize/scikit-optimize) |
-| **ProcessSimulator** | Generates synthetic event logs for testing process mining models. | [GitHub](https://github.com/AdaptiveBPM/ProcessSimulator) |
+| **BupaR (Python Wrapper)** | Process mining tools for event log analysis, originally in R. | [bupaverse.com](https://bupaverse.github.io/docs/) |
+| **SimPy** | Discrete-event simulation framework for modeling process behavior. | [simpy.readthedocs.io](https://pypi.org/project/simpy/) |
+| **BPSim** | Business Process Simulation standard compatible with BPMN and Simod. | [bpsim.org](bpsim.org) |
+| **ProcessOptimizer (skopt)** | Library for Bayesian Optimization to tune process parameters. | [GitHub](https://github.com/novonordisk-research/ProcessOptimizer) |
 
 ---
 
@@ -84,14 +83,6 @@ Authoritative academic sources and organizations in Process Mining and Process I
 | **Process Mining Manifesto (IEEE 2011)** | Foundational document defining Process Mining principles. | [PDF](https://www.win.tue.nl/ieeetfpm/doku.php?id=shared:process_mining_manifesto) |
 | **ICPM Conference & BPI Challenge** | Annual research conference and open data competition. | [icpmconference.org](https://icpmconference.org/) |
 | **Fraunhofer FIT – Process Intelligence Group** | Research institute developing PM4Py and Process Intelligence tools. | [fit.fraunhofer.de](https://www.fit.fraunhofer.de/en.html) |
-
----
-
-# Recommended Next Steps for Thesis Development
-1. Select **2–3 key libraries** (e.g., `PM4Py`, `Simod`, `ML4ProM`) for deeper analysis.  
-2. Integrate **AI/ML-based prediction** (using PM4Py-AI or scikit-learn).  
-3. Use **BPIC or Traffic Fines dataset** for testing and simulation.  
-4. Focus on **visualizing discovered processes and predictive models**.
 
 ---
 
