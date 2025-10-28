@@ -14,4 +14,3 @@ This document lists Python libraries related to Process Mining and Process Intel
 | 8 | **Celonis PyMiner API** | Python API for Celonis Process Intelligence platform. | [Celonis](https://www.celonis.com/) | [Docs](https://docs.celonis.com/en/api.html) |
 | 9 | **BupaR (Python wrapper)** | Process mining tools for event log analysis, originally in R, available for Python. | [bupaverse.com](https://www.bupaverse.com/packages/bupar/) | [Tutorial](https://rpubs.com/gertjanssenswillen/bupar-intro) |
 | 10 | **ProM (via PM4Py)** | Academic process mining framework integrated with PM4Py. | [promtools.org](https://www.promtools.org/) | [Docs](https://www.promtools.org/prom6/) |
-
