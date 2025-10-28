@@ -4,7 +4,7 @@ These libraries provide the essential building blocks for process discovery, con
 
 | Library | Description | Website / Repo | Documentation |
 |----------|--------------|----------------|----------------|
-| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [pm4py.fit.fraunhofer.de]((https://processintelligence.solutions/pm4py)) 
+| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [processintelligence.solutions/pm4py]((https://processintelligence.solutions/pm4py)) | [Docs](https://pm4py.github.io/pm4py-core/) |
 | **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://github.com/pm4py/pm4py-streaming) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
 | **PM4Py-AI** | Integrates AI-based predictive and prescriptive process analytics into PM4Py. | [GitHub](https://github.com/pm4py/pm4py-ai) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
 | **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AdaptiveBPM/simod) | [Tutorial](https://github.com/AdaptiveBPM/simod#usage) |
