@@ -4,7 +4,7 @@ These libraries provide the essential building blocks for process discovery, con
 
 | Library | Description | Website / Repo | Documentation |
 |----------|--------------|----------------|----------------|
-| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [pm4py.fit.fraunhofer.de](https://pm4py.fit.fraunhofer.de/) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
+| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [pm4py.fit.fraunhofer.de]((https://processintelligence.solutions/pm4py)) 
 | **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://github.com/pm4py/pm4py-streaming) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
 | **PM4Py-AI** | Integrates AI-based predictive and prescriptive process analytics into PM4Py. | [GitHub](https://github.com/pm4py/pm4py-ai) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
 | **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AdaptiveBPM/simod) | [Tutorial](https://github.com/AdaptiveBPM/simod#usage) |
@@ -13,7 +13,7 @@ These libraries provide the essential building blocks for process discovery, con
 
 ---
 
-## 🤖 2. AI & Predictive Process Intelligence Tools
+# 2. AI & Predictive Process Intelligence Tools
 Libraries and frameworks for applying Machine Learning and AI to predictive process monitoring and decision automation.
 
 | Library | Description | Website / Repo | Docs / Paper |
@@ -26,7 +26,7 @@ Libraries and frameworks for applying Machine Learning and AI to predictive proc
 
 ---
 
-## 📊 3. Simulation, Optimization & Event Logs
+# 3. Simulation, Optimization & Event Logs
 Tools and frameworks for simulating, optimizing, or generating process data for experiments.
 
 | Tool | Description | URL |
@@ -39,7 +39,7 @@ Tools and frameworks for simulating, optimizing, or generating process data for 
 
 ---
 
-## 🧩 4. Visualization & Analytics Extensions
+# 4. Visualization & Analytics Extensions
 Libraries that enable process visualization, dashboards, and network analysis.
 
 | Library | Description | URL |
@@ -51,7 +51,7 @@ Libraries that enable process visualization, dashboards, and network analysis.
 
 ---
 
-## 🗂️ 5. Datasets & Event Logs for Process Intelligence
+# 5. Datasets & Event Logs for Process Intelligence
 Standard datasets widely used for benchmarking process mining and predictive monitoring models.
 
 | Dataset | Description | Link |
@@ -63,7 +63,7 @@ Standard datasets widely used for benchmarking process mining and predictive mon
 
 ---
 
-## 🧠 6. Complementary Libraries (Integration & ML Support)
+# 6. Complementary Libraries (Integration & ML Support)
 Supporting Python packages for data processing, modeling, and deep learning integration.
 
 | Library | Use Case | URL |
@@ -77,7 +77,7 @@ Supporting Python packages for data processing, modeling, and deep learning inte
 
 ---
 
-## 🧾 7. Academic & Research Resources
+# 7. Academic & Research Resources
 Authoritative academic sources and organizations in Process Mining and Process Intelligence.
 
 | Resource | Type | Link |
@@ -89,7 +89,7 @@ Authoritative academic sources and organizations in Process Mining and Process I
 
 ---
 
-### 🧩 Recommended Next Steps for Thesis Development
+# Recommended Next Steps for Thesis Development
 1. Select **2–3 key libraries** (e.g., `PM4Py`, `Simod`, `ML4ProM`) for deeper analysis.  
 2. Integrate **AI/ML-based prediction** (using PM4Py-AI or scikit-learn).  
 3. Use **BPIC or Traffic Fines dataset** for testing and simulation.  
