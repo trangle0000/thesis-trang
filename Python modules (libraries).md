@@ -4,12 +4,10 @@ These libraries provide the essential building blocks for process discovery, con
 
 | Library | Description | Website / Repo | Documentation |
 |----------|--------------|----------------|----------------|
-| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [processintelligence.solutions/pm4py](https://processintelligence.solutions/pm4py) 
-| **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://github.com/pm4py/pm4py-streaming) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
-| **PM4Py-AI** | Integrates AI-based predictive and prescriptive process analytics into PM4Py. | [GitHub](https://github.com/pm4py/pm4py-ai) | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
-| **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AdaptiveBPM/simod) | [Tutorial](https://github.com/AdaptiveBPM/simod#usage) |
-| **PMLab** | Toolkit for process discovery and conformance checking for research. | [GitHub](https://github.com/Process-Discovery-Group/pmlab) | [Docs](https://pmlab.readthedocs.io/) |
-| **ProcessMining (Python)** | Library for analyzing event logs and generating directly-follows graphs. | [GitHub](https://github.com/JanClaes/processmining) | [PyPI](https://pypi.org/project/processmining/) |
+| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [processintelligence.solutions/pm4py](https://github.com/process-intelligence-solutions/pm4py) | [Docs](https://www.sciencedirect.com/science/article/pii/S2665963823000933) |
+| **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://pm4py-source.readthedocs.io/en/latest/pm4py.streaming.html) 
+| **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AutomatedProcessImprovement/Simod?tab=readme-ov-file)
+| **PMLab** | Toolkit for process discovery and conformance checking for research. | [GitHub](https://github.com/pmlab/pmlab-full) 
 
 ---
 
