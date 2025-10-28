@@ -44,7 +44,7 @@ Libraries that enable process visualization, dashboards, and network analysis.
 | **Plotly / Dash** | Interactive dashboards for process performance analytics. | [plotly.com](https://plotly.com/python/) |
 | **NetworkX** | Graph-based modeling of process networks. | [networkx.org](https://networkx.org/) |
 | **Graphviz** | Visualization of directly-follows graphs and BPMN workflows. | [graphviz.org](https://graphviz.org/) |
-| **ProcessVisualizer (PM4Py plugin)** | Visualizes discovered process models in Jupyter Notebook. | [Docs](https://pm4py.fit.fraunhofer.de/documentation) |
+| **ProcessVisualizer (PM4Py plugin)** | Visualizes discovered process models in Jupyter Notebook. | [Docs](https://pm4py-source.readthedocs.io/en/latest/pm4py.visualization.process_tree.html) |
 
 ---
 
