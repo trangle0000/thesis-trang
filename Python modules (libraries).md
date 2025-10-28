@@ -49,7 +49,6 @@ Libraries that enable process visualization, dashboards, and network analysis.
 ---
 
 # 5. Datasets & Event Logs for Process Intelligence
-Standard datasets widely used for benchmarking process mining and predictive monitoring models.
 
 | Dataset | Description | Link |
 |----------|--------------|------|
@@ -76,7 +75,6 @@ Authoritative academic sources and organizations in Process Mining and Process I
 | Resource | Type | Link |
 |-----------|------|------|
 | **IEEE Task Force on Process Mining** | Official research community for Process Mining. | [tf-pm.org](https://www.tf-pm.org/) |
-| **Process Mining Manifesto (IEEE 2011)** | Foundational document defining Process Mining principles. | [PDF](https://www.win.tue.nl/ieeetfpm/doku.php?id=shared:process_mining_manifesto) |
 | **ICPM Conference & BPI Challenge** | Annual research conference and open data competition. | [icpmconference.org](https://icpmconference.org/) |
 | **Fraunhofer FIT – Process Intelligence Group** | Research institute developing PM4Py and Process Intelligence tools. | [fit.fraunhofer.de](https://www.fit.fraunhofer.de/en.html) |
 
