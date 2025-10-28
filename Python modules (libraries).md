@@ -53,10 +53,6 @@ Standard datasets widely used for benchmarking process mining and predictive mon
 
 | Dataset | Description | Link |
 |----------|--------------|------|
-| **BPI Challenge (2012–2020)** | Real-life business process event logs (loan, purchasing, healthcare). | [data.4tu.nl](https://data.4tu.nl/) |
-| **BPIC-2017** | Loan application process with rich temporal and categorical features. | [4TU Dataset](https://data.4tu.nl/articles/dataset/BPI_Challenge_2017/12696884) |
-| **Road Traffic Fines** | Event logs from traffic fine management process. | [4TU Dataset](https://data.4tu.nl/articles/dataset/Road_Traffic_Fine_Management_Process/12683249) |
-| **Helpdesk** | IT support ticket event logs for performance analysis. | [4TU Dataset](https://data.4tu.nl/articles/dataset/Helpdesk/12707639) |
 
 ---
 
