@@ -16,7 +16,7 @@ Libraries and frameworks for applying Machine Learning and AI to predictive proc
 
 | Library | Description | Website / Repo | Docs / Paper |
 |----------|--------------|----------------|---------------|
-| **ML4ProM** | Combines process mining with machine learning for predictive monitoring. | [GitHub]([https://github.com/ML4ProM](https://github.com/rizavelioglu/ml4prom)) | [Paper](https://dataninja.nrw/?page_id=2341) |
+| **ML4ProM** | Combines process mining with machine learning for predictive monitoring. | [GitHub(Original)](https://github.com/ML4ProM) / [Fork)](https://github.com/rizavelioglu/ml4prom) | [Paper](https://dataninja.nrw/?page_id=2341) |
 | **pm4pyml** | Extension of PM4Py integrating ML pipelines (scikit-learn). | [Docs](https://pm4py-source.readthedocs.io/en/stable/index.html) |
 | **PyCelonis API** | Python API for Celonis Process Intelligence and RPA integration. | [Celonis Docs](https://docs.celonis.com/index.html?lang=en) | [Celonis Academy](https://celonis.github.io/pycelonis/2.0.1/) |
 | **bpmn-python** | Extracts and manipulates BPMN process models (workflow automation). | [GitHub](https://github.com/process-analytics/bpmn-visualization-pm4py) | [Paper](https://bpmn-python.readthedocs.io/en/latest/) |
