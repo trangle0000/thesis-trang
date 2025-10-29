@@ -4,7 +4,7 @@ These libraries provide the essential building blocks for process discovery, con
 
 | Library | Description | Website / Repo | Documentation |
 |----------|--------------|----------------|----------------|
-| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [(processintelligence.solutions/pm4py)](https://github.com/process-intelligence-solutions/pm4py) | [Docs](https://www.sciencedirect.com/science/article/pii/S2665963823000933) [(https://processintelligence.solutions/pm4py/api?page=index.html)] |
+| **PM4Py** | Open-source process mining library supporting discovery, conformance, and performance analysis. | [(processintelligence.solutions/pm4py)](https://github.com/process-intelligence-solutions/pm4py) | [Docs](https://www.sciencedirect.com/science/article/pii/S2665963823000933) (https://processintelligence.solutions/pm4py/api?page=index.html) |
 | **PM4Py-Streaming** | Extension of PM4Py for real-time process mining on event streams. | [GitHub](https://pm4py-source.readthedocs.io/en/latest/pm4py.streaming.html) 
 | **Simod** | Simulation-based process discovery and optimization from BPMN models. | [GitHub](https://github.com/AutomatedProcessImprovement/Simod?tab=readme-ov-file)
 | **PMLab** | Toolkit for process discovery and conformance checking for research. | [GitHub](https://github.com/pmlab/pmlab-full) 
