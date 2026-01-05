@@ -1,9 +1,6 @@
-% Style for a MSc paper at Warsaw School of Economics
-% Michał Ramsza
-% Fri Dec 22 14:49:36 CET 2023
-
 % --- document class and other global stuff ---------------------------
-\documentclass[english, twoside, 12pt, a4paper]{article}
+%\documentclass[english, twoside, 12pt, a4paper]{article}
+\documentclass[english, oneside, 12pt, a4paper]{article}
 
 % --- packages --------------------------------------------------------
 \usepackage{textcomp}
@@ -21,7 +18,14 @@
 \usepackage[english]{babel}
 \usepackage{booktabs}
 \usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tabularx}   % For the \textwidth adjustment
+\usepackage{caption}    % For proper spacing of the title
+\usepackage{float} % for [H]
+\usepackage{graphicx}
+\usepackage{longtable}
 \usepackage[centering, left=3.5cm, right=2.5cm, textheight=24cm]{geometry}
+%\usepackage[centering, margin=2.5cm, left=3.5cm]{geometry}
 
 % --- packages for citations ------------------------------------------
 \usepackage[backend=biber, style=authoryear, autocite=inline, defernumbers=true]{biblatex}
@@ -141,38 +145,36 @@
 \includegraphics[width=0.66\textwidth]{logo.JPG}
 
 \vspace*{0.5cm}
-Studium <licencjackie/magisterskie>\\
+Master's Degree Studies\\
 \begin{flushleft}
-Kierunek: Metody Ilościowe w Ekonomii i System Informacyjne\\
-%Specjalność: <specjalność> % w przypadku braku należy pominać
-%Forma studiów: <forma studiów (stacjonarne, itd.)>
+Field of Study: Advanced Analytics --- Big Data\\
 \end{flushleft}
 
 \vspace*{.5cm}
 \rule{0cm}{1cm}\hfill
 \begin{minipage}{9cm}
-Author's name and family name: Michał Ramsza\\
-Nr albumu: <12345>
+Author's Name: Thi van Trang\\
+Student ID: 140036
 \end{minipage}
 
 \vspace*{1cm}
 \begin{minipage}{12cm}
 \centering
 \Large
-\textbf{<title>}
+\textbf{Process Intelligence with Python Language}
 \end{minipage}
 
 \vspace*{2cm}
 \rule{0cm}{1cm}\hfill
 \begin{minipage}{9cm}
-Praca <licencjacka/magisterska> napisana\\
-w Instytucie Ekonomii Matematycznej\\
-pod kierunkiem naukowym\\
+Master's Thesis\\
+at the Institute of Mathematical Economics\\
+under scientific supervision of\\
 dr hab. Michała Ramszy
 \end{minipage}
 
 \vfill
-Warszawa <year>
+Warsaw 2026
 \end{titlepage}
 
 \rule{1ex}{0ex}\clearpage
@@ -185,15 +187,44 @@ Warszawa <year>
 \cleardoublepage
 \section{Introduction}
 
+% --- chapter ---------------------------------------------------------
+\cleardoublepage
+\section{The mathematics of process mining}
+
+% TODO: Here we will have everything that's related to mathematics and to process mining that is related to every single tool that we're going to use in Python.
 
 
+% --- chapter ---------------------------------------------------------
+\cleardoublepage
+\section{The tools available in Python}
+
+% TODO: Here, incorporate the sarv of the tools that you've done in the quarto file.
+
+% --- chapter ---------------------------------------------------------
+\cleardoublepage
+\section{Sepsis: the case study}
+
+% TODO: Here will be an example of the complete analysis of a selected data set.
+
+
+% --- chapter ---------------------------------------------------------
+\cleardoublepage
 \section{Conclusions}
+
+
+
+% --- appendices ------------------------------------------------------
+\appendix
+
+% ---------------------------------------------------------------------
+\clearpage
+\section{Appendix: Some important stuff}
+
 
 % --- bibliography ----------------------------------------------------
 \clearpage
 \printbibliography[heading=subbibliography,nottype=online,title={References}]
 \printbibliography[heading=subbibliography,type=online,title={Online references}]
-
 
 % --- abstract --------------------------------------------------------
 \clearpage
@@ -205,18 +236,9 @@ Warszawa <year>
 \addcontentsline{toc}{section}{List of figures}
 \listoffigures
 
-
-
-% --- abstract --------------------------------------------------------
-\clearpage
-\addcontentsline{toc}{section}{Streszczenie}
-\section*{Streszczenie}
-
-Tutaj zamieszczają Państwo streszczenie pracy. Streszczenie powinno być długości około pół strony.
-
-
+% --- Literature ------------------------------------------------------
+\printbibliography
 \end{document}
-
 
 %%% Local Variables:
 %%% mode: latex
