@@ -12,11 +12,11 @@
 // ----------------------------------------------------------------------------
 
 #show: sgh.with(
-  author: "Name & Family Name",
-  student_id: "112358",
-  title: "Process mining",
+  author: "Thi van Trang",
+  student_id: "140036",
+  title: "Process Intelligence with Python Language",
   advisor: "dr hab. Michała Ramsza",
-  advisor_department: "Instytut Ekonomii Matematycznej",
+  advisor_department: "Institute of Mathematical Economics",
   year: "2026",
   studies: "mgr",
   program: "Advanced Analysis -- Big Data",
@@ -27,41 +27,45 @@
 
 = Introduction
 
-I type something here. This is inline mathematics $f(x) = sin(x^2) + log(1 + y^2 + x^2)$. This is the displayed mathemathics
-$
-  EE(X) &= integral_(-oo)^(oo) x f(x) d x \
-  &= integral_(-oo)^(oo) x d F_X (x) \
-  &= integral_(-oo)^(oo) x d mu_X (x) .\
-$<eq-mean-value>
+= The mathematics of process mining
 
-This is a reference to the equation @eq-mean-value. This is a citatation @benaim2003. I can also cite like this #cite(<benaim2003>, form: "prose"). 
+// TODO: Here we will have everything that's related to mathematics and to process mining that is related to every single tool that we're going to use in Python.
 
-#sgh_table(
-  caption: [The data that were exported directly from a Python script and I can easily read this into the file and create a table.],
-  source: [Own elaboration]
-)[
-  #let data = csv("tabs/tab-1.csv")
-  #let dataHead = data.at(0)
-  #let dataValues = data.slice(1)
-  #table(
-    columns: (1fr, 1fr, 1fr, 1fr),
-    ..dataHead,
-    ..dataValues.flatten()
-  )  
-]<tab-first-table>
-
-This is a refrence to table @tab-first-table. And this is a reference to figure @fig-first-petri-net. 
-
-#sgh_figure(
-  caption: [This is an example caption for some figure.],
-  source: [This is where I put the source of the figure. If this is a figure that I generated I can put my own elaboration or some our own computation something like this.]
-)[
-  #image("/code/fig1.png", width: 80%)
-]<fig-first-petri-net>
-
-// To be written at the end.
+// - Explain the data and do a little bit of exploratory data analysis.
 
 
+
+
+
+= The tools available in Python
+
+// TODO: Here, incorporate the sarv of the tools that you've done in the quarto file.
+
+= Worked examples
+
+== Introductory synthetic example
+
+// TODO: This is the synthetic example where you create this synthetic data, a very simple table with the data.
+
+== Sepsis: the case study
+
+// TODO: First, you need to describe the source of the data and the format and structure of the data.
+
+// TODO: Now you need to describe the statistical properties of the data. So this is like the exploratory data analysis. Probably this should be another Jupyter notebook.
+
+// TODO: Describe what is the purpose of this example. So how we get the process structure from the data, why this is important, what we can get from it and so on. So describe what this example is all about.
+
+// TODO: Just do the example. So here is going to be all the steps necessary to produce the results.
+
+#callisto.render(
+  nb: json("code/example-01-BPI-2019.ipynb"))
+
+// TODO: Discussion of the results that you get from this implementation of examples. So what we get, what is the information from this stuff that we get and similar things. Also here we need to have connections to the mathematics that is described before.
+
+
+== Some other examples
+
+// TODO: Here will be some other example. 
 
 = Conclusions
 
