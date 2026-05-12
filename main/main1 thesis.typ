@@ -63,7 +63,7 @@ The scope of the thesis is limited to Python tools and to the three core process
 
 == Relevance and academic context
 
-Process mining as a scientific field was formally established around the work of Wil van der Aalst and colleagues at Eindhoven University of Technology in the late 1990s and early 2000s. The field has since grown into a mature discipline with dedicated academic infrastructure: the International Conference on Process Mining (ICPM) is held annually, and the IEEE Task Force on Process Mining has produced a formal manifesto defining the scope and principles of the field @vanderAalst2012manifesto. The textbook by van der Aalst @vanderAalst2022 provides a comprehensive reference for both the theoretical foundations and the practical applications of process mining and is the primary academic reference for this thesis.
+Process mining as a scientific field was formally established around the work of Wil van der Aalst and colleagues at Eindhoven University of Technology in the late 1990s and early 2000s. The field has since grown into a mature discipline with dedicated academic infrastructure: the International Conference on Process Mining (ICPM) is held annually, and the IEEE Task Force on Process Mining has produced a formal manifesto defining the scope and principles of the field. The textbook by van der Aalst @vanderAalst2022 provides a comprehensive reference for both the theoretical foundations and the practical applications of process mining and is the primary academic reference for this thesis.
 
 The BPI Challenge, organized annually in connection with ICPM, provides publicly available benchmark datasets from real organizations and invites researchers to analyze them using process mining methods. These datasets have become standard benchmarks in the process mining literature and are widely used to compare algorithms, tools, and analytical approaches. The BPI Challenge 2019 dataset, which is used as the main case study in this thesis, was collected from a real procurement process at a large multinational company. It contains nearly 1.6 million events and represents one of the most complex datasets in the BPI Challenge series. It has been analyzed in numerous academic papers, which makes it a suitable choice for a thesis that aims to demonstrate process mining techniques in a realistic setting.
 
@@ -89,13 +89,13 @@ The methodology is descriptive and demonstrative rather than evaluative in a str
 
 The remainder of this thesis is organized as follows.
 
-*Chapter 2* introduces the mathematical foundations of process mining. It formally defines events, traces, and event logs, explains directly-follows relations and their role in process discovery, describes the main process model representations used in this thesis — the directly-follows graph, the process tree, and the Petri net — and introduces the concepts of conformance checking and performance analysis. It also explains the structure of the Object-Centric Event Log (OCEL) format and provides an exploratory description of the BPI Challenge 2019 dataset.
+*Chapter 2* Introduces the mathematical foundations of process mining. It formally defines events, traces, and event logs, explains directly-follows relations and their role in process discovery, describes the main process model representations used in this thesis — the directly-follows graph, the process tree, and the Petri net — and introduces the concepts of conformance checking and performance analysis. It also explains the structure of the Object-Centric Event Log (OCEL) format and provides an exploratory description of the BPI Challenge 2019 dataset.
 
-*Chapter 3* reviews the main Python tools available for process mining and process intelligence. The tools are organized into five categories — core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages — and each category is described in terms of the tasks it supports and the tools it contains. The chapter concludes with a comparative summary table.
+*Chapter 3* Reviews the main Python tools available for process mining and process intelligence. The tools are organized into five categories — core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages — and each category is described in terms of the tasks it supports and the tools it contains. The chapter concludes with a comparative summary table.
 
-*Chapter 4* presents three worked examples. The first is a synthetic introductory example that demonstrates the basic process mining workflow on a small hand-constructed dataset. The second is a full case study based on the BPI Challenge 2019 dataset, covering data loading, exploratory analysis, flattening, process discovery, and result interpretation. The third extends the case study to include variant analysis, loop detection, and throughput time distribution analysis.
+*Chapter 4* Presents three worked examples. The first is a synthetic introductory example that demonstrates the basic process mining workflow on a small hand-constructed dataset. The second is a full case study based on the BPI Challenge 2019 dataset, covering data loading, exploratory analysis, flattening, process discovery, and result interpretation. The third extends the case study to include variant analysis, loop detection, and throughput time distribution analysis.
 
-*Chapter 5* summarizes the main findings of the thesis, discusses its limitations, and proposes directions for future research.
+*Chapter 5* Summarizes the main findings of the thesis, discusses its limitations, and proposes directions for future research.
 
 = The mathematics of process mining
 
@@ -207,11 +207,11 @@ Directly-follows pairs: $A -> B$, $A -> C$, $B -> D$, $C -> D$. Relations: $A >>
 
 The maximal causal pairs are $({A}, {B, C})$, $({B}, {D})$, and $({C}, {D})$. Adding an initial place connected to $A$ and a final place connected from $D$, the algorithm produces a Petri net with $A$ at the start, a place branching to both $B$ and $C$ (representing an exclusive choice, since $B \# C$), and places from $B$ and $C$ each leading to $D$, which produces the final token. This correctly represents both variants in the log.
 
-The Alpha algorithm is historically important because it was the first algorithm to demonstrate that a process model can be derived automatically from event data alone @vanderAalst2004alpha. However, it has well-documented limitations: it handles loops poorly, it is sensitive to noise and infrequent behavior, it cannot represent all control-flow patterns correctly, and it fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
+The Alpha algorithm is historically important because it was the first algorithm to demonstrate that a process model can be derived automatically from event data alone. However, it has well-documented limitations: it handles loops poorly, it is sensitive to noise and infrequent behavior, it cannot represent all control-flow patterns correctly, and it fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
 
 === The Inductive Miner and process trees
 
-The Inductive Miner is a more recent and widely used discovery algorithm that addresses many of the limitations of the Alpha algorithm @leemans2013inductive. It works by recursively dividing the event log into smaller sublogs based on detected control-flow patterns — sequences, exclusive choices, parallel branches, and loops. Each subdivision corresponds to a node in a *process tree*.
+The Inductive Miner is a more recent and widely used discovery algorithm that addresses many of the limitations of the Alpha algorithm. It works by recursively dividing the event log into smaller sublogs based on detected control-flow patterns — sequences, exclusive choices, parallel branches, and loops. Each subdivision corresponds to a node in a *process tree*.
 
 A process tree is a hierarchical model in which leaf nodes represent individual activities (or the silent activity $tau$, which represents an internal step with no observable name) and internal nodes are *operator nodes* that define how their children are executed. The four main operators are: sequence ($->$), exclusive choice ($times$), parallel execution ($+$), and loop ($circle.small$). More precisely:
 
@@ -224,13 +224,13 @@ Process trees always produce *sound* models, meaning they cannot result in deadl
 
 The Inductive Miner algorithm discovers a process tree using a divide-and-conquer strategy. Starting with the full log, it attempts to detect a *cut* — a partition of activities into groups that correspond to one of the four operators. If a sequence cut is detected, the log is split into sublogs for each group and the algorithm recurses. If an exclusive choice cut is detected, the log is split by separating cases that contain each group's activities. If a parallel cut is detected, the log is projected onto each group. If a loop cut is detected, the body and redo sublogs are separated. If no cut is detected, a fall-through strategy is applied.
 
-The *Inductive Miner Infrequent (IMf)* variant, which is used in this thesis via PM4Py, filters out infrequent directly-follows pairs before attempting to detect cuts @leemans2014infrequent. This makes the algorithm more robust to noise and exceptional cases in large real-world logs, at the cost of some fitness on rare variants.
+The *Inductive Miner Infrequent (IMf)* variant, which is used in this thesis via PM4Py, filters out infrequent directly-follows pairs before attempting to detect cuts. This makes the algorithm more robust to noise and exceptional cases in large real-world logs, at the cost of some fitness on rare variants.
 
 To illustrate, consider $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D chevron.r^3]$. The algorithm first detects a sequence cut: $A$ is always first and $D$ is always last, so the partition $A_1 = {A}$, $A_2 = {B, C}$, $A_3 = {D}$ is valid. Recursing on $A_2 = {B, C}$: the sub-log is $[chevron.l B chevron.r^4, chevron.l C chevron.r^3]$ and no directly-follows relation exists between $B$ and $C$, so an exclusive choice cut applies. The final process tree is $->(A, times(B, C), D)$: always start with $A$, exclusively choose $B$ or $C$, then always end with $D$. This correctly represents both variants in the log and produces a sound Petri net automatically.
 
 === Petri nets
 
-The main model representation used in this thesis is the Petri net, which is the standard output format of PM4Py and most other process mining tools @murata1989petri. A Petri net is formally defined as a triple $N = (P, T, F)$ where:
+The main model representation used in this thesis is the Petri net, which is the standard output format of PM4Py and most other process mining tools. A Petri net is formally defined as a triple $N = (P, T, F)$ where:
 
 - $P$ is a finite set of *places*, represented as circles,
 - $T$ is a finite set of *transitions*, represented as rectangles, with $P inter T = emptyset$,
@@ -275,7 +275,7 @@ $ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 0.5 $
 
 This value reflects the significant deviation: one activity was skipped and one token was left unconsumed.
 
-The second approach is *alignment-based conformance*, which finds the closest valid execution in the model for each observed trace @adriansyah2015alignment. An *alignment* is a sequence of move pairs $(a_i, b_i)$ where $a_i$ is a move in the log and $b_i$ is a move in the model:
+The second approach is *alignment-based conformance*, which finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$ where $a_i$ is a move in the log and $b_i$ is a move in the model:
 
 - *Synchronous move* $(a, a)$: $a$ occurs in both the log and the model — no deviation.
 - *Log move* $(a, >>)$: $a$ occurs in the log but not at this point in the model — unexpected behavior observed.
@@ -336,7 +336,7 @@ From the implementation point of view, event data are typically represented in P
 
 Process mining libraries then convert such tables into richer event-log objects that preserve trace structure and support discovery algorithms. In PM4Py, the conversion is performed by `pm4py.format_dataframe`, which requires the analyst to specify which columns hold the case identifier, activity name, and timestamp, followed by `pm4py.convert_to_event_log` to produce the internal event-log object. The resulting object supports all PM4Py discovery, conformance, and performance functions directly. This conversion step is demonstrated in the introductory synthetic example in Chapter 4, where a plain pandas DataFrame with three columns is transformed into an input suitable for the Inductive Miner.
 
-A more advanced representation is the *Object-Centric Event Log (OCEL)* @ghahfarokhi2021ocel. Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously @vanderAalst2019objectcentric. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
+A more advanced representation is the *Object-Centric Event Log (OCEL)*. Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
 
 *Flattening* is the process of converting an OCEL into a classical event log by selecting one object type as the case identifier. In PM4Py, the function `pm4py.ocel_flattening(ocel, object_type)` performs this step. When one event is related to multiple objects of the selected type, that event appears in multiple cases in the flattened log, which inflates the case count. When the selected object type is not directly linked to all events, some events may be lost during flattening. Managing these artifacts is an important preprocessing step before applying classical discovery algorithms to object-centric data.
 
@@ -344,7 +344,7 @@ In the practical examples in Chapter 4, both representations are used. The intro
 
 == Exploratory description of the BPI Challenge 2019 dataset
 
-The real-world case study in this thesis uses the BPI Challenge 2019 dataset, stored in OCEL format @vanderwaal2019bpi. The dataset originates from a real procurement process at a large multinational company and was released as part of the annual BPI Challenge competition organized in connection with the International Conference on Process Mining. It has been widely used in academic research on process mining and serves here as a representative example of a large, complex, real-world event log.
+The real-world case study in this thesis uses the BPI Challenge 2019 dataset, stored in OCEL format. The dataset originates from a real procurement process at a large multinational company and was released as part of the annual BPI Challenge competition organized in connection with the International Conference on Process Mining. It has been widely used in academic research on process mining and serves here as a representative example of a large, complex, real-world event log.
 
 The dataset contains approximately 1,595,923 events and 330,685 objects distributed across four object types: purchase orders (PO), purchase order items (POItem), resources (Resource), and vendors (Vendor). Each event carries a timestamp, an activity name, and a set of business context attributes including company code, document type, item category, spending area, and vendor details. These attributes make the dataset suitable not only for control-flow analysis but also for performance analysis and organizational mining.
 
@@ -391,7 +391,7 @@ The most important and widely used tools in the Python process mining ecosystem 
 
 === PM4Py
 
-PM4Py is the central library in the Python process mining ecosystem @berti2023pm4py. It is an open-source package developed and maintained by the Process Intelligence Solutions group, with academic roots at Fraunhofer FIT and RWTH Aachen University. PM4Py was first released in 2018 @berti2019pm4py and has since become the de facto standard Python library for process mining, with active development, regular releases, and a growing user community in both academia and industry.
+PM4Py is the central library in the Python process mining ecosystem. It is an open-source package developed and maintained by the Process Intelligence Solutions group, with academic roots at Fraunhofer FIT and RWTH Aachen University. PM4Py was first released in 2018 and has since become the de facto standard Python library for process mining, with active development, regular releases, and a growing user community in both academia and industry.
 
 PM4Py covers the complete process mining workflow. Its main capabilities span several areas.
 
@@ -419,7 +419,7 @@ PM4Py-Streaming implements online versions of core process mining algorithms. Th
 
 === Simod
 
-Simod is a Python tool for simulation-based business process optimization @camargo2020simod. It takes a BPMN process model — typically one derived from process discovery — as input, estimates simulation parameters from an event log, and produces an optimized simulation configuration. The goal is to find the combination of resource assignments, activity durations, and scheduling rules that minimizes a target objective such as throughput time or cost.
+Simod is a Python tool for simulation-based business process optimization. It takes a BPMN process model — typically one derived from process discovery — as input, estimates simulation parameters from an event log, and produces an optimized simulation configuration. The goal is to find the combination of resource assignments, activity durations, and scheduling rules that minimizes a target objective such as throughput time or cost.
 
 Simod's workflow consists of three main phases. In the first phase, a process model is extracted from the event log and converted to BPMN format. In the second phase, simulation parameters — including resource pools, activity duration distributions, and arrival rates — are estimated from the log data. In the third phase, a Bayesian optimization loop runs multiple simulation experiments with different parameter settings to find the configuration that best achieves the target objective.
 
@@ -439,7 +439,7 @@ A growing set of Python tools connects process mining with machine learning and 
 
 === ML4ProM
 
-ML4ProM is a Python framework that combines process mining techniques with machine learning models to support predictive process monitoring @teinemaa2019outcome. Predictive process monitoring is concerned with predicting future states of running process instances — for example, whether a case will be completed on time, what the next activity will be, or how much longer the case will take to finish.
+ML4ProM is a Python framework that combines process mining techniques with machine learning models to support predictive process monitoring. Predictive process monitoring is concerned with predicting future states of running process instances — for example, whether a case will be completed on time, what the next activity will be, or how much longer the case will take to finish.
 
 ML4ProM follows a standard pipeline structure: an event log is preprocessed to extract features from partial traces, these features are used to train a machine learning model (typically a classifier or regressor from scikit-learn), and the trained model is then applied to new incoming events to generate predictions. The library provides implementations of common feature extraction strategies for process mining, including sequence encoding (representing the prefix of activities as a fixed-length vector), last-state encoding (using the most recent activity and its attributes), and aggregate encoding (using statistics computed over the trace prefix).
 
@@ -447,13 +447,13 @@ The choice of feature encoding is important because it determines how much of th
 
 *Strengths and limitations.* ML4ProM's main strength is its direct integration of process mining feature extraction with scikit-learn compatible models. Its main limitations are that it requires a reasonably large labeled training set and does not yet support object-centric event logs.
 
-=== pm4pyml
+=== PM4PYML
 
-pm4pyml is an extension of PM4Py that integrates machine learning pipelines directly with PM4Py event-log objects and analysis functions. It provides scikit-learn compatible transformers that convert PM4Py event logs into feature matrices suitable for training machine learning models, enabling analysts to build end-to-end predictive monitoring pipelines entirely within the PM4Py ecosystem.
+PM4PYML is an extension of PM4Py that integrates machine learning pipelines directly with PM4Py event-log objects and analysis functions. It provides scikit-learn compatible transformers that convert PM4Py event logs into feature matrices suitable for training machine learning models, enabling analysts to build end-to-end predictive monitoring pipelines entirely within the PM4Py ecosystem.
 
 The library supports several feature extraction methods compatible with PM4Py's internal log format, including activity occurrence counts, directly-follows pair frequencies, and time-based features such as remaining time and elapsed time. These features can be combined with any scikit-learn estimator using standard Pipeline objects. The `LogTransformer` class from pm4pyml converts a PM4Py event log directly into a numpy feature matrix that can be passed to any scikit-learn classifier or regressor.
 
-*Strengths and limitations.* pm4pyml's main strength is its tight integration with PM4Py, which reduces the preprocessing effort needed to move from process mining analysis to machine learning modeling. Its main limitations are similar to those of ML4ProM: it requires labeled training data and does not support object-centric logs natively.
+*Strengths and limitations.* PM4PYML's main strength is its tight integration with PM4Py, which reduces the preprocessing effort needed to move from process mining analysis to machine learning modeling. Its main limitations are similar to those of ML4ProM: it requires labeled training data and does not support object-centric logs natively.
 
 === PyCelonis
 
@@ -463,9 +463,9 @@ The main capabilities of PyCelonis include connecting to a Celonis instance and 
 
 *Strengths and limitations.* PyCelonis's main strength is its ability to bridge Celonis's powerful commercial process intelligence infrastructure with Python's flexible data science ecosystem. Its main limitation is that it is tightly coupled to the Celonis platform, which requires a commercial subscription and is therefore not accessible for academic or small-scale use without an institutional license.
 
-=== bpmn-python and workflow automation
+=== BPMN-python and workflow automation
 
-The bpmn-python library and related tools support the extraction, manipulation, and rendering of BPMN process models in Python. BPMN (Business Process Model and Notation) is the standard graphical language for representing business processes and is widely used in workflow automation systems. PM4Py can export discovered Petri nets to BPMN format, and bpmn-python can then read these BPMN models, modify them programmatically, or render them as interactive visualizations. This creates a bridge between the analytical process mining workflow and the operational business process management infrastructure.
+The BPMN-python library and related tools support the extraction, manipulation, and rendering of BPMN process models in Python. BPMN (Business Process Model and Notation) is the standard graphical language for representing business processes and is widely used in workflow automation systems. PM4Py can export discovered Petri nets to BPMN format, and bpmn-python can then read these BPMN models, modify them programmatically, or render them as interactive visualizations. This creates a bridge between the analytical process mining workflow and the operational business process management infrastructure.
 
 *Strengths and limitations.* BPMN tools are most useful in organizations that already use BPMN-based workflow systems. For pure analytical use cases, they add complexity without significant benefit over the Petri net and process tree representations used by PM4Py.
 
@@ -527,7 +527,7 @@ A number of general-purpose Python libraries are essential for working with proc
 
 === pandas
 
-pandas is the most important general-purpose library for process mining in Python @pandas2020. It provides the DataFrame data structure — a two-dimensional table with labeled columns — which is used throughout the process mining workflow to represent event logs, compute statistics, and prepare data for analysis.
+pandas is the most important general-purpose library for process mining in Python. It provides the DataFrame data structure — a two-dimensional table with labeled columns — which is used throughout the process mining workflow to represent event logs, compute statistics, and prepare data for analysis.
 
 Most real-world event log data is initially available in tabular formats such as CSV files, Excel spreadsheets, or database query results. pandas provides the tools needed to read these formats, clean and transform the data, filter cases or events, and compute derived attributes such as throughput times. PM4Py's most user-friendly interface accepts pandas DataFrames directly: the analyst calls `pm4py.format_dataframe()` to annotate the column roles, then `pm4py.convert_to_event_log()` to produce the internal event-log object. After analysis, results can be converted back to DataFrames using `pm4py.convert_to_dataframe()` for further processing with standard pandas operations such as groupby, merge, and aggregation.
 
@@ -537,7 +537,7 @@ NumPy provides the numerical computing foundation for most of the Python scienti
 
 === scikit-learn
 
-scikit-learn is the standard Python library for machine learning on tabular data @scikit2011. It provides implementations of a wide range of supervised and unsupervised learning algorithms — including decision trees, random forests, support vector machines, logistic regression, and k-means clustering — along with tools for model evaluation, cross-validation, and pipeline construction.
+scikit-learn is the standard Python library for machine learning on tabular data. It provides implementations of a wide range of supervised and unsupervised learning algorithms — including decision trees, random forests, support vector machines, logistic regression, and k-means clustering — along with tools for model evaluation, cross-validation, and pipeline construction.
 
 In the process mining context, scikit-learn is used to build predictive models on features extracted from event logs. The typical workflow involves extracting a feature matrix from the log using tools such as pm4pyml or ML4ProM, splitting the data into training and test sets, training a scikit-learn estimator, and evaluating its performance using standard metrics. The `Pipeline` class is particularly useful for combining feature extraction and model training into a single reusable object.
 
