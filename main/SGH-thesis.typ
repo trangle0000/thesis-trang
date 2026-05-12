@@ -356,7 +356,7 @@
     #v(0.5cm)
 
     #if studies == "mgr" [
-      #text("Studium magisterskie")
+      #text("Master's Degree Program")
     ] else if studies == "lic" [
       #text("Studium licencjackie") 
     ] else [ 
@@ -367,7 +367,7 @@
   v(1cm)
 
   if program != "" [
-    #text([Kierunek #program \ ])
+    #text([Field of Study: #program \ ])
   ] else [
       #text(loc-pl-en("Brak kierunku!","Program name missing!"), fill: red)
   ]
@@ -384,7 +384,7 @@
     ] else [
       #text(loc-pl-en("Brak autora!","Author name missing!"), fill: red)
     ]
-    Nr albumu 
+    Number ID :
     #if student_id != "" [
       #text([#student_id \ ])
     ] else [
@@ -399,13 +399,13 @@
 
   block(inset: (left: 9cm))[
     #if studies == "mgr" [
-      #text([Praca magisterska\ ])
+      #text([Master's Thesis\ ])
     ] else if studies == "lic" [
       #text([Praca licencjacka\ ])
     ] else [
       #text(loc-pl-en("Niewłaściwa nazwa studium!","Wrong name!"), fill: red)
     ]
-    pod kierunkiem naukowym\ 
+    Under the supervision of\ 
     #if advisor != "" [
       #text([#advisor\ ])
     ] else [
