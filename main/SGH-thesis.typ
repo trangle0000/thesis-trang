@@ -352,7 +352,7 @@
   show math.equation: set text(font: "New Computer Modern Math")
   
   align(center)[
-    #image.decode(sgh_godlo, format: "svg", width: 35%)
+    #image(bytes(sgh_godlo), format: "svg", width: 35%)
     #v(0.5cm)
 
     #if studies == "mgr" [
@@ -462,9 +462,6 @@
     ]
   ]
 
-  set-inherited-levels(0)
-  set-zero-fill(true)
-  set-leading-zero(true)
   set-theorion-numbering("1")
   show: show-theorion
   
@@ -505,7 +502,6 @@
             target: figure.where(kind: "tabela"),
             title: none
         )
-  }
 }
 
 /// Procedura generująca bibliografię. -> none
