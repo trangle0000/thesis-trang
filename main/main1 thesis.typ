@@ -899,7 +899,7 @@ Arcs       : 328
 ```
 ]
 
-The conformance checking step evaluates the discovered model against 2,000 held-out test cases that were not used during discovery. The results are summarised in the following table.
+The conformance checking step evaluates the discovered model against 7,979 held-out test cases that were not used during discovery. The results are summarised in the following table.
 
 #table(
   columns: 2,
