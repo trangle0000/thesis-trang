@@ -38,90 +38,89 @@
 
 == Background and motivation
 
-Most business processes today run through digital systems - Enterprise Resource Planning (ERP) platforms, Customer Relationship Management (CRM) tools, and workflow applications - and these systems leave a detailed trail. Every approval, payment, or status update is logged automatically: who performed it, when, and for which case. Taken individually, each record seems unremarkable. Taken together, however, they reveal how work actually gets done, often in ways that differ significantly from how it was originally designed.
+These days, almost every business process happens inside digital systems such as ERP platforms, CRM tools, or workflow apps. What’s interesting is that every action, whether it’s an approval, a payment, or just a status update, gets recorded automatically: who did it, when, and for which case. On their own, these records might not seem important. But when you look at them all together, they reveal how work really happens in practice, which is often quite different from the way the process was originally designed.
 
-This kind of data tells a different story than a standard management report. Reports summarize — average throughput, error rates, utilization — but they are built on models of how things should work. Event logs record how things actually work. The difference often turns out to be substantial. Real processes deviate from their designs in ways that aggregate statistics simply cannot reveal: bottlenecks that only appear under certain conditions, activities that get skipped routinely, workarounds that have become informal standard practice @vanderAalst2022.
+When we analyze this data, we gain a much clearer and more honest view of how processes operate day-to-day. Unlike traditional management reports, which often reflect how things are supposed to work, process mining allows us to trace the actual sequence of events by following the digital footprints left in the system. This makes it possible to see where delays or repeated work really happen, and to spot differences between teams, locations, or even individual cases. In many situations, these insights reveal surprising gaps between the process as designed and how it unfolds in reality.
 
-Process mining is the field that makes sense of this data. Given an event log, process mining algorithms can reconstruct the actual flow of work as a process model, check whether cases followed established rules, and measure how long each step takes. The field has grown considerably since the late 1990s, when the first algorithms were proposed by van der Aalst and colleagues @vanderAalst2022. It now has its own conference series, a formal IEEE task force, and active use in healthcare, finance, logistics, and manufacturing.
+Since the late 1990s, when van der Aalst and his colleagues introduced the first process mining algorithms, the field has developed rapidly. What began as a research topic has now found its way into real businesses around the world. There are dedicated conferences, an official IEEE task force, and a growing number of practical applications in areas such as healthcare, finance, logistics, and manufacturing. This growing interest highlights just how valuable process mining has become, both in theory and in everyday business practice.
 
-Process intelligence takes this a step further. Where process mining is largely retrospective — it analyzes what already happened — process intelligence adds a forward-looking dimension: monitoring cases as they run, predicting which ones are likely to go wrong, simulating what would happen under different resource configurations. The goal is not just to understand the past but to act on it in real time.
+Process intelligence builds on the foundation of process mining and takes it a step further. While process mining mainly looks back to analyze what has already happened, process intelligence brings a forward-looking perspective. It involves monitoring ongoing cases in real time, predicting which ones might encounter problems, and even simulating how things could play out if resources were allocated differently. The aim is not only to understand past performance, but also to use that understanding to make better decisions and take action as events unfold.
 
-Python has become the natural home for this kind of work. The language already dominates data science, and its ecosystem now includes libraries specifically built for process mining. PM4Py, the most complete of these, handles the full workflow from log loading to model discovery, conformance checking, and performance analysis. Other libraries add simulation, prediction, and visualization. A practitioner can carry out an entire process intelligence project without leaving the Python environment.
+Python has emerged as the preferred language for process mining and process intelligence work. Its strong presence in the data science community, along with a growing selection of specialized libraries, makes it a natural choice for practitioners. For example, PM4Py is one of the most comprehensive libraries available, covering everything from loading event logs to discovering process models, checking conformance, and analyzing performance. Other libraries extend these capabilities further by offering tools for simulation, prediction, and visualization. As a result, it is now possible to carry out an entire process intelligence project entirely within the Python ecosystem.
 
-The ecosystem is, however, harder to navigate than it needs to be. Several libraries overlap in what they offer, documentation quality is uneven, and there is no single reference that explains which tool suits which task and shows how to use it in practice. This thesis is an attempt to address that gap by providing a structured review of the available tools alongside working code examples that readers can run and adapt.
+Despite these advances, navigating the Python process mining ecosystem can still be challenging. Many libraries offer similar features, and the quality of documentation varies widely. There is also a lack of a single, comprehensive resource to help users understand which tool is best suited for each task, or how to use them effectively in real-world situations. With this thesis, I aim to fill that gap by providing a structured overview of the main tools available, along with practical code examples that readers can try out and adapt to their own needs.
 
-== Research objectives and research question
+== Research Objectives and Research Question
 
-The central research question of this thesis is:
+The main question guiding this thesis is:
 
 #align(center)[
-  _Which Python tools are available for process mining and process intelligence, and how suitable are they for key analytical tasks such as process discovery, conformance checking, and performance analysis?_
+  _Which Python tools are available for process mining and process intelligence, and how well do they support key analytical tasks like process discovery, conformance checking, and performance analysis?_
 ]
 
-To address this question, the thesis pursues four specific objectives:
+To answer this question, the thesis sets out to achieve four specific objectives:
 
-+ To introduce and formalize the mathematical concepts that underlie process mining — including event logs, traces, directly-follows relations, process models, and conformance measures — so that the capabilities and limitations of different tools can be understood and compared on a rigorous basis.
++ To introduce and explain the mathematical concepts that form the foundation of process mining, such as event logs, traces, directly-follows relations, process models, and conformance measures, so that it’s possible to compare different tools in a rigorous way.
 
-+ To survey the main Python libraries available for process mining and process intelligence, organized by their primary function, and to describe their features, strengths, and limitations in a structured way.
++ To review the main Python libraries available for process mining and process intelligence, grouping them by their primary functions, and describing their features, strengths, and limitations in an organized manner.
 
-+ To demonstrate how selected Python tools can be applied in practice, through a series of worked examples that range from a simple synthetic dataset to a full-scale procurement event log, and that extend beyond basic discovery to include performance measurement, process simulation, and outcome prediction.
++ To show how selected Python tools can be used in real-world scenarios, using worked examples that range from simple synthetic datasets to large procurement event logs, and extending beyond basic process discovery to include performance measurement, simulation, and outcome prediction.
 
-+ To draw conclusions about the current state of the Python process mining ecosystem and to identify gaps and directions for future development.
++ To draw conclusions about the current state of the Python process mining ecosystem, highlighting any gaps and suggesting directions for future development.
 
-The scope of the thesis is limited to Python tools and to the three core process mining tasks — discovery, conformance checking, and performance analysis — along with adjacent capabilities such as simulation and predictive monitoring. The focus is on open-source tools that are accessible to practitioners and researchers without requiring commercial licenses, with the exception of PyCelonis, which is included because it represents an important category of commercial process intelligence platform with a Python interface.
+This thesis focuses on Python-based tools and the three core process mining tasks discovery, conformance checking, and performance analysis as well as related capabilities such as simulation and predictive monitoring. The emphasis is on open-source solutions that can be accessed by both practitioners and researchers without the need for commercial licenses. The only exception is PyCelonis, which is included because it represents an important category of commercial process intelligence platforms that offer a Python interface.
 
-== Relevance and academic context
+== Relevance and Academic Context
 
-Process mining as a scientific field was formally established around the work of Wil van der Aalst and colleagues at Eindhoven University of Technology in the late 1990s and early 2000s. The field has since grown into a mature discipline with dedicated academic infrastructure: the International Conference on Process Mining (ICPM) is held annually, and the IEEE Task Force on Process Mining has produced a formal manifesto defining the scope and principles of the field. The textbook by van der Aalst @vanderAalst2022 provides a comprehensive reference for both the theoretical foundations and the practical applications of process mining and is the primary academic reference for this thesis.
+Process mining emerged as a research field in the late 1990s and early 2000s, largely thanks to the pioneering work of Wil van der Aalst and his colleagues at Eindhoven University of Technology. Since then, the field has grown significantly, with its own annual conference—the International Conference on Process Mining (ICPM)—and a formal IEEE task force that has established a clear set of principles and goals for process mining. The textbook by van der Aalst (Aalst, 2022) remains the main reference point for both theoretical and practical aspects of process mining, and it serves as the primary academic resource for this thesis.
 
-The BPI Challenge, organized annually in connection with ICPM, provides publicly available benchmark datasets from real organizations and invites researchers to analyze them using process mining methods. These datasets have become standard benchmarks in the process mining literature and are widely used to compare algorithms, tools, and analytical approaches. The BPI Challenge 2019 dataset, which is used as the main case study in this thesis, was collected from a real procurement process at a large multinational company. It contains nearly 1.6 million events and represents one of the most complex datasets in the BPI Challenge series. It has been analyzed in numerous academic papers, which makes it a suitable choice for a thesis that aims to demonstrate process mining techniques in a realistic setting.
+One important driver of progress in the field has been the BPI Challenge, which is held each year alongside ICPM. The challenge provides researchers with real-world datasets from organizations and invites them to apply process mining techniques to analyze them. These datasets have become standard benchmarks and are widely used to compare algorithms and tools. For this thesis, I use the BPI Challenge 2019 dataset as the main case study. This dataset, drawn from a large multinational company’s procurement process, includes nearly 1.6 million events and is one of the most complex in the series. Its widespread use in academic studies makes it a strong foundation for demonstrating process mining methods in a realistic context.
 
-The Python ecosystem for process mining has developed rapidly since the initial release of PM4Py in 2018. Earlier process mining software was implemented primarily in ProM, a Java-based platform that remains widely used in academic research but requires specialized knowledge to extend and deploy. The availability of a Python implementation of the core algorithms significantly lowered the barrier to entry and enabled process mining to be integrated with the broader Python data science ecosystem, including libraries for machine learning, visualization, and statistical analysis. Since then, additional libraries have been released to support specific tasks such as streaming process mining, simulation-based optimization, and predictive monitoring. However, the ecosystem remains less mature and less comprehensively documented than the equivalent Java-based ProM ecosystem, which makes a structured review particularly timely.
+The Python ecosystem for process mining has evolved rapidly since the introduction of PM4Py in 2018. Earlier implementations, such as ProM, were Java-based and still see heavy use in academic settings, but they require more specialized expertise to extend and deploy. The arrival of Python-based libraries has made it much easier for both researchers and practitioners to get started, and has allowed process mining to integrate more naturally with other data science tools for machine learning, visualization, and statistical analysis. New libraries have continued to appear, supporting tasks like streaming process mining, simulation, and predictive monitoring. Even so, the Python ecosystem is still less mature and less thoroughly documented than its Java-based counterpart, making a clear, structured review especially valuable at this stage.
 
-This thesis contributes to this context by providing a structured, practitioner-oriented review of the Python process mining ecosystem, with particular attention to PM4Py and its extensions. The practical examples are implemented as Jupyter notebooks, which allows all steps to be reproduced and verified by the reader. This reproducibility is an important feature of the work, as it ensures that the results reported in Chapter 4 can be independently validated and extended by other researchers or practitioners.
+With this thesis, I aim to contribute by offering a comprehensive, practice-oriented review of the Python process mining ecosystem, with a special focus on PM4Py and its related extensions. All practical examples are provided as Jupyter notebooks, making it possible for others to reproduce and verify the results. This emphasis on reproducibility is important, as it ensures that the findings in Chapter 4 can be validated and built upon by future researchers and practitioners.
 
 == Methodology
 
-This thesis is a structured review combined with empirical demonstration. The work follows four sequential phases.
+This thesis combines a structured literature review with hands-on demonstrations. The work is organized into four main phases:
 
-*Phase 1: Theoretical foundation.* The mathematical concepts required to understand process mining are introduced and formalized in Chapter 2. The primary source for these definitions is van der Aalst @vanderAalst2022. Establishing this theoretical foundation before describing tools is important because it provides a common vocabulary for comparing different implementations and for interpreting the results of the practical examples.
+*Phase 1: Building the theoretical foundation.* In Chapter 2, I introduce and formalize the key mathematical concepts that underpin process mining. Most of these definitions are drawn from van der Aalst (Aalst, 2022). Starting with this theoretical groundwork helps establish a shared vocabulary for comparing different tools and for interpreting the practical examples that follow.
 
-*Phase 2: Tool survey.* Python libraries are identified through a combination of academic sources — papers and conference proceedings from ICPM and related venues — the Python Package Index (PyPI), GitHub repositories related to process mining and process intelligence, and cross-references within the PM4Py documentation. For each tool, the following aspects are examined: the primary analytical task it supports, the data formats it accepts, the algorithms it implements, and the level of active maintenance and community support as indicated by recent commit history and documentation quality. Tools are organized into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages.
+*Phase 2: Surveying the tools.* I identify relevant Python libraries through a mix of academic sources—such as publications from ICPM and related conferences—as well as searching the Python Package Index (PyPI), exploring GitHub repositories, and reviewing references within the PM4Py documentation. For each tool, I look at its main analytical focus, the data formats it can handle, the algorithms it implements, and signs of active development and community support (such as recent updates and quality of documentation). The tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and supporting data processing packages.
 
-*Phase 3: Practical implementation.* Five Jupyter notebooks are developed to demonstrate the process intelligence workflow end to end. The first notebook uses a small hand-built dataset to introduce the core steps of process mining in a setting where the expected output is known. The remaining four notebooks work with the BPI Challenge 2019 procurement dataset and progressively build up the analysis: the second covers process discovery and conformance checking, the third adds variant analysis and throughput measurement, the fourth examines process performance using a performance-annotated DFG and computes an object-centric directly-follows graph, and the fifth models the process using discrete-event simulation and builds a Random Forest classifier to flag cases likely to exceed a 30-day completion threshold. Each notebook combines executable Python code with printed outputs and saved figures, making the results fully reproducible.
+*Phase 3: Practical implementation.* To show how these tools work in real scenarios, I developed five Jupyter notebooks that together demonstrate a complete process intelligence workflow. The first notebook introduces the basics using a small, hand-crafted dataset where the expected outcomes are clear. The remaining notebooks use the BPI Challenge 2019 procurement dataset and gradually build up the analysis: starting with process discovery and conformance checking, then adding variant analysis and throughput measurement, followed by performance analysis and object-centric directly-follows graph computation, and finally, process simulation and predictive modeling using a Random Forest classifier to flag cases likely to exceed a 30-day completion time. Each notebook combines executable Python code, outputs, and saved figures, ensuring that all results are fully reproducible.
 
-*Phase 4: Synthesis and conclusions.* The results of the tool survey and the practical examples are combined in Chapter 5, where the research question is answered, the limitations of the work are acknowledged, and directions for future research are proposed.
+*Phase 4: Synthesizing findings and drawing conclusions.* In Chapter 5, I bring together insights from the tool survey and the practical examples to answer the research question, discuss limitations, and suggest directions for future research.
 
-The methodology is descriptive and demonstrative rather than evaluative in a strict experimental sense. No formal benchmarking is performed — the thesis does not measure and compare the runtime, fitness scores, or precision values of multiple discovery algorithms on the same dataset. Such a comparison would require a controlled experimental design and falls outside the scope of this work. The contribution instead lies in the structured organization, explanation, and demonstration of the available tools.
+It’s important to note that this thesis is descriptive and demonstrative rather than experimental or comparative. I do not conduct formal benchmarking or direct comparisons of algorithm performance, such as runtime or accuracy, as this would require a controlled experimental setup beyond the scope of this work. Instead, my contribution lies in organizing, explaining, and demonstrating the available tools in a way that is accessible and practical for both researchers and practitioners.
 
 == Structure of the thesis
 
-The remainder of this thesis is organized as follows.
+The rest of this thesis is organized as follows:
 
-*Chapter 2* Introduces the mathematical foundations of process mining. It formally defines events, traces, and event logs, explains directly-follows relations and their role in process discovery, describes the main process model representations used in this thesis — the directly-follows graph, the process tree, and the Petri net — and introduces the concepts of conformance checking and performance analysis. It also explains the structure of the Object-Centric Event Log (OCEL) format and provides an exploratory description of the BPI Challenge 2019 dataset.
+*Chapter 2* Lays out the mathematical foundations of process mining. Here, I define key concepts like events, traces, and event logs, and explain how directly-follows relations are used in process discovery. I also describe the main types of process models used in this thesis—directly-follows graphs, process trees, and Petri nets—and introduce the principles of conformance checking and performance analysis. This chapter also covers the Object-Centric Event Log (OCEL) format and takes an exploratory look at the BPI Challenge 2019 dataset.
 
-*Chapter 3* Reviews the main Python tools available for process mining and process intelligence. The tools are organized into five categories — core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages — and each category is described in terms of the tasks it supports and the tools it contains. The chapter concludes with a comparative summary table.
+*Chapter 3* Reviews the primary Python tools available for process mining and process intelligence. The tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages. Each category is discussed in terms of the tasks it supports and the specific tools it includes. The chapter ends with a summary table that compares the main features of the reviewed tools.
 
-*Chapter 4* Walks through five practical notebooks that together cover the full process intelligence cycle. The first notebook introduces process mining concepts using a synthetic event log. The second and third apply these concepts to real procurement data from the BPI Challenge 2019, producing a Petri net model, a conformance score, and a throughput time distribution. The fourth notebook adds a performance perspective by annotating the directly-follows graph with median waiting times, measuring the share of automated activities, and computing a per-object-type DFG directly from the OCEL relations table. The fifth notebook closes the cycle with forward-looking analyses: a SimPy simulation that estimates how throughput time changes under different resource assumptions, and a Random Forest model that classifies whether a case will be slow or fast based on features observed at the start of execution.
+*Chapter 4* Provides a step-by-step walkthrough of five practical Jupyter notebooks, covering the full process intelligence workflow. The first notebook uses a synthetic event log to introduce core process mining ideas. The second and third notebooks apply these methods to real procurement data from the BPI Challenge 2019, resulting in a Petri net model, conformance scores, and throughput time distributions. The fourth notebook adds a performance perspective by annotating directly-follows graphs with median waiting times, measuring the level of automation, and computing object-type-specific DFGs from the OCEL relations. The fifth and final notebook looks ahead, using SimPy to simulate throughput times under different resource scenarios and applying a Random Forest model to predict whether a case will be completed quickly or slowly based on early features.
 
-*Chapter 5* Summarizes the main findings of the thesis, discusses its limitations, and proposes directions for future research.
+*Chapter 5* Summarizes the main findings, discusses the thesis’s limitations, and suggests directions for future research.
 
 = The mathematics of process mining
 
-Understanding process mining properly requires a shared vocabulary. Without clear definitions, terms like "fitness" or "conformance" mean different things to different people, and comparing two tools or algorithms becomes guesswork. This chapter introduces the core mathematical concepts used throughout the thesis: events, traces, and event logs; directly-follows relations and variants; process discovery and process models; conformance checking; and performance analysis. Each concept is illustrated with a small worked example so that the formal definition connects directly to something concrete. The chapter also explains how event data are represented in Python and provides an exploratory description of the BPI Challenge 2019 dataset that is used in the case study in Chapter 4.
+To truly understand process mining, it’s important that everyone speaks the same language. Without precise definitions, terms like “fitness” or “conformance” can mean different things to different people, making it difficult to compare tools or algorithms in a meaningful way. This chapter lays out the core mathematical concepts that will be used throughout the thesis: events, traces, event logs, directly-follows relations (and their variants), process discovery and modeling, conformance checking, and performance analysis. Each concept is illustrated with a simple example, so the formal definitions are always connected to something concrete. I’ll also explain how event data are represented in Python and give a first look at the BPI Challenge 2019 dataset, which forms the basis for the case study in Chapter 4.
 
-== Event logs and traces
+== Event Logs and Traces
 
-An event is the basic unit of data in process mining. Each event records that a specific activity was performed for a specific process instance at a specific point in time. Formally, let $cal(U)_C$ be the universe of case identifiers, $cal(U)_A$ be the universe of activity names, and $cal(U)_T$ be the universe of timestamps, where $cal(U)_T$ is totally ordered by the natural chronological ordering $<=$.
+At the heart of process mining is the event — the most basic piece of data we work with. Each event captures the fact that a particular activity was carried out for a particular instance of a process, at a particular moment in time. More formally, let $cal(U)_C$ be the set of all possible case identifiers, $cal(U)_A$ the set of all activity names, and $cal(U)_T$ the set of all timestamps, with $cal(U)_T$ ordered chronologically.
 
-An *event* $e$ is a tuple $e = (c, a, t)$ where $c in cal(U)_C$ is a case identifier, $a in cal(U)_A$ is an activity name, and $t in cal(U)_T$ is a timestamp. In practice, events may carry additional attributes such as the name of the resource that performed the activity, the organizational unit, the cost, or business-specific data fields. These attributes extend the basic definition without changing its core structure. For the purposes of process discovery, only the case identifier, activity name, and timestamp are strictly required.
+An event $e$ is a tuple $e = (c, a, t)$, where $c in cal(U)_C$ is the case identifier, $a in cal(U)_A$ is the activity name, and $t in cal(U)_T$ is the timestamp. In practice, events might also include extra attributes like the resource that performed the activity, the organizational unit, or other business-specific data. For most process discovery tasks, only these three are strictly necessary.
 
-A *trace* is the projection of all events belonging to a single case onto the sequence of their activity names, ordered by timestamp. Let $A$ be a finite set of activity names. A trace $sigma$ is a finite sequence of activity names written as $sigma = chevron.l a_1, a_2, dots, a_n chevron.r$, where each $a_i in A$ and the order of elements follows the chronological order of the underlying events. The set of all finite sequences over $A$ is denoted $A^*$.
+A trace is simply the sequence of activities that make up a single case, ordered by when they happened. If $A$ is the set of all activity names, a trace $sigma$ is a sequence $chevron.l a_1, a_2, dots, a_n chevron.r$, with each $a_i in A$, ordered by timestamp. The set of all possible traces is written as $A^*$.
 
-An *event log* $L$ collects traces from many cases. Because the same sequence of activities can occur in more than one case, the log is modelled as a multiset over $A^*$, written $L in cal(B)(A^*)$, where $cal(B)$ denotes the multiset operator. A multiset is a function $m: X -> NN_0$ that assigns a non-negative integer multiplicity to each element of $X$. For a trace $sigma in A^*$, the value $L(sigma)$ gives the number of cases in which that exact sequence was observed.
+An event log $L$ collects the traces from many process cases. Since the same sequence of activities can happen in more than one case, the event log is modeled as a multiset over $A^*$, denoted $L in cal(B)(A^*)$, where $cal(B)$ represents the multiset operator. A multiset is a function $m: X -> NN_0$ that tells us how many times each possible trace occurs in the log. For a trace $sigma in A^*$, the value $L(sigma)$ gives the number of cases where that exact sequence was observed.
 
-To make this concrete, consider the following nine events:
-
+To make this more concrete, let’s look at the following nine events:
 #table(
   columns: 4,
   align: (center, left, center, center),
@@ -143,15 +142,25 @@ Grouping by case identifier and ordering by timestamp gives three traces:
 - Case 2: $sigma_2 = chevron.l "Create order", "Approve order", "Send invoice" chevron.r$
 - Case 3: $sigma_3 = chevron.l "Create order", "Reject order", "Close case" chevron.r$
 
-Because $sigma_1 = sigma_2$, the event log is the multiset $L = [sigma_1^2, sigma_3^1]$. This log has two distinct trace patterns: the approval path (observed twice) and the rejection path (observed once). The total number of cases is $||L|| = 3$, the number of distinct variants is 2, and the average trace length is $(3 + 3 + 3)/3 = 3$.
+Since $sigma_1 = sigma_2$, the event log can be written as the multiset $L = [sigma_1^2, sigma_3^1]$ — the approval path occurs twice and the rejection path once. In total, the log contains three cases, two unique variants, and the average trace length is $(3 + 3 + 3) / 3 = 3$.
 
-Several summary statistics are routinely computed from a log before applying any discovery algorithm. The *number of distinct variants* is $|{"Var"}(L)| = |{sigma in A^* : L(sigma) > 0}|$. The *average trace length* is $macron(ell) = (sum_(sigma in L) L(sigma) dot |sigma|) / (||L||)$. The *variant frequency distribution* ranks traces by their multiplicity in descending order. In real-world logs this distribution is typically highly skewed: a small number of variants account for the large majority of cases, while many variants are observed only once or twice. This skewness is important because it guides decisions about filtering and sampling before applying discovery algorithms.
+Before applying any process discovery algorithms, it is common practice to calculate a few summary statistics for the event log. These include:
 
-Traces are useful for studying both the structure and the variability of a process. When most cases follow the same sequence, the process is stable and predictable. When many distinct sequences appear, the process is more variable and may require a more flexible model to represent it accurately. The distribution of trace frequencies is therefore one of the first things an analyst examines when working with a new event log, as it gives an immediate indication of how complex and varied the underlying process is.
+- The number of distinct variants, which is simply the count of unique trace patterns that appear in the log.
+- The average trace length, calculated as the total number of activities across all cases divided by the number of cases.
+- The variant frequency distribution, which ranks each trace pattern by how often it occurs.
+
+In real-world event logs, the frequency distribution of variants is usually very uneven: a small number of trace variants account for the majority of cases, while most variants occur only once or twice. This kind of skewed distribution is important to recognize, as it influences decisions about filtering and sampling before running discovery algorithms.
+
+Analyzing traces is valuable for understanding both the structure and the variability of a process. If most cases follow the same sequence, the process is likely stable and predictable. But if there are many different variants, the process is more flexible, or potentially chaotic — and might need a more adaptable model to describe it effectively. That’s why, when analysts work with a new event log, one of the first things they look at is the distribution of trace frequencies: it provides a quick sense of how complex and variable the process really is.
 
 == Activities, variants, and directly-follows relations
 
-One of the most important structural relationships between activities in a log is the directly-follows relation. Activity $b$ directly follows activity $a$ in trace $sigma$ if $a$ appears immediately before $b$ in $sigma$. Formally, for a trace $sigma = chevron.l a_1, dots, a_n chevron.r$, the relation $a >_sigma b$ holds if there exists some index $i$ such that $a_i = a$ and $a_(i+1) = b$. The directly-follows relation of the full log $L$ is then:
+One of the key ways to understand the structure of a process is by looking at the directly-follows relationship between activities in the event log. Simply put, activity $b$ is said to directly follow activity $a$ in a trace if $a$ comes immediately before $b$ in the sequence.
+
+Formally, for a trace $sigma = chevron.l a_1, dots, a_n chevron.r$, we say $b$ directly follows $a$ (written as $a >_sigma b$) if there is some position $i$ in the trace such that $a_i = a$ and $a_(i+1) = b$.
+
+To extend this idea to the entire event log $L$, we look at all traces and collect every pair of activities where one directly follows the other anywhere in any trace. This gives us the set of directly-follows pairs for the whole log:
 
 $ >_L = union.big_(sigma in "support"(L)) >_sigma $
 
@@ -159,10 +168,15 @@ The *frequency* of a directly-follows pair $(a, b)$ counts how many times $b$ im
 
 $ f_L(a, b) = sum_(sigma in L) L(sigma) dot |{i : a_i = a, a_(i+1) = b}| $
 
-The *directly-follows graph* (DFG) of a log $L$ is the directed weighted graph $"DFG"(L) = (A_L, E_L, f_L)$ where $A_L$ is the set of activities appearing in at least one trace, $E_L = >_L$ is the set of directed edges, and $f_L$ assigns each edge its frequency. In addition, a start node and an end node are included, with edges from the start node to every activity that begins at least one trace, and edges from every activity that ends at least one trace to the end node. These edges are weighted by the frequency of each start and end activity.
+The directly-follows graph (DFG) is a useful way to visualize the flow of activities in an event log. For a given log $L$, the DFG is defined as a directed, weighted graph $"DFG"(L) = (A_L, E_L, f_L)$, where:
 
-Using the log from the previous section, the directly-follows pairs and their frequencies are:
+- $A_L$ is the set of activities that appear in at least one trace,
+- $E_L$ is the set of directed edges representing directly-follows relationships between activities, and
+- $f_L$ assigns a frequency to each edge, indicating how often a particular directly-follows pair occurs in the log.
 
+To give a complete picture, the DFG also includes a special start node and end node. The start node connects to every activity that begins at least one trace, and every activity that ends a trace connects to the end node. The weights on these edges reflect how often each activity starts or ends a trace.
+
+Using the event log from the previous example, we can list all the directly-follows pairs and count how many times each one appears:
 #table(
   columns: 3,
   align: (left, left, center),
@@ -173,52 +187,52 @@ Using the log from the previous section, the directly-follows pairs and their fr
   [Reject order],  [Close case],    [1],
 )
 
-The DFG reveals two distinct execution paths through the process: the approval path (Create $->$ Approve $->$ Send, frequency 2) and the rejection path (Create $->$ Reject $->$ Close, frequency 1). This already suggests the presence of an exclusive choice after Create order, which a process discovery algorithm would later formalize. The DFG provides a quick visual overview of which activities tend to follow each other and how often. However, it does not distinguish between control-flow patterns such as sequences, choices, and parallel branches, which limits its usefulness for deeper structural analysis.
+The DFG reveals two distinct execution paths: the approval path ($"Create" -> "Approve" -> "Send"$, frequency 2) and the rejection path ($"Create" -> "Reject" -> "Close"$, frequency 1). This already suggests an exclusive choice after Create order — something a discovery algorithm would later formalize into a proper model. The DFG gives a quick visual overview of which activities tend to follow each other and how often, which makes it a useful first step in any process analysis. That said, it does not distinguish between control-flow patterns such as sequences, choices, and parallel branches, which limits how far you can go with it on its own.
 
-A *variant* is any trace $sigma$ with $L(sigma) > 0$. The variant set is $"Var"(L) = {sigma in A^* : L(sigma) > 0}$. Variant analysis ranks variants by frequency and examines the proportion of cases accounted for by the top-$k$ variants. The *coverage* of the top $k$ variants is:
+A variant is any trace $sigma$ with $L(sigma) > 0$. The variant set is $"Var"(L) = {sigma in A^* : L(sigma) > 0}$. Variant analysis ranks variants by frequency and examines the proportion of cases accounted for by the top-$k$ variants. The coverage of the top $k$ variants is:
 
 $ "Coverage"(k) = (sum_(i=1)^k L(sigma^*_i)) / (||L||) $
 
-where $sigma^*_1, sigma^*_2, dots$ are the variants ordered by decreasing frequency. Filtering the log to retain only the top-$k$ variants is a standard preprocessing step that focuses the analysis on dominant behavior and reduces the influence of noise and exceptional cases. In the BPI Challenge 2019 dataset, the full log contains 26,378 distinct variants after flattening, illustrating how variable real procurement processes can be in practice.
+where $sigma^*_1, sigma^*_2, dots$ are the variants ordered by decreasing frequency.
 
-Simple counts — the number of events per activity, the total number of cases, the number of distinct variants, and the average trace length — also provide a useful initial summary of the log. These statistics help the analyst understand the overall complexity and variability of the process before applying more detailed techniques.
+Beyond variants, simple summary counts are also worth looking at early on — the number of events per activity, the total number of cases, the number of distinct variants, and the average trace length. These give the analyst a quick sense of the overall complexity and variability of the process before moving on to more detailed techniques.
 
-== Process discovery and process models
+== Process Discovery and Process Models
 
-Process discovery is the task of constructing a process model directly from an event log, without using any prior reference model. A good discovered model must balance four quality dimensions:
+Process discovery is the task of building a process model directly from an event log, without relying on any pre-existing reference model. A good discovered model needs to balance four quality dimensions:
 
-- *Fitness* measures whether the model can reproduce the traces observed in the log. A model with high fitness accepts most of the behavior that actually occurred. A model with perfect fitness would accept every trace in the log. Formally, if $cal(L)(M)$ denotes the language (set of accepted traces) of model $M$, then high fitness means $"Var"(L) subset.eq cal(L)(M)$ or at least most of $"Var"(L)$ is covered.
+- *Fitness* measures whether the model can reproduce the behavior observed in the log. A model with high fitness accepts most of the traces that actually occurred — ideally all of them. Formally, if $cal(L)(M)$ denotes the language (the set of accepted traces) of model $M$, then high fitness means $"Var"(L) subset.eq cal(L)(M)$, or at least most of $"Var"(L)$ is covered.
 
-- *Precision* measures whether the model avoids accepting behavior that was never observed. A model with low precision is too general and allows many traces that do not appear in the log. A model that simply allows any sequence of any activity has perfect fitness but zero precision.
+- *Precision* measures whether the model avoids accepting behavior that was never observed. A model with low precision is too permissive — it allows many traces that never appeared in the log. A model that simply accepts any sequence of any activity would have perfect fitness but zero precision.
 
-- *Generalization* reflects how well the model handles cases that were not seen during discovery but are still plausible given the process structure. A model that memorizes every observed trace exactly without allowing for any unseen but valid behavior is said to overfit the log.
+- *Generalization* reflects how well the model handles cases that were not seen during discovery but are still plausible given the process structure. A model that memorizes every observed trace exactly — without allowing for any unseen but valid behavior — is said to overfit the log.
 
-- *Simplicity* refers to how easy the model is to read and interpret. Simpler models are generally preferred when they still achieve acceptable fitness and precision. The most common simplicity measure is the total number of nodes and arcs in the model representation.
+- *Simplicity* refers to how easy the model is to read and interpret. Simpler models are generally preferred when they still achieve acceptable fitness and precision. The most common simplicity measure is the total number of nodes and arcs in the model.
 
-These four dimensions are in tension with each other. Improving fitness often reduces precision, since a more permissive model accepts a wider range of behavior. Finding an appropriate balance is one of the central challenges in process discovery, and different algorithms make different trade-offs among these dimensions. For large and noisy real-world logs, robustness to noise and computational efficiency are also practical considerations that influence algorithm selection.
+These four dimensions are in tension with each other. Improving fitness often comes at the cost of precision, since a more permissive model accepts a wider range of behavior. Finding the right balance is one of the central challenges in process discovery, and different algorithms handle this trade-off differently. For large and noisy real-world logs, robustness to noise and computational efficiency are also practical factors that influence which algorithm to use.
 
 === The Alpha algorithm
 
-The Alpha algorithm is one of the earliest and most well-known process discovery algorithms. It works by analyzing the directly-follows relations in the log and inferring causal dependencies between activities. From these dependencies, it constructs a Petri net that represents the discovered process.
+The Alpha algorithm is one of the earliest and most well-known process discovery algorithms. It works by analyzing the directly-follows relations in the log and inferring causal dependencies between activities, then using those dependencies to construct a Petri net.
 
-The algorithm begins by computing four binary relations between all pairs of activities in $A_L$ based on directly-follows information:
+The algorithm starts by computing four binary relations between all pairs of activities in $A_L$:
 
 - $a -> b$ (direct succession): $b$ directly follows $a$ in at least one trace
 - $a >> b$ (causality): $a -> b$ holds but $b -> a$ does not — $a$ appears to cause $b$
 - $a || b$ (parallelism): both $a -> b$ and $b -> a$ hold — the two activities can appear in either order
 - $a hash b$ (independence): neither $a -> b$ nor $b -> a$ holds — the activities never directly follow each other
 
-The algorithm then identifies all pairs $(A, B)$ of non-empty activity sets where every activity in $A$ causes every activity in $B$ (i.e., $a >> b$ for all $a in A, b in B$), all activities within $A$ are independent of each other, and all activities within $B$ are independent of each other. The maximal such pairs become places in the discovered Petri net, each connecting the activities in $A$ as input transitions to the activities in $B$ as output transitions.
+From these relations, the algorithm identifies all pairs $(A, B)$ of non-empty activity sets where every activity in $A$ causes every activity in $B$ (i.e., $a >> b$ for all $a in A, b in B$), all activities within $A$ are independent of each other, and all activities within $B$ are independent of each other. The maximal such pairs become places in the Petri net, each connecting the activities in $A$ as input transitions to the activities in $B$ as output transitions.
 
 To illustrate, consider the log $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D chevron.r^3]$.
 
-Directly-follows pairs: $A -> B$, $A -> C$, $B -> D$, $C -> D$. Relations: $A >> B$, $A >> C$, $B >> D$, $C >> D$. Neither $B -> C$ nor $C -> B$ holds, so $B hash C$.
+The directly-follows pairs are $A -> B$, $A -> C$, $B -> D$, $C -> D$, which gives the causal relations $A >> B$, $A >> C$, $B >> D$, $C >> D$. Since neither $B -> C$ nor $C -> B$ holds, we have $B hash C$.
 
-The maximal causal pairs are $({A}, {B, C})$, $({B}, {D})$, and $({C}, {D})$. Adding an initial place connected to $A$ and a final place connected from $D$, the algorithm produces a Petri net with $A$ at the start, a place branching to both $B$ and $C$ (representing an exclusive choice, since $B hash C$), and places from $B$ and $C$ each leading to $D$, which produces the final token. This correctly represents both variants in the log.
+The maximal causal pairs are $({A}, {B, C})$, $({B}, {D})$, and $({C}, {D})$. Adding an initial place connected to $A$ and a final place connected from $D$, the result is a Petri net where $A$ leads to an exclusive choice between $B$ and $C$ (since $B hash C$), and both paths converge at $D$. This correctly represents both variants in the log.
 
-The Alpha algorithm is historically important because it was the first algorithm to demonstrate that a process model can be derived automatically from event data alone. However, it has well-documented limitations: it handles loops poorly, it is sensitive to noise and infrequent behavior, it cannot represent all control-flow patterns correctly, and it fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
+The Alpha algorithm is historically important — it was the first to show that a process model can be derived automatically from event data alone. That said, it has well-documented limitations: it handles loops poorly, is sensitive to noise and infrequent behavior, cannot represent all control-flow patterns correctly, and fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
 
-=== The Inductive Miner and process trees
+=== The Inductive Miner and Process Trees
 
 The Inductive Miner is a more recent and widely used discovery algorithm that addresses many of the limitations of the Alpha algorithm. It works by recursively dividing the event log into smaller sublogs based on detected control-flow patterns — sequences, exclusive choices, parallel branches, and loops. Each subdivision corresponds to a node in a *process tree*.
 
@@ -239,123 +253,135 @@ To illustrate, consider $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D c
 
 === Petri Nets
 
-The main model representation used in this thesis is the Petri net, which is the standard output format of PM4Py and most other process mining tools. A Petri net is formally defined as a triple $N = (P, T, F)$ where:
+The main model representation used in this thesis is the Petri net, which is also the standard output format for PM4Py and most other process mining tools. A Petri net provides a flexible and formal way to describe how activities in a process are connected and how cases move through the process.
 
-- $P$ is a finite set of *places*, represented as circles,
-- $T$ is a finite set of *transitions*, represented as rectangles, with $P inter T = emptyset$,
-- $F subset.eq (P times T) union (T times P)$ is the *flow relation*, defining the directed arcs between places and transitions.
+Formally, a Petri net is defined as a triple $N = (P, T, F)$, where:
 
-For a transition $t in T$, its *preset* is $bullet t = {p in P : (p, t) in F}$ (input places) and its *postset* is $t bullet = {p in P : (t, p) in F}$ (output places).
+- $P$ is a finite set of *places* (usually drawn as circles),
+- $T$ is a finite set of *transitions* (usually shown as rectangles), with $P$ and $T$ being disjoint ($P inter T = emptyset$),
+- $F subset.eq (P times T) union (T times P)$ is the set of directed arcs, connecting places to transitions and transitions to places.
 
-A *marking* $M: P -> NN_0$ assigns a non-negative integer number of *tokens* to each place. The pair $(N, M)$ is called a marked Petri net. A transition $t$ is *enabled* in marking $M$ if every input place holds at least one token: $M(p) >= 1$ for all $p in bullet t$. Firing an enabled transition $t$ produces a new marking $M'$:
+For any transition $t in T$:
 
-$ M'(p) = cases(
-  M(p) - 1 & "if" p in bullet t " and " p in.not t bullet,
-  M(p) + 1 & "if" p in t bullet " and " p in.not bullet t,
-  M(p)     & "otherwise"
-) $
+- The *preset* $bullet t$ is the set of input places (all places with an arc going to $t$),
+- The *postset* $t bullet$ is the set of output places (all places with an arc coming from $t$).
 
-An *accepting Petri net* $(N, M_0, M_f)$ specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there exists a firing sequence of transitions whose labels match $sigma$ and that leads from $M_0$ to $M_f$.
+A *marking* $M$ assigns a non-negative integer (a number of tokens) to each place. The combination $(N, M)$ is called a marked Petri net. A transition $t$ is *enabled* in marking $M$ if every input place of $t$ has at least one token. When $t$ fires, it consumes a token from each input place and produces a token in each output place, resulting in a new marking.
 
-To illustrate, consider the sequential process $A -> B -> D$. The Petri net has places $P = {p_0, p_1, p_2, p_3}$, transitions $T = {A, B, D}$, and flow $F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)}$. Initial marking $M_0 = {p_0: 1}$, final marking $M_f = {p_3: 1}$.
+An *accepting Petri net* specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there is a sequence of transition firings, matching the labels in $sigma$, that leads from $M_0$ to $M_f$.
 
-Replaying the trace $chevron.l A, B, D chevron.r$:
-- Step 1: $A$ is enabled ($p_0$ has 1 token). Fire $A$: $M_1 = {p_1: 1}$.
-- Step 2: $B$ is enabled ($p_1$ has 1 token). Fire $B$: $M_2 = {p_2: 1}$.
-- Step 3: $D$ is enabled ($p_2$ has 1 token). Fire $D$: $M_3 = {p_3: 1} = M_f$. Accepted.
+As a simple example, consider a sequential process $A -> B -> D$:
 
-If instead the trace $chevron.l A, D chevron.r$ is replayed: after firing $A$, the marking is $M_1 = {p_1: 1}$. Transition $D$ requires $p_2$ to hold a token, but $p_2 = 0$. $D$ is not enabled, and the trace cannot be completed without artificially adding tokens. This correctly reflects that $B$ cannot be skipped in this model.
+- Places: $P = {p_0, p_1, p_2, p_3}$,
+- Transitions: $T = {A, B, D}$,
+- Flow: $F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)}$,
+- Initial marking: $M_0 = {p_0: 1}$, Final marking: $M_f = {p_3: 1}$.
 
-In process mining, transitions correspond to activities, places represent states between activities, and tokens represent the current execution state of a process instance. Petri nets are valuable because they support both visual interpretation and formal analysis of properties such as reachability and soundness, and because PM4Py uses them as the primary model format for conformance checking and performance analysis.
+If we replay the trace $chevron.l A, B, D chevron.r$:
+
+- Step 1: $A$ is enabled because $p_0$ has a token. Firing $A$ moves the token to $p_1$.
+- Step 2: $B$ is enabled because $p_1$ now has a token. Firing $B$ moves the token to $p_2$.
+- Step 3: $D$ is enabled because $p_2$ has a token. Firing $D$ moves the token to $p_3$, which matches the final marking. This trace is accepted.
+
+If we try to replay $chevron.l A, D chevron.r$: after firing $A$, the token is at $p_1$. $D$ requires a token at $p_2$, but $p_2$ is empty, so $D$ is not enabled and the trace cannot be completed. This correctly shows that $B$ cannot be skipped in this model.
+
+In process mining, transitions represent activities, places represent the state between activities, and tokens represent the current execution state of a process instance. Petri nets are highly valuable because they are both easy to visualize and allow for formal analysis of properties like reachability and soundness. They are also the primary model format used by PM4Py for tasks such as conformance checking and performance analysis.
 
 == Conformance Checking
 
-Once both a process model and an event log are available, they can be compared to determine how closely actual process executions match the model. This task is called conformance checking and is one of the most practically valuable applications of process mining, as it can identify rule violations, unexpected deviations, and data quality problems.
+Once you have both a process model and an event log, you can compare them to see how closely real-life process executions match the intended process design. This comparison, known as *conformance checking*, is one of the most practically valuable applications of process mining. It allows organizations to spot rule violations, unexpected deviations, and potential data quality issues.
 
-Two main approaches are used in practice. The first is *token-based replay*, which simulates each trace in the log on the Petri net by moving tokens according to the observed sequence of activities. When a trace follows a path the model allows, the replay proceeds smoothly. When it does not, tokens must be added artificially (missing tokens) or are left over at the end (remaining tokens). The fitness of a single trace is estimated as:
+There are two main approaches to conformance checking:
+
+*1. Token-based replay*
+
+This method simulates each trace from the log on the Petri net model by moving tokens according to the observed activity sequence. If a trace follows a path allowed by the model, the replay goes smoothly. If not, extra tokens might need to be added (missing tokens), or some tokens may be left behind at the end (remaining tokens). The fitness of a single trace is calculated as:
 
 $ "fitness"(sigma) = 1/2 (1 - p/c) + 1/2 (1 - r/q) $
 
-where $p$ is the number of missing tokens added during replay, $c$ is the total number of tokens consumed, $r$ is the number of remaining tokens at the end, and $q$ is the total number of tokens produced. A value of 1 indicates a perfectly fitting trace; lower values indicate more deviation. The overall log fitness is the weighted average of trace fitness values across all cases @vanderAalst2022.
+where:
 
-To illustrate token-based replay, consider the net $A -> B -> D$ and the trace $sigma = chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, the marking is ${p_1: 1}$. Transition $D$ requires $p_2$, which has no token: one missing token is added ($p = 1$), $D$ fires, and the final marking is reached. However, $p_1$ still holds a token that was never consumed because $B$ was not observed ($r = 1$). With $c = 2$ and $q = 2$:
+- $p$ = number of missing tokens added,
+- $c$ = total number of consumed tokens,
+- $r$ = number of remaining tokens at the end,
+- $q$ = total number of produced tokens.
+
+A fitness value of 1 means the trace fits the model perfectly; lower values indicate greater deviation. The overall fitness for the log is measured as the weighted average of all trace fitness values @vanderAalst2022.
+
+*Example:* Consider the process model $A -> B -> D$ and the trace $chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, there is a token at $p_1$. $D$ requires a token at $p_2$, which is not present, so one missing token is added ($p = 1$). After firing $D$, there is still a token left at $p_1$ ($r = 1$). With $c = 2$ and $q = 2$:
 
 $ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 0.5 $
 
-This value reflects the significant deviation: one activity was skipped and one token was left unconsumed.
+This reflects a significant deviation: one activity was skipped, and one token was left unconsumed.
 
-The second approach is *alignment-based conformance*, which finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$ where $a_i$ is a move in the log and $b_i$ is a move in the model:
+*2. Alignment-based conformance*
 
-- *Synchronous move* $(a, a)$: $a$ occurs in both the log and the model — no deviation.
-- *Log move* $(a, >>)$: $a$ occurs in the log but not at this point in the model — unexpected behavior observed.
-- *Model move* $(>>, a)$: $a$ is expected by the model but absent in the log — expected behavior was skipped.
+This approach finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$, where $a_i$ is a move in the log and $b_i$ is a move in the model:
 
-The cost of an alignment is the total number of non-synchronous moves. The *optimal alignment* minimizes this cost and is found by solving a shortest-path problem in an alignment state space, typically using the $A^*$ algorithm.
+- *Synchronous move* $(a, a)$: Activity occurs in both log and model — no deviation.
+- *Log move* $(a, >>)$: Activity occurs in the log but not in the model at this point — unexpected behavior.
+- *Model move* $(>>, a)$: Activity expected by the model but missing from the log — expected behavior was skipped.
 
-For the same example — trace $chevron.l A, D chevron.r$ against the model accepting $chevron.l A, B, D chevron.r$:
+The cost of an alignment is the number of non-synchronous moves, and the optimal alignment minimizes this cost, usually found by solving a shortest-path problem (commonly with the $A^*$ algorithm).
+
+*Example:* Comparing $chevron.l A, D chevron.r$ to the model accepting $chevron.l A, B, D chevron.r$:
 
 #table(
   columns: 3,
   align: center,
   table.header([*Log move*], [*Model move*], [*Type*]),
   [A],  [A],  [Synchronous],
-  [>>], [B],  [Model move — B expected but absent],
+  [>>], [B],  [Model move — B expected but not observed],
   [D],  [D],  [Synchronous],
 )
 
-Cost: 1. The alignment shows precisely that the only deviation is the absence of activity $B$. This level of diagnostic detail is more informative than the token-based fitness score alone, because it identifies exactly which activity was missed and at which point in the trace.
+The alignment cost is 1, pinpointing that the only deviation is the absence of activity $B$. This is more informative than a fitness score alone, as it shows exactly what was missed and where.
 
-Alignment-based conformance provides more precise and detailed diagnostic information than token replay, but it is also more computationally expensive, particularly for long traces and large models. In practice, token replay is often used for a quick overall fitness estimate, while alignment-based conformance is applied when detailed per-trace diagnostics are needed.
+Alignment-based conformance gives much more detailed diagnostic information than token replay, but it is also more computationally intensive, especially for long traces and complex models. In practice, token replay is often used for a quick, overall fitness check, while alignment-based conformance is preferred when detailed, trace-level diagnostics are needed.
 
-Deviations identified through conformance checking may reflect data quality issues, exceptional cases, policy violations, or genuine changes in the process over time. Understanding the nature and frequency of deviations is one of the main outputs of a conformance checking study.
+Deviations found through conformance checking can point to data quality problems, rare exceptions, policy violations, or even real changes in how the process is carried out over time. Understanding what kinds of deviations occur — and how often — is a central outcome of any conformance checking study.
 
-== Performance analysis and process intelligence
+== Performance Analysis and Process Intelligence
 
-Performance analysis adds a time dimension to the structural view produced by process discovery and conformance checking. Because event logs contain timestamps, it is possible to measure the duration of individual activities, the waiting time between activities, and the total throughput time for each case. These measurements can be projected onto the process model to produce a *performance-annotated* view that highlights where time is spent or lost in the process.
+Performance analysis adds a crucial time dimension to the structural insights obtained from process discovery and conformance checking. Because event logs include timestamps, it is possible to measure how long each activity takes, how much time passes between activities, and the overall time it takes to complete a case. By projecting these measurements onto the process model, we can create a performance-annotated view that highlights exactly where time is spent — or lost — in the process.
 
-The *throughput time* of a case $c$ is the elapsed time between the timestamp of its first and last recorded event:
+The *throughput time* of a case $c$ is simply the time between its first and last recorded event:
 
-$ "TT"(c) = max_{e in c} t(e) - min_{e in c} t(e) $
+$ "TT"(c) = max_(e in c) t(e) - min_(e in c) t(e) $
 
-The *waiting time* between two consecutive activities $a_i$ and $a_(i+1)$ in a trace is the elapsed time between the completion of $a_i$ and the start of $a_(i+1)$. The *service time* of an activity is its own execution duration, measurable when both a start event and a complete event are recorded for the same activity instance.
+We can also calculate the *waiting time* between two consecutive activities $a_i$ and $a_(i+1)$ in a trace, and the *service time* for an activity (if both its start and end are recorded).
 
-Several summary statistics are routinely reported to characterize throughput time across all cases in the log:
+Common summary statistics for throughput time include:
 
-#table(
-  columns: 2,
-  align: (left, left),
-  table.header([*KPI*], [*Meaning*]),
-  [Mean throughput time],   [Average case duration across all cases],
-  [Median throughput time], [Middle value — robust to extreme outliers],
-  [P95 throughput time],    [95% of cases complete within this time],
-  [Minimum],                [Fastest observed case duration],
-  [Maximum],                [Slowest observed case duration],
-  [Coefficient of variation], [Standard deviation divided by mean — measures variability],
-)
+- *Mean throughput time*: Average duration for all cases.
+- *Median throughput time*: Middle value, less sensitive to outliers.
+- *P95 throughput time*: 95% of cases finish within this time.
+- *Minimum and maximum*: Fastest and slowest observed cases.
+- *Coefficient of variation*: Standard deviation divided by the mean; higher values indicate more variability.
 
-The coefficient of variation is particularly informative: a low value indicates that most cases complete in a similar time, while a high value indicates high variability, which may point to bottlenecks, resource constraints, or exceptional cases that require special handling.
+The coefficient of variation is particularly useful — a low value means cases are fairly consistent, while a high value signals significant variation, which might point to bottlenecks or special cases.
 
-When throughput times or waiting times are projected onto the process model — associating each arc or transition with the median or mean duration computed from all cases passing through it — a performance-annotated model is obtained. This visualization immediately shows which transitions have the longest associated waiting times and are therefore candidates for process improvement. For example, if two activities are always directly connected in the model but a consistently long delay is observed between them in the data, this suggests a bottleneck or resource constraint at that point in the process.
+When these time measurements are mapped onto the process model — tagging each step with statistics like median or mean duration — we get a performance-annotated model. This visualization makes it easy to spot where delays occur. For instance, if two activities are always directly connected in the model but there is a consistent delay between them in the data, this suggests a possible bottleneck.
 
-Process intelligence extends these ideas by connecting process data with forecasting, simulation, and optimization. Once the event log has been analyzed and a performance baseline has been established, it becomes possible to predict future outcomes for running cases, test the effects of proposed process changes through simulation, or build real-time monitoring dashboards that alert managers when a case is projected to exceed a target throughput time. The mathematical foundations introduced in this chapter therefore remain relevant across the full scope of process intelligence, not only for the basic retrospective tasks of discovery and conformance checking.
+Process intelligence takes things further by combining process data with forecasting, simulation, and optimization. Once we have established a performance baseline, we can start to predict outcomes for ongoing cases, simulate the effects of potential process changes, or build dashboards that alert managers when a case is likely to exceed a target time. The mathematical concepts introduced in this chapter remain relevant for these more advanced, forward-looking applications — not just for retrospective analysis.
 
-== Event data representation in Python
+== Event Data Representation in Python
 
-From the implementation point of view, event data are typically represented in Python either as tabular data structures or as specialized log objects. The simplest tabular representation uses three core columns: case identifier, activity label, and timestamp. This format is easy to inspect and manipulate using the `pandas` library, which provides the DataFrame structure used throughout the Python data science ecosystem.
+From an implementation perspective, event data in Python are usually stored as either standard tables (DataFrames) or as more specialized log objects. The simplest approach is a table with three columns: case identifier, activity label, and timestamp. This format works well with the `pandas` library, which is the standard data structure for Python data science.
 
-Process mining libraries then convert such tables into richer event-log objects that preserve trace structure and support discovery algorithms. In PM4Py, the conversion is performed by `pm4py.format_dataframe`, which requires the analyst to specify which columns hold the case identifier, activity name, and timestamp, followed by `pm4py.convert_to_event_log` to produce the internal event-log object. The resulting object supports all PM4Py discovery, conformance, and performance functions directly. This conversion step is demonstrated in the introductory synthetic example in Chapter 4, where a plain pandas DataFrame with three columns is transformed into an input suitable for the Inductive Miner.
+Process mining libraries like PM4Py can convert these tables into richer event-log objects that preserve the structure of traces and support various discovery algorithms. In PM4Py, you first use `pm4py.format_dataframe` to specify which columns correspond to the case ID, activity, and timestamp, then `pm4py.convert_to_event_log` to create the internal log object. This object then supports all of PM4Py's discovery, conformance, and performance functions. This conversion is demonstrated in the synthetic example at the start of Chapter 4, where a simple DataFrame is transformed for use with the Inductive Miner.
 
-A more advanced representation is the *Object-Centric Event Log (OCEL)*. Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
+A more advanced format is the *Object-Centric Event Log (OCEL)*. Unlike traditional logs, where each event is linked to just one case, OCEL allows each event to be associated with multiple objects of different types. For example, a procurement event might relate to a purchase order, an order item, a vendor, and a resource all at once. The OCEL standard defines how to store and handle such logs, and PM4Py provides `pm4py.read_ocel` to read OCEL files in JSON format. This produces an object with separate DataFrames for events and objects, plus metadata about object types and event attributes.
 
-*Flattening* is the process of converting an OCEL into a classical event log by selecting one object type as the case identifier. In PM4Py, the function `pm4py.ocel_flattening(ocel, object_type)` performs this step. When one event is related to multiple objects of the selected type, that event appears in multiple cases in the flattened log, which inflates the case count. When the selected object type is not directly linked to all events, some events may be lost during flattening. Managing these artifacts is an important preprocessing step before applying classical discovery algorithms to object-centric data.
+*Flattening* is the process of turning an OCEL into a classical event log by selecting one object type to serve as the case identifier. In PM4Py, this is done with `pm4py.ocel_flattening(ocel, object_type)`. If an event is linked to multiple objects of that type, it will appear in multiple cases in the flattened log, increasing the case count. If some events are not linked to the selected object type, they may be lost during flattening. Managing these effects is an important preprocessing step before using classical discovery algorithms on object-centric data.
 
-In the practical examples in Chapter 4, both representations are used. The introductory synthetic example uses the tabular representation to illustrate the basic conversion pipeline. The BPI Challenge 2019 case study uses the OCEL representation, and the flattening step demonstrates how object-centric data must be preprocessed before classical discovery can be applied. Later examples in Chapter 4 return to the OCEL representation directly, computing an object-centric directly-follows graph from the relations table without flattening, in order to compare per-object-type process behavior without the artifacts introduced by the flattening step.
+In the practical examples in Chapter 4, both representations are used. The introductory example uses the simple tabular format to show the basic conversion process. The BPI Challenge 2019 case study uses the OCEL format, and the flattening step demonstrates the preprocessing needed for classical analysis. Later examples return to the OCEL format directly, computing an object-centric directly-follows graph from the relations table without flattening, so that differences in process behavior by object type can be compared without the distortions introduced by flattening.
 
-== Exploratory description of the BPI Challenge 2019 dataset
+== Exploratory Description of the BPI Challenge 2019 Dataset
 
-The real-world case study in this thesis uses the BPI Challenge 2019 dataset, stored in OCEL format. The dataset originates from a real procurement process at a large multinational company and was released as part of the annual BPI Challenge competition organized in connection with the International Conference on Process Mining. It has been widely used in academic research on process mining and serves here as a representative example of a large, complex, real-world event log.
+For the real-world case study in this thesis, I use the BPI Challenge 2019 dataset, which is stored in OCEL format. This dataset was collected from the procurement process of a large multinational company and was released as part of the annual BPI Challenge, organized alongside the International Conference on Process Mining. It has become a widely used benchmark in academic research and is a representative example of what large, complex, real-world event logs look like.
 
-The dataset contains approximately 1,595,923 events and 330,685 objects distributed across four object types: purchase orders (PO), purchase order items (POItem), resources (Resource), and vendors (Vendor). Each event carries a timestamp, an activity name, and a set of business context attributes including company code, document type, item category, spending area, and vendor details. These attributes make the dataset suitable not only for control-flow analysis but also for performance analysis and organizational mining.
+The dataset includes roughly 1.6 million events and over 330,000 objects, which are divided into four types: purchase orders (PO), purchase order items (POItem), resources, and vendors. Each event comes with a timestamp, an activity name, and a rich set of business context attributes — such as company code, document type, item category, spending area, and vendor information. This level of detail makes the dataset valuable not only for analyzing process flows, but also for performance analysis and organizational mining.
 
 #table(
   columns: 2,
@@ -368,7 +394,7 @@ The dataset contains approximately 1,595,923 events and 330,685 objects distribu
   [Domain],         [Procurement],
 )
 
-After flattening with respect to the POItem object type — selected because it is the most frequent type in the log — the classical event log contains one case per distinct POItem object. The full dataset produces a flattened log with a large number of cases; in the sample used for the practical examples in Chapter 4, the flattened log contains 53,198 cases.
+To analyze the process from a case-centric perspective, I flattened the log using the POItem object type, since this is the most common type in the data. After flattening, each case corresponds to a unique POItem. In the full dataset, this results in a very large number of cases; for the practical examples in Chapter 4, I use a sample of 53,198 cases drawn from the flattened log.
 
 #table(
   columns: 2,
@@ -382,221 +408,221 @@ After flattening with respect to the POItem object type — selected because it 
   [Maximum],                      [25,670.6 days],
 )
 
-The mean throughput time of 72.3 days and median of 64.3 days indicate that a typical purchase order item takes roughly two months to process from first to last recorded event. The 95th percentile of 143 days shows that a minority of cases take significantly longer. The maximum of over 25,000 days almost certainly represents either an open case that was never formally closed or a data anomaly. The distribution of throughput times is right-skewed, which is typical of procurement processes where the majority of cases are completed within a predictable time range but a small number of exceptions take much longer.
+On average, each purchase order item takes about two months from the first to the last recorded event. The 95th percentile — 143 days — shows that while most cases are handled in a predictable time frame, a minority take much longer. The extreme maximum (over 25,000 days) is almost certainly an artifact, perhaps representing an open case that was never formally closed or a data entry error. The distribution of throughput times is skewed to the right, which is typical for procurement processes where most cases finish on schedule but some outliers drag on far longer.
 
-These basic statistics reveal several important characteristics of the dataset. First, the volume is large enough to require efficient tools and careful preprocessing before any analysis can begin. Second, the presence of four object types means that the process cannot be fully represented as a simple single-case model without losing meaningful relational information. Third, the combination of control-flow data with rich business attributes makes this dataset suitable for a range of process mining tasks beyond simple discovery.
+These statistics highlight several important features of the dataset. First, its size means that efficient tools and careful preprocessing are essential before analysis. Second, having four object types means the process cannot be fully captured with a simple, single-case model — some relational information is inevitably lost if we try. Third, the combination of detailed process data and rich business context makes this dataset suitable for a wide range of process mining tasks, not just process discovery.
 
-In Chapter 4, the dataset is loaded using `pm4py.read_ocel`, flattened to a case-centric format, and then sampled to a manageable size before discovery algorithms are applied. The theoretical concepts introduced in this chapter — traces, variants, Petri nets, and throughput time — are all used directly in that implementation, connecting the mathematical foundations established here with concrete analytical results.
+In Chapter 4, I show how to load this dataset using `pm4py.read_ocel`, flatten it to a case-based format, and sample it down to a manageable size before running any discovery algorithms. The theoretical concepts discussed in this chapter — traces, variants, Petri nets, and throughput time — are all put into practice there, connecting the mathematical foundations with real analytical results.
 
-= The tools available in Python
+= The Tools Available in Python
 
-The Python ecosystem for process mining and process intelligence has grown considerably over the past decade. It now covers a wide range of analytical tasks, from loading and exploring event logs to discovering process models, checking conformance, predicting future outcomes, and simulating alternative process designs. This chapter provides a structured overview of the main Python tools available for these purposes. The tools are organized into five groups: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages. For each tool, the discussion covers its primary purpose, the data formats it supports, the algorithms or methods it implements, and its practical strengths and limitations. The chapter concludes with a comparative summary table.
+Over the past decade, the Python ecosystem for process mining and process intelligence has grown rapidly. Today, Python supports a wide range of analytical tasks — from loading and exploring event logs, to discovering process models, checking conformance, predicting future outcomes, and even simulating alternative process designs. This chapter provides a structured overview of the main Python tools available for these purposes. For clarity, the tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and supporting data processing packages. For each tool, I discuss its primary purpose, the data formats it supports, the main algorithms or methods it implements, and its practical strengths and limitations. At the end of the chapter, there is a comparative summary table for quick reference.
 
-The selection of tools discussed here is based on a review of academic publications from the International Conference on Process Mining (ICPM) and related venues, the Python Package Index (PyPI), and active GitHub repositories related to process mining. The focus is on tools that are either actively maintained, widely cited in the literature, or representative of an important category of functionality. Commercial tools are included only where they provide a Python interface that is accessible to practitioners, as in the case of PyCelonis.
+The selection of tools covered here is based on a review of academic publications (especially from the International Conference on Process Mining), the Python Package Index (PyPI), and active GitHub repositories. The focus is on tools that are actively maintained, widely used in the community, or that represent an important category of functionality. Commercial tools are only included if they provide a Python interface that is accessible to practitioners, such as PyCelonis.
 
-== Core process mining libraries
+== Core Process Mining Libraries
 
-The most important and widely used tools in the Python process mining ecosystem are the core libraries that implement the fundamental workflow: reading event data, exploring log statistics, discovering process models, checking conformance, and analyzing performance. This section describes the four main libraries in this category: PM4Py, PM4Py-Streaming, Simod, and PMLab.
+The backbone of Python process mining is formed by a handful of core libraries. These libraries implement the essential workflow: reading in event data, exploring log statistics, discovering process models, checking conformance, and analyzing process performance. In this section, I describe the four main libraries in this category: PM4Py, PM4Py-Streaming, Simod, and PMLab.
 
 === PM4Py
 
-PM4Py is the central library in the Python process mining ecosystem. It is an open-source package developed and maintained by the Process Intelligence Solutions group, with academic roots at Fraunhofer FIT and RWTH Aachen University. PM4Py was first released in 2018 and has since become the de facto standard Python library for process mining, with active development, regular releases, and a growing user community in both academia and industry.
+PM4Py is the central library in the Python process mining ecosystem. Developed and maintained by the Process Intelligence Solutions group (with academic roots at Fraunhofer FIT and RWTH Aachen University), PM4Py was first released in 2018. Since then, it has become the de facto standard for process mining in Python, with regular updates, active development, and a growing user base in both academia and industry.
 
-PM4Py covers the complete process mining workflow. Its main capabilities span several areas.
+PM4Py covers the entire process mining workflow. Its main capabilities include:
 
-*Event log input and output: * PM4Py supports reading and writing event logs in multiple formats. The most commonly used formats are XES (the IEEE standard for event logs), CSV files converted via pandas DataFrames, and the OCEL JSON format for object-centric event logs. Reading a standard XES file is performed with `pm4py.read_xes()`, while reading an OCEL file uses `pm4py.read_ocel()`. Both functions return structured objects that can be passed directly to all other PM4Py analysis functions.
+- *Event log input and output:* PM4Py can read and write event logs in various formats, including XES (the IEEE standard), CSV files via pandas DataFrames, and OCEL JSON files for object-centric logs. Reading a standard XES file is as simple as calling `pm4py.read_xes()`, while `pm4py.read_ocel()` is used for OCEL logs. Both functions return structured objects that integrate directly with the rest of PM4Py's analysis functions.
 
-*Log statistics and exploration:* PM4Py provides functions for computing basic statistics on an event log, including the set of distinct activities, the number of cases, the number of events, variant frequencies, start and end activities, and directly-follows relations. The functions `pm4py.get_variants()` and `pm4py.discover_dfg()` are used to retrieve variant counts and construct the directly-follows graph respectively. These functions operate on both classical event logs and OCEL structures.
+- *Log statistics and exploration:* PM4Py offers functions for computing basic statistics, such as the number of activities, cases, and events, as well as variant frequencies, start and end activities, and directly-follows relations. For example, `pm4py.get_variants()` retrieves variant counts, and `pm4py.discover_dfg()` constructs the directly-follows graph. These functions work with both classical event logs and OCEL structures.
 
-*Process discovery:* PM4Py implements several discovery algorithms. The Alpha algorithm is available via `pm4py.discover_petri_net_alpha()` and produces a Petri net from directly-follows relations as described in Chapter 2. The Inductive Miner, called via `pm4py.discover_petri_net_inductive()`, produces a sound Petri net through a process tree using the divide-and-conquer approach described in Chapter 2; this is the algorithm used in the case study in Chapter 4. The Heuristics Miner, available via `pm4py.discover_petri_net_heuristics()`, uses frequency thresholds to filter the directly-follows graph before constructing the model, making it more robust to noise than the Alpha algorithm. All discovery functions accept either a classic event-log object or a pandas DataFrame with explicitly specified column names.
+- *Process discovery:* Several discovery algorithms are implemented. The Alpha algorithm, available via `pm4py.discover_petri_net_alpha()`, creates a Petri net from directly-follows relations. The Inductive Miner (`pm4py.discover_petri_net_inductive()`) produces a sound Petri net through a process tree, and is the main algorithm used in my case study in Chapter 4. The Heuristics Miner (`pm4py.discover_petri_net_heuristics()`) uses frequency thresholds to filter the directly-follows graph before building the model, making it more robust to noise than the Alpha algorithm. All discovery functions accept either a classic event-log object or a pandas DataFrame with specified column names.
 
-*Conformance checking:* PM4Py implements both token-based replay and alignment-based conformance. Token-based replay is invoked with `pm4py.fitness_token_based_replay()` and is faster, making it suitable for large logs where an overall fitness estimate is needed quickly. Alignment-based conformance is invoked with `pm4py.fitness_alignments()` and provides per-trace diagnostic information at a higher computational cost. Both functions return a dictionary of fitness metrics including the overall fitness score.
+- *Conformance checking:* PM4Py provides both token-based replay (`pm4py.fitness_token_based_replay()`) — which is fast and suitable for large logs — and alignment-based conformance (`pm4py.fitness_alignments()`), which gives detailed per-trace diagnostics at a higher computational cost. Both return a dictionary of fitness metrics, including the overall fitness score.
 
-*Performance analysis:* PM4Py provides functions for computing throughput times, activity durations, and waiting times from event logs with timestamps. Performance statistics can be projected onto a discovered process model to produce a performance-annotated visualization that highlights bottlenecks.
+- *Performance analysis:* PM4Py calculates throughput times, activity durations, and waiting times for event logs with timestamps. These statistics can be projected onto a process model to generate performance-annotated visualizations that highlight bottlenecks.
 
-*Object-centric process mining:* PM4Py is currently the only Python library with comprehensive native support for OCEL. It provides `pm4py.ocel_flattening()` for converting an OCEL to a classical log, and `pm4py.discover_ocdfg()` for computing an object-centric directly-follows graph directly from the OCEL without flattening.
+- *Object-centric process mining:* PM4Py is currently the only Python library with comprehensive, native support for OCEL. It provides `pm4py.ocel_flattening()` to convert an OCEL log to a classical format, and `pm4py.discover_ocdfg()` to compute object-centric directly-follows graphs without flattening.
 
-*Strengths and limitations:* PM4Py's main strengths are its breadth of coverage, active maintenance, good documentation, and native OCEL support. It is the only Python library that covers the complete process mining workflow within a single package. Its main limitations are computational: alignment-based conformance and some discovery algorithms can be slow on very large logs, and certain advanced features such as simulation are outside its scope.
+*Strengths and limitations:* PM4Py's main strengths are its wide coverage, active development, good documentation, and robust OCEL support. It is the only Python library that offers a complete process mining workflow in a single package. The main limitations are computational: alignment-based conformance and some discovery algorithms can be slow on very large logs, and certain advanced features — like simulation — are beyond its current scope.
 
 === PM4Py-Streaming
 
-PM4Py-Streaming is an extension of PM4Py designed for settings where event data arrives continuously as a stream rather than as a complete stored log. In many real-world scenarios — such as live monitoring of an ERP system or a logistics platform — events are generated in real time and the analyst needs to maintain an up-to-date process model without reprocessing the entire history of events each time a new event arrives.
+PM4Py-Streaming is an extension of the core PM4Py library, designed specifically for situations where event data arrives continuously — as a stream — rather than in a complete, stored log. This is particularly useful in real-world scenarios like live monitoring of ERP systems or logistics platforms, where new events are generated in real time. In these cases, analysts need to keep the process model up to date without having to reprocess all historical events each time something new happens.
 
-PM4Py-Streaming implements online versions of core process mining algorithms. These algorithms update their internal state incrementally as each new event is received, without storing the full event history. The online directly-follows graph maintains running frequency counts for each activity pair and updates them in constant time per event. An online variant of the Inductive Miner that can revise the discovered process tree when stream statistics change significantly is also available. The library is designed to work with PM4Py's standard data structures, so models discovered from a stream can be analyzed using PM4Py's conformance and performance functions.
+The library implements online versions of key process mining algorithms. These algorithms update their internal state incrementally with each incoming event, without storing the full event history. For example, the online directly-follows graph keeps running frequency counts for each activity pair and updates them instantly as new events come in. There is even an online variant of the Inductive Miner, which can adapt the discovered process tree as stream statistics change over time. PM4Py-Streaming is designed to work seamlessly with PM4Py's standard data structures, so any models discovered from the stream can be further analyzed using the conformance and performance functions in PM4Py.
 
-*Strengths and limitations:* PM4Py-Streaming is the only Python library specifically designed for online process mining. Its main limitation is that the set of supported algorithms is smaller than in the batch PM4Py library, and online discovery algorithms necessarily make approximations that can reduce model quality compared with batch discovery on the same data.
+*Strengths and limitations:* PM4Py-Streaming is currently the only Python library dedicated to online process mining. Its main limitation is that it supports fewer algorithms than the standard batch PM4Py library, and the approximations required for online discovery can sometimes reduce model quality compared to what is possible with a complete, static log.
 
 === Simod
 
-Simod is a Python tool for simulation-based business process optimization. It takes a BPMN process model — typically one derived from process discovery — as input, estimates simulation parameters from an event log, and produces an optimized simulation configuration. The goal is to find the combination of resource assignments, activity durations, and scheduling rules that minimizes a target objective such as throughput time or cost.
+Simod is a Python tool focused on simulation-based optimization of business processes. It takes a BPMN process model — usually one produced by process discovery — as input, estimates simulation parameters from an event log, and then generates an optimized simulation configuration. The ultimate goal is to identify the combination of resource assignments, activity durations, and scheduling rules that will minimize some target objective, such as overall throughput time or cost.
 
-Simod's workflow consists of three main phases. In the first phase, a process model is extracted from the event log and converted to BPMN format. In the second phase, simulation parameters — including resource pools, activity duration distributions, and arrival rates — are estimated from the log data. In the third phase, a Bayesian optimization loop runs multiple simulation experiments with different parameter settings to find the configuration that best achieves the target objective.
+Simod's workflow proceeds in three main phases. First, it extracts and converts a process model from the event log to BPMN format. Next, it estimates simulation parameters — such as resource pools, activity duration distributions, and arrival rates — from the log data. Finally, a Bayesian optimization loop runs multiple simulation experiments with different parameter settings, searching for the configuration that best achieves the chosen objective.
 
-*Strengths and limitations:* Simod fills an important gap in the Python ecosystem by combining process mining with simulation-based optimization. Its main limitation is that it requires a reasonably clean and well-structured BPMN model as input, which means it is most useful after a successful process discovery step. It also requires Graphviz and a BPMN simulation engine, which adds installation complexity.
+*Strengths and limitations:* Simod fills an important gap in the Python ecosystem by linking process mining with simulation-based optimization. However, it requires a fairly clean and well-structured BPMN model as input, so it is most useful after a successful process discovery step has already been completed. It also depends on tools like Graphviz and a BPMN simulation engine, which can add to the installation and setup complexity.
 
 === PMLab
 
-PMLab is a research-oriented Python toolkit for process mining that provides implementations of a range of process discovery and conformance algorithms, including several that are not available in PM4Py. It is aimed primarily at researchers who need to experiment with and extend process mining algorithms, rather than at practitioners who need a production-ready tool.
+PMLab is a research-oriented toolkit for process mining in Python. It provides implementations of a variety of process discovery and conformance algorithms, including several that are not available in PM4Py. PMLab is aimed mainly at researchers who want to experiment with or develop new process mining algorithms, rather than practitioners who need a polished, production-ready tool.
 
-PMLab supports classical event logs in XES format and provides Python implementations of the Alpha algorithm, several variants of the Heuristics Miner, and conformance checking methods. It is designed to be modular and extensible, so researchers can add new algorithms or modify existing ones without changing the core library.
+The library supports classical event logs in XES format and offers Python implementations of the Alpha algorithm, several variants of the Heuristics Miner, and various conformance checking methods. PMLab is designed to be modular and extensible, making it easier for researchers to add or modify algorithms without having to overhaul the entire library.
 
-*Assessment:* PMLab is useful for researchers who need to look inside an algorithm and modify it. For anyone wanting a production-ready tool, however, it falls short - maintenance has slowed, documentation is thin, and newer features like OCEL support and the Inductive Miner Infrequent are absent.
+*Assessment:* PMLab is a valuable resource for researchers who need to dive deep into algorithm development and modification. However, it is less suited for production use — development has slowed, documentation is limited, and it lacks support for newer features like OCEL and the Inductive Miner Infrequent variant.
 
-=== BupaR (Python interface)
+=== BupaR (Python Interface)
 
-BupaR is a comprehensive process mining framework originally developed for R @janssenswillen2019bupar. It provides a grammar of process analysis — a structured vocabulary of operations for filtering, aggregating, and visualizing event data — built around a dedicated event log object that enforces a consistent structure across all operations. BupaR has influenced the design of several Python tools and remains widely used in academic research due to its expressive pipeline syntax. A Python interface to BupaR functionality is accessible through the rpy2 bridge, which allows Python analysts to call bupaR functions directly from a Python environment without leaving the Python data science ecosystem.
+BupaR is a comprehensive process mining framework originally developed for the R programming language @janssenswillen2019bupar. It introduces a structured grammar for process analysis — a set of consistent operations for filtering, aggregating, and visualizing event data — centered around a dedicated event log object. This approach ensures that all analyses are built on a consistent data structure. BupaR's expressive and readable pipeline syntax has influenced several tools in the Python ecosystem and remains popular in academic research for its clarity and reproducibility.
 
-BupaR is particularly strong in event log manipulation and process visualization. Its declarative pipeline operators — analogous to dplyr verbs in the R tidyverse — allow complex filtering, grouping, and aggregation operations to be composed into readable, reproducible analysis scripts. The dotted chart and process map visualizations produced by bupaR are widely used in academic publications as clear, compact summaries of process behavior.
+Python users can access BupaR's functionality through the rpy2 bridge, which allows R functions to be called directly from within a Python environment. This means analysts can leverage BupaR's powerful event log manipulation and visualization tools — such as dotted charts and process maps — without leaving Python. These visualizations are widely seen in academic papers as clear, succinct summaries of process behavior.
 
-*Strengths and limitations:* BupaR's main strength is its expressive and consistent grammar for process analysis, which supports a broader range of log manipulation and visualization operations than PM4Py's current Python API. Its main limitation in a Python context is the dependency on a working R installation and the rpy2 bridge, which adds significant environment complexity compared with pure-Python alternatives.
+*Strengths and limitations:* BupaR's greatest strength is its expressive, consistent grammar for process analysis, which supports a broader range of log manipulation and visualization operations than PM4Py's current Python API. Its main limitation for Python users is the need for a working R installation and the rpy2 bridge, which adds a layer of complexity compared to pure-Python solutions.
 
-== Predictive and AI-oriented tools
+== Predictive and AI-Oriented Tools
 
-A growing set of Python tools connects process mining with machine learning and artificial intelligence to support predictive process monitoring, automated decision support, and intelligent process automation. This section describes the main tools in this category.
+A rapidly growing set of Python tools connects process mining with machine learning and artificial intelligence, enabling predictive process monitoring, automated decision support, and intelligent process automation. The following are some of the most prominent libraries in this area.
 
 === ML4ProM
 
-ML4ProM is a Python framework that combines process mining techniques with machine learning models to support predictive process monitoring. Predictive process monitoring is concerned with predicting future states of running process instances — for example, whether a case will be completed on time, what the next activity will be, or how much longer the case will take to finish.
+ML4ProM is a Python framework that brings together process mining techniques and machine learning models to support predictive process monitoring. This area focuses on forecasting future states for running process instances — for example, predicting whether a case will finish on time, what the next activity will be, or how long a case is likely to take.
 
-ML4ProM follows a standard pipeline structure: an event log is preprocessed to extract features from partial traces, these features are used to train a machine learning model (typically a classifier or regressor from scikit-learn), and the trained model is then applied to new incoming events to generate predictions. The library provides implementations of common feature extraction strategies for process mining, including sequence encoding (representing the prefix of activities as a fixed-length vector), last-state encoding (using the most recent activity and its attributes), and aggregate encoding (using statistics computed over the trace prefix).
+The ML4ProM workflow follows a standard pattern: first, the event log is preprocessed to extract features from partial traces. These features are then used to train a machine learning model, such as a classifier or regressor from scikit-learn. The trained model can then be applied to new, ongoing cases to generate predictions. ML4ProM provides several feature extraction strategies that are commonly used in process mining, including sequence encoding (representing the activity prefix as a fixed-length vector), last-state encoding (capturing the most recent activity and its attributes), and aggregate encoding (using statistics over the trace prefix).
 
-The choice of feature encoding is important because it determines how much of the trace history is captured and how well the resulting features represent the process state. ML4ProM allows the analyst to experiment with different encodings and compare their predictive performance using standard machine learning evaluation metrics such as accuracy, AUC-ROC, and mean absolute error.
+Choosing the right feature encoding is important, as it determines how much of the process history is captured and how well the features represent the process state. ML4ProM enables analysts to experiment with different encodings and compare their predictive accuracy using standard metrics like accuracy, AUC-ROC, and mean absolute error.
 
-*Strengths and limitations:* ML4ProM's main strength is its direct integration of process mining feature extraction with scikit-learn compatible models. Its main limitations are that it requires a reasonably large labeled training set and does not yet support object-centric event logs.
+*Strengths and limitations:* ML4ProM's main strength is its seamless integration of process mining feature extraction with scikit-learn-compatible models. Its main drawbacks are the need for a reasonably large labeled training dataset and the current lack of support for object-centric event logs.
 
 === PM4PYML
 
-PM4PYML is an extension of PM4Py that integrates machine learning pipelines directly with PM4Py event-log objects and analysis functions. It provides scikit-learn compatible transformers that convert PM4Py event logs into feature matrices suitable for training machine learning models, enabling analysts to build end-to-end predictive monitoring pipelines entirely within the PM4Py ecosystem.
+PM4PYML is an extension of PM4Py that directly integrates machine learning pipelines with PM4Py event-log objects and analysis functions. It provides scikit-learn-compatible transformers to convert PM4Py event logs into feature matrices, making it easy to train machine learning models for predictive process monitoring within the PM4Py ecosystem.
 
-The library supports several feature extraction methods compatible with PM4Py's internal log format, including activity occurrence counts, directly-follows pair frequencies, and time-based features such as remaining time and elapsed time. These features can be combined with any scikit-learn estimator using standard Pipeline objects. The `LogTransformer` class from pm4pyml converts a PM4Py event log directly into a numpy feature matrix that can be passed to any scikit-learn classifier or regressor.
+The library supports several feature extraction methods that work with PM4Py's internal log format, including counts of activity occurrences, frequencies of directly-follows pairs, and time-based features like remaining and elapsed time. These features can be plugged into any scikit-learn estimator using standard pipeline objects. The `LogTransformer` class converts a PM4Py event log directly into a NumPy feature matrix, which can then be passed to any scikit-learn classifier or regressor.
 
-*Strengths and limitations:* PM4PYML's main strength is its tight integration with PM4Py, which reduces the preprocessing effort needed to move from process mining analysis to machine learning modeling. Its main limitations are similar to those of ML4ProM: it requires labeled training data and does not support object-centric logs natively.
+*Strengths and limitations:* PM4PYML's main advantage is its tight integration with PM4Py, which streamlines the process of going from process mining analysis to machine learning modeling. Its main limitations are similar to ML4ProM: it requires labeled training data and does not natively support object-centric logs.
 
 === PyCelonis
 
-PyCelonis is the official Python API for the Celonis Process Intelligence platform. Celonis is one of the leading commercial process mining tools, used by many large enterprises for operational monitoring, compliance checking, and process improvement at scale. PyCelonis allows analysts to interact with the Celonis platform programmatically from Python, enabling automation of analyses, extraction of data and results, and integration of Celonis insights into broader Python workflows.
+PyCelonis is the official Python API for the Celonis Process Intelligence platform — a leading commercial solution used by large organizations for process monitoring, compliance, and improvement at scale. With PyCelonis, analysts can interact with the Celonis platform directly from Python, making it possible to automate analyses, extract data and results, and integrate Celonis insights into broader data science workflows.
 
-The main capabilities of PyCelonis include connecting to a Celonis instance and authenticating with an API key, extracting event log data from Celonis's data model using PQL (Process Query Language), pushing analysis results and action recommendations back to the platform, and integrating Celonis with robotic process automation (RPA) tools for automated process execution.
+Key features of PyCelonis include connecting to a Celonis instance (using an API key for authentication), extracting event log data using PQL (Process Query Language), sending analysis results and action recommendations back to the platform, and integrating Celonis with robotic process automation (RPA) tools for automated process execution.
 
-*Strengths and limitations:* PyCelonis's main strength is its ability to bridge Celonis's powerful commercial process intelligence infrastructure with Python's flexible data science ecosystem. Its main limitation is that it is tightly coupled to the Celonis platform, which requires a commercial subscription and is therefore not accessible for academic or small-scale use without an institutional license.
+*Strengths and limitations:* PyCelonis's biggest strength is its ability to bridge Celonis's powerful commercial process intelligence infrastructure with the flexibility of Python's data science ecosystem. The main limitation is that it is tightly tied to the Celonis platform, which requires a commercial subscription — so it is not accessible for academic or small-scale projects without an institutional license.
 
-=== BPMN-python and workflow automation
+=== BPMN-Python and Workflow Automation
 
-The BPMN-python library and related tools support the extraction, manipulation, and rendering of BPMN process models in Python. BPMN (Business Process Model and Notation) is the standard graphical language for representing business processes and is widely used in workflow automation systems. PM4Py can export discovered Petri nets to BPMN format, and bpmn-python can then read these BPMN models, modify them programmatically, or render them as interactive visualizations. This creates a bridge between the analytical process mining workflow and the operational business process management infrastructure.
+The BPMN-python library and related tools enable users to extract, manipulate, and visualize BPMN process models in Python. BPMN (Business Process Model and Notation) is the industry standard graphical language for representing business processes, widely adopted in workflow automation systems. PM4Py can export discovered Petri nets to BPMN format, after which bpmn-python can import these models, modify them programmatically, or render them as interactive visualizations. This creates a practical bridge between process mining analysis and operational business process management systems.
 
-*Strengths and limitations:* BPMN tools are most useful in organizations that already use BPMN-based workflow systems. For pure analytical use cases, they add complexity without significant benefit over the Petri net and process tree representations used by PM4Py.
+*Strengths and limitations:* BPMN-python and similar tools are most valuable in organizations that already use BPMN-based workflow systems. For purely analytical purposes, however, they may add unnecessary complexity compared to the Petri net and process tree models already supported by PM4Py.
 
 === Predictive Process Monitoring Toolkit (PPMT)
 
-The Predictive Process Monitoring Toolkit (PPMT) is a Python implementation of the standardized benchmark framework for predictive process monitoring research described by Teinemaa et al. @teinemaa2019outcome. It implements the full experimental pipeline from the benchmark study: it reads XES event logs, extracts prefixes of varying lengths, applies multiple feature encoding strategies — simple index encoding, sequence encoding, and aggregate encoding — trains multiple machine learning models including logistic regression, random forest, and XGBoost, and evaluates predictive performance using AUC-ROC and mean absolute error across cross-validation folds.
+The Predictive Process Monitoring Toolkit (PPMT) is a Python implementation of the benchmark framework for predictive process monitoring research described by Teinemaa et al. @teinemaa2019outcome. It supports the full experimental pipeline: reading XES event logs, extracting prefixes of various lengths, applying multiple feature encoding strategies (such as index, sequence, and aggregate encoding), training a range of machine learning models (including logistic regression, random forest, and XGBoost), and evaluating predictive performance using metrics like AUC-ROC and mean absolute error.
 
-PPMT is primarily a research tool designed to reproduce and extend the benchmark results of Teinemaa et al. rather than a production-ready predictive monitoring system. Its value lies in enabling researchers to compare new methods against a well-established baseline using a consistent experimental protocol, without reimplementing the evaluation infrastructure from scratch.
+PPMT is primarily a research tool, designed to reproduce and extend the benchmark results of Teinemaa et al. Its main value is that it allows researchers to compare new predictive methods against a well-established baseline, using a consistent experimental protocol — without having to build the evaluation infrastructure from scratch.
 
-*Strengths and limitations:* PPMT's main strength is its comprehensive benchmark coverage, which allows researchers to reproduce published results and add new methods to the comparison in a standardized way. Its main limitations are that it is not designed for real-time deployment, has limited documentation beyond the associated research paper, and is not actively maintained as a production library.
+*Strengths and limitations:* PPMT's main strength is its comprehensive benchmark coverage: it enables researchers to reproduce published results and add new methods for standardized comparison. Its limitations are that it is not designed for real-time deployment, documentation is limited beyond the associated research paper, and it is not actively maintained as a production system.
 
-== Simulation and optimization tools
+== Simulation and Optimization Tools
 
-Simulation and optimization tools extend the scope of analysis from retrospective understanding of past behavior toward forward-looking design of future processes. This section describes the main tools in this category: SimPy, BPSim, and ProcessOptimizer.
+Simulation and optimization tools extend the reach of process mining from simply understanding what happened in the past to designing and testing improvements for future processes. The next section introduces the main Python tools for simulation and optimization: SimPy, BPSim, and ProcessOptimizer.
 
 === SimPy
 
-SimPy is a widely used Python library for discrete-event simulation. In discrete-event simulation, a system is modelled as a sequence of events that occur at specific points in time, each of which may change the state of the system and schedule future events. This approach is well suited to modelling business processes, where activities are performed by resources over time and cases arrive and depart according to statistical distributions.
+SimPy is a popular Python library for discrete-event simulation. In this approach, a system is modeled as a series of events that happen at specific points in time, each of which can change the system's state and schedule future events. This method fits business processes very well, since activities are performed by resources over time and cases enter and leave the process according to statistical patterns.
 
-Although SimPy is not specific to process mining, it can be used in conjunction with process mining results to simulate business process behavior. The typical workflow involves three steps: first, a process mining analysis is conducted to discover the process structure and estimate activity duration distributions from the event log; second, a SimPy simulation is constructed using these estimated parameters, defining process generators, resource pools, and arrival rates; third, the simulation is run to generate synthetic event data for alternative process configurations that can be analyzed with PM4Py.
+While SimPy is not designed specifically for process mining, it works well in combination with process mining results to simulate how a business process might behave under different conditions. The typical workflow starts with process mining: the event log is analyzed to discover the process structure and estimate activity durations. These parameters are then used to build a SimPy simulation, defining process generators, resource pools, and arrival rates. Finally, the simulation is run to generate synthetic event data for different process scenarios, which can be further analyzed using PM4Py.
 
-For example, a SimPy model of a three-activity sequential process would define a process generator function that requests resources, waits for exponentially distributed service times, and releases resources after each activity. Running this simulation with different resource capacities allows the analyst to estimate the effect of staffing changes on throughput time before implementing them in the real process.
+For example, modeling a sequential process with three activities in SimPy involves defining a function that requests a resource, waits for a service time (often modeled as an exponential distribution), and releases the resource after each activity. By running this simulation with different numbers of available resources, it is possible to estimate how staffing changes might affect throughput time — before making any changes to the actual process.
 
-*Assessment:* SimPy works well here because it is simple, well-documented, and widely used. The gap is integration: there is no automatic bridge between a PM4Py - discovered model and a SimPy simulation. Building that bridge manually is manageable for simple processes but becomes time-consuming as model complexity grows.
+*Assessment:* SimPy is simple, well-documented, and widely used, which makes it a practical tool for this kind of analysis. The main limitation is integration: there is no automatic bridge between a process model discovered with PM4Py and a SimPy simulation. For simple processes, building this bridge manually is straightforward, but it can become time-consuming as model complexity increases.
 
 === BPSim
 
-BPSim is a simulation standard compatible with BPMN process models. It defines a structured XML-based format for specifying simulation parameters - such as resource pools, activity duration distributions, and routing probabilities - directly within a BPMN model file. Tools that support BPSim, including Simod, can read these parameters and run structured simulation experiments without requiring custom code. BPSim is most useful when the process model has already been exported to BPMN format and structured simulation is needed to evaluate multiple alternative configurations systematically.
+BPSim is a simulation standard designed to work with BPMN process models. It defines a structured, XML-based format for specifying simulation parameters — such as resource pools, activity duration distributions, and routing probabilities — directly inside a BPMN model file. Tools that support BPSim, including Simod, can read these parameters and run structured simulation experiments without requiring custom code. BPSim is especially useful when a process model is already available in BPMN format and the goal is to systematically evaluate multiple alternative configurations.
 
 === Process Optimizer
 
-Process Optimizer is a Python library for Bayesian optimization developed by Novo Nordisk Research. It is built on top of scikit-optimize and provides a framework for optimizing process parameters when evaluating each parameter setting is expensive — for example, because it requires running a time-consuming simulation.
+Process Optimizer is a Python library for Bayesian optimization, developed by Novo Nordisk Research. Built on top of scikit-optimize, it provides a framework for tuning process parameters in situations where each evaluation is expensive — such as when running a detailed simulation.
 
-In the process mining context, Process Optimizer can be used to tune simulation parameters in order to find the combination that minimizes throughput time or maximizes resource utilization. The analyst defines an objective function that takes a set of process parameters as input, runs the simulation, and returns a performance score. ProcessOptimizer then iteratively proposes parameter settings, evaluates them, and uses the results to build a probabilistic model of the objective function that guides subsequent evaluations toward the most promising region of the parameter space.
+In the context of process mining, Process Optimizer can be used to find the combination of simulation parameters that minimizes throughput time or maximizes resource utilization. The analyst defines an objective function: it takes a set of process parameters, runs the simulation, and returns a performance score. Process Optimizer then suggests parameter settings, evaluates them, and builds a probabilistic model of the objective function to focus subsequent evaluations on the most promising regions of the parameter space.
 
-*Strengths and limitations:* Process Optimizer's main strength is its ability to find good parameter settings with a relatively small number of expensive evaluations. Its main limitation is that it requires the analyst to define a suitable objective function and a simulation model, which means it is most useful after the process structure has already been established through discovery.
+*Strengths and limitations:* The main advantage of Process Optimizer is its efficiency: it can find good parameter settings without needing to try every possible combination, which is especially valuable when each simulation run is time-consuming. Its limitation is that the analyst must define a suitable objective function and simulation model ahead of time, so it is most useful after the process structure has already been established through discovery.
 
-== Visualization libraries
+== Visualization Libraries
 
-Visualization is an important part of process analysis, both for exploring event data and for communicating results to stakeholders. This section describes the main visualization libraries used in the Python process mining ecosystem.
+Visualization plays a crucial role in process analysis, both for exploring event data and for communicating findings to stakeholders. The Python process mining ecosystem offers several libraries to support different types of process visualizations.
 
 === Graphviz
 
-Graphviz is an open-source graph visualization tool that is used by PM4Py as its primary rendering backend for process models. When PM4Py discovers a Petri net, a process tree, or a directly-follows graph, it exports the model to Graphviz's DOT language and calls the Graphviz `dot` command-line tool to render the result as an image. PM4Py generates the DOT representation automatically, so the analyst does not need to write DOT code manually. The rendered image can be saved as a PNG or PDF file for inclusion in a report, or displayed interactively in a Jupyter notebook.
+Graphviz is an open-source tool for graph visualization and serves as the primary rendering backend for process models in PM4Py. When a model — such as a Petri net, process tree, or directly-follows graph — is discovered, PM4Py automatically converts it to Graphviz's DOT format and calls the `dot` command-line tool to generate images. This means analysts do not have to write any DOT code themselves. The resulting images can be saved as PNG or PDF files for reports, or displayed interactively in Jupyter notebooks.
 
-For the practical examples in this thesis, Graphviz is used to render the Petri net discovered from the BPI Challenge 2019 dataset. When Graphviz is not installed on the system, PM4Py falls back to rendering directly-follows graphs using a built-in renderer, but full Petri net visualization requires Graphviz to be available in the system PATH.
+In this thesis, Graphviz is used to visualize the Petri net models discovered from the BPI Challenge 2019 dataset. If Graphviz is not installed, PM4Py falls back on a built-in renderer for directly-follows graphs, but full Petri net visualization requires Graphviz to be available in the system PATH.
 
-*Strengths and limitations:* Graphviz produces high-quality, publication-ready visualizations of process models. Its main limitation is that it must be installed separately from PM4Py as an external system dependency, which can cause environment issues on some platforms.
+*Strengths and limitations:* Graphviz produces high-quality, publication-ready visualizations. Its main drawback is that it must be installed separately from PM4Py as an external dependency, which can occasionally cause installation or compatibility issues on some systems.
 
 === Plotly and Dash
 
-Plotly is a Python library for creating interactive, web-based charts and graphs. Unlike static plots produced by Matplotlib, Plotly charts support interactive features such as zooming, panning, filtering, and hover-over tooltips. Dash is a web application framework built on top of Plotly that allows analysts to build full interactive dashboards combining charts, tables, and user controls.
+Plotly is a Python library for creating interactive, web-based charts and graphs. Unlike static plotting libraries such as Matplotlib, Plotly enables interactivity — users can zoom, pan, filter, and hover for more details. Dash, built on top of Plotly, is a framework for building full-featured interactive dashboards that combine visualizations, tables, and user controls.
 
-In the process mining context, Plotly and Dash are useful for visualizing process performance metrics in an interactive format. For example, an analyst can use `plotly.express.histogram()` to create an interactive histogram of throughput times, or `plotly.express.bar()` to compare variant frequencies across different time periods. Dash extends this capability to full web dashboards where users can filter by date range, document type, or other attributes and see all charts update dynamically.
+For process mining, Plotly and Dash are particularly useful for visualizing performance metrics in an interactive way. For example, `plotly.express.histogram()` can be used to explore the distribution of throughput times, or `plotly.express.bar()` to compare variant frequencies over time. Dash allows analysts to build dashboards that update dynamically as filters — such as date range or document type — are changed.
 
-*Strengths and limitations:* Plotly and Dash are the most capable tools in the Python ecosystem for building interactive process performance dashboards. Their main limitation for process mining specifically is that they do not provide built-in support for rendering process models — for Petri net and DFG visualization, Graphviz remains the standard tool.
+*Strengths and limitations:* Plotly and Dash are the most capable Python tools for building interactive dashboards for process performance analysis. Their main limitation is that they do not natively support rendering process models such as Petri nets or directly-follows graphs — for those, Graphviz remains the standard tool.
 
 === NetworkX
 
-NetworkX is a Python library for the creation, manipulation, and analysis of complex networks and graphs. In the process mining context, it can be used to analyze the structural properties of directly-follows graphs, such as finding the most central activities, detecting communities of closely related activities, and computing path lengths and connectivity measures. Since PM4Py exposes directly-follows graphs as Python dictionaries of activity pairs and frequencies, converting them to a NetworkX directed graph requires only a few lines of code. Standard NetworkX functions such as `betweenness_centrality()` and `shortest_path()` can then be applied to identify structurally important activities in the process.
+NetworkX is a library for creating, manipulating, and analyzing complex networks and graphs. In the context of process mining, it can be used to analyze the structure of directly-follows graphs — for example, by finding the most central activities, detecting clusters of related activities, or computing path lengths and connectivity. Since PM4Py outputs directly-follows graphs as Python dictionaries, converting them to NetworkX graphs is straightforward. Standard NetworkX functions such as `betweenness_centrality()` and `shortest_path()` can then be applied to uncover important structural features of the process.
 
-*Strengths and limitations:* NetworkX is a mature and well-documented library with a wide range of graph analysis algorithms. Its main limitation in the process mining context is that it does not natively understand process mining concepts such as markings or conformance measures — it treats the process model as a plain directed graph.
+*Strengths and limitations:* NetworkX is mature, well-documented, and offers a wide range of graph analysis algorithms. Its main limitation for process mining is that it treats the process model as a generic directed graph — it does not understand process mining-specific concepts such as markings or conformance.
 
 === Pyvis
 
-Pyvis is a Python library for interactive network visualization based on the vis.js JavaScript library. In the process mining context, pyvis can be used to create interactive, browser-based visualizations of directly-follows graphs in which the analyst can zoom, pan, rearrange nodes, and inspect edge weights interactively. While PM4Py and Graphviz produce static renderings of process models, pyvis produces HTML-based visualizations that can be embedded in Jupyter notebooks or shared as standalone web pages — making them easier to distribute to stakeholders who do not have process mining software installed.
+Pyvis is a Python library for interactive network visualization, based on the vis.js JavaScript library. With Pyvis, analysts can create browser-based visualizations of directly-follows graphs that users can explore by zooming, panning, rearranging nodes, and inspecting edge weights. While PM4Py and Graphviz produce static images, Pyvis generates interactive HTML visualizations that can be embedded in Jupyter notebooks or shared as standalone web pages — making them easier to distribute, especially to stakeholders who may not have process mining software installed.
 
-The integration with PM4Py requires a few lines of code: the PM4Py DFG dictionary is first converted to a NetworkX directed graph, and the NetworkX graph is then passed to pyvis's `Network` object, which handles the interactive rendering. This workflow makes pyvis a lightweight complement to Graphviz for cases where interactivity is more important than publication-quality rendering.
+To use Pyvis with PM4Py, the PM4Py directly-follows graph dictionary is first converted to a NetworkX graph, which is then passed to Pyvis's `Network` object for rendering. This makes Pyvis a lightweight option when interactivity is more important than the polished, publication-ready output of Graphviz.
 
-*Strengths and limitations:* pyvis's main strength is its ability to produce interactive, shareable process visualizations with minimal code. Its main limitations are that it does not support Petri net or process tree rendering — only graph-based representations — and the resulting visualizations are less polished than those produced by Graphviz for formal process model diagrams.
+*Strengths and limitations:* Pyvis excels at producing interactive, shareable network visualizations with minimal code. However, it does not support Petri net or process tree rendering — only general graph representations — and its visual output is not as polished as Graphviz for formal process model diagrams.
 
-== Complementary data processing libraries
+== Complementary Data Processing Libraries
 
-A number of general-purpose Python libraries are essential for working with process mining tools in practice. These libraries are not specific to process mining but form the data processing infrastructure on which the process mining workflow depends.
+In practice, several general-purpose Python libraries are essential for working effectively with process mining tools. These libraries are not specific to process mining, but they provide the underlying infrastructure that makes the whole workflow possible.
 
 === Pandas
 
-Pandas is the most important general-purpose library for process mining in Python. It provides the DataFrame data structure — a two-dimensional table with labeled columns — which is used throughout the process mining workflow to represent event logs, compute statistics, and prepare data for analysis.
+Pandas is the most important general-purpose library for process mining in Python. Its DataFrame structure — a two-dimensional table with labeled columns — is used throughout the process mining workflow to represent event logs, calculate statistics, and prepare data for analysis.
 
-Most real-world event log data is initially available in tabular formats such as CSV files, Excel spreadsheets, or database query results. pandas provides the tools needed to read these formats, clean and transform the data, filter cases or events, and compute derived attributes such as throughput times. PM4Py's most user-friendly interface accepts pandas DataFrames directly: the analyst calls `pm4py.format_dataframe()` to annotate the column roles, then `pm4py.convert_to_event_log()` to produce the internal event-log object. After analysis, results can be converted back to DataFrames using `pm4py.convert_to_dataframe()` for further processing with standard pandas operations such as groupby, merge, and aggregation.
+Most real-world event log data starts out in tabular formats like CSV files, Excel spreadsheets, or database queries. Pandas provides all the tools needed to read these formats, clean and transform the data, filter cases or events, and compute derived attributes such as throughput times. PM4Py's user-friendly interface accepts pandas DataFrames directly: `pm4py.format_dataframe()` is used to specify the column roles, then `pm4py.convert_to_event_log()` to create the internal event log. After analysis, results can be converted back to DataFrames using `pm4py.convert_to_dataframe()` for further processing with familiar pandas operations like groupby, merge, and aggregation.
 
 === NumPy
 
-NumPy provides the numerical computing foundation for most of the Python scientific computing stack, including pandas and scikit-learn. In the process mining context, NumPy is used mainly as an internal dependency of other libraries rather than directly by the analyst. However, it is sometimes useful for computing custom performance metrics or implementing numerical methods that are not available in higher-level libraries.
+NumPy is the numerical foundation for most of Python's scientific computing stack, including pandas and scikit-learn. In the context of process mining, it mainly works behind the scenes as a dependency for other libraries. Occasionally, analysts may use NumPy directly to compute custom metrics or implement numerical methods not available in higher-level libraries.
 
 === Scikit-Learn
 
-Scikit-Learn is the standard Python library for machine learning on tabular data. It provides implementations of a wide range of supervised and unsupervised learning algorithms — including decision trees, random forests, support vector machines, logistic regression, and k-means clustering — along with tools for model evaluation, cross-validation, and pipeline construction.
+Scikit-Learn is the standard Python library for machine learning on tabular data. It offers a wide range of algorithms for classification, regression, clustering, and more, along with tools for model evaluation, cross-validation, and pipeline construction.
 
-In the process mining context, Scikit-Learn is used to build predictive models on features extracted from event logs. The typical workflow involves extracting a feature matrix from the log using tools such as pm4pyml or ML4ProM, splitting the data into training and test sets, training a scikit-learn estimator, and evaluating its performance using standard metrics. The `Pipeline` class is particularly useful for combining feature extraction and model training into a single reusable object.
+For process mining, Scikit-Learn is used to build predictive models on features extracted from event logs. The typical workflow involves extracting a feature matrix (using tools like pm4pyml or ML4ProM), splitting the data into training and test sets, training a model, and evaluating its performance. The `Pipeline` class is especially useful for chaining together feature extraction and modeling into a single, reusable object.
 
 === XGBoost and LightGBM
 
-XGBoost and LightGBM are gradient boosting libraries that consistently achieve strong performance on tabular machine learning tasks. They implement ensemble learning methods that combine many weak decision tree models into a single strong predictor using gradient descent. In the process mining context, they are used as drop-in replacements for scikit-learn estimators when higher predictive accuracy is needed on tasks such as remaining time prediction or outcome classification. Because they are scikit-learn compatible, they can be used within standard Pipeline objects.
+XGBoost and LightGBM are powerful gradient boosting libraries that consistently deliver strong performance on tabular machine learning tasks. They work by combining many weak decision tree models into a single strong predictor using gradient descent. In process mining, they are often used as high-accuracy alternatives to scikit-learn estimators for tasks like remaining time prediction or outcome classification. Both are compatible with scikit-learn pipelines.
 
 === TensorFlow and PyTorch
 
-TensorFlow and PyTorch are the two dominant deep learning frameworks in Python. They are used in more advanced process mining research applications, particularly for tasks that benefit from sequence modeling — such as next-activity prediction, remaining time estimation, and anomaly detection — where recurrent neural networks (RNNs), long short-term memory networks (LSTMs), or transformer architectures are applied to sequences of process events.
+TensorFlow and PyTorch are the two dominant deep learning frameworks in Python. They are used in advanced process mining research, particularly for sequence modeling tasks such as next-activity prediction, remaining time estimation, and anomaly detection. Techniques like recurrent neural networks (RNNs), long short-term memory networks (LSTMs), and Transformer-based models are often applied to event sequences.
 
-Deep learning approaches to process mining have been an active research area since approximately 2016. More recent work has applied transformer architectures to process event sequences, achieving state-of-the-art results on several benchmark datasets. In practice, using deep learning for process mining requires substantially more data and computational resources than simpler approaches, and the resulting models are less interpretable. For most practical applications, gradient boosting methods provide a better trade-off between performance, interpretability, and computational cost.
+While deep learning approaches have become more common in process mining since around 2016, they require more data and computational resources, and the resulting models are generally less interpretable. For most practical applications, gradient boosting methods strike a better balance between predictive power, interpretability, and computational cost.
 
-== Academic and community resources
+== Academic and Community Resources
 
-Alongside the software tools described above, several academic and community resources play an important role in the process mining ecosystem and are useful reference points for practitioners and researchers.
+Beyond the software tools, several academic and community resources play a crucial role in the process mining ecosystem.
 
-The *IEEE Task Force on Process Mining* (tf-pm.org) is the official academic body responsible for defining the scope and principles of process mining as a discipline. It published the Process Mining Manifesto @vanderAalst2012manifesto, which defines the key tasks, challenges, and guiding principles of the field, and continues to coordinate research activities and standardization efforts within the academic community.
+The *IEEE Task Force on Process Mining* (tf-pm.org) is the official academic body for the field, responsible for setting the scope, principles, and standards of process mining. It published the Process Mining Manifesto @vanderAalst2012manifesto, which defines key tasks, challenges, and guiding principles.
 
-The *International Conference on Process Mining* (ICPM, icpmconference.org) is the primary academic venue for process mining research. It is held annually and includes the BPI Challenge, an open data competition in which researchers are invited to analyze a publicly available real-world event log using process mining methods. The BPI Challenge datasets — including the BPI Challenge 2019 dataset used in this thesis — are publicly available and have become standard benchmarks in the literature @vanderwaal2019bpi.
+The *International Conference on Process Mining* (ICPM, icpmconference.org) is the leading academic conference for process mining research, held annually. ICPM hosts the BPI Challenge, an open competition where researchers analyze publicly available event logs. The BPI Challenge datasets — including the 2019 edition used in this thesis — are now standard benchmarks in the field @vanderwaal2019bpi.
 
-The *Fraunhofer FIT Process Intelligence Group* (fit.fraunhofer.de) is the research institute responsible for developing PM4Py and several related tools. It coordinates the ongoing development of the library, maintains the official documentation, and publishes research on new process mining algorithms and applications. For practitioners who need support beyond the official documentation, the Fraunhofer FIT group is the primary point of contact for PM4Py-related questions.
+The *Fraunhofer FIT Process Intelligence Group* (fit.fraunhofer.de) is the research institute behind PM4Py and related tools. They coordinate the ongoing development of PM4Py, maintain its documentation, and conduct research on new process mining algorithms and applications. For practitioners using PM4Py, the Fraunhofer FIT group is the main point of contact for support beyond the official documentation.
 
 == Summary
 
-The table below provides a concise overview of the tools discussed in this chapter, organized by category, together with their primary use and a brief assessment of their practical maturity.
+The following table provides a concise overview of the tools discussed in this chapter, organized by category, with their primary use and a brief assessment of their practical maturity.
 
 #table(
   columns: (auto, auto, auto, auto),
@@ -626,28 +652,27 @@ The table below provides a concise overview of the tools discussed in this chapt
   [],               [TensorFlow/PyTorch],[Deep learning for sequence modeling],         [High],
 )
 
-Among these tools, PM4Py stands out as the most comprehensive and actively maintained library for process mining in Python. It is the tool used throughout the practical examples in this thesis. Its coverage of the complete process mining workflow — from OCEL loading to conformance checking — within a single package makes it the natural starting point for any Python-based process mining project.
+Among all the tools discussed, PM4Py stands out as the most comprehensive and actively maintained library for process mining in Python. It is the main tool used throughout the practical examples in this thesis. PM4Py’s ability to cover the entire process mining workflow—from loading OCEL files to performing conformance checking—within a single package makes it the natural starting point for anyone embarking on Python-based process mining.
 
-The other libraries serve complementary roles. SimPy and Simod extend the analytical scope from retrospective analysis toward simulation and optimization. ML4ProM and pm4pyml connect process mining outputs with machine learning for predictive monitoring. Plotly, NetworkX, and Graphviz support communication and exploration of results. pandas, scikit-learn, and their associated libraries form the essential data processing infrastructure. Together, these tools form a sufficiently complete ecosystem to conduct end-to-end process intelligence analysis — from raw event data to predictive model and interactive dashboard — within a single Python environment.
+The other libraries play important supporting roles. SimPy and Simod extend the analysis beyond retrospective insights, allowing for simulation and optimization. ML4ProM and PM4PYML bridge process mining with machine learning, enabling predictive monitoring. Plotly, NetworkX, and Graphviz help visualize and communicate results. And general-purpose tools like pandas, scikit-learn, and their associated libraries provide the data processing backbone for the whole workflow. Together, this ecosystem is mature enough to support end-to-end process intelligence—from raw event data to predictive models and interactive dashboards—entirely within Python.
 
-One notable gap in the current ecosystem is the limited availability of mature tools for object-centric process mining beyond the basic flattening and OCDFG functions in PM4Py. A second gap is the absence of a standardized benchmark and evaluation framework for comparing process mining tools in Python, which makes it difficult to objectively assess the relative performance of different discovery algorithms on a common set of datasets and quality metrics.
+Despite these strengths, there are still some notable gaps. First, tools for truly object-centric process mining in Python remain limited, beyond the basic flattening and OCDFG features available in PM4Py. Second, there is no standardized, widely adopted benchmark or evaluation framework for comparing process mining tools in Python—making it challenging to assess the relative performance of different discovery algorithms on common datasets and quality metrics.
 
-= Worked examples
+= Worked Examples: 
 
-This chapter presents five worked examples that demonstrate how the theoretical concepts and Python tools introduced in Chapters 2 and 3 are applied in practice. The first is a synthetic introductory example in which a small event log is constructed deliberately, allowing every step of the workflow to be verified against the formal definitions from Chapter 2. The remaining four examples work with the BPI Challenge 2019 dataset and progressively build up the analysis: process discovery and conformance checking, variant and throughput analysis, performance DFG annotation and object-centric DFG computation, and finally simulation and predictive monitoring using SimPy and a Random Forest classifier. Together, these examples cover the complete process intelligence cycle from raw event data to forward-looking prediction, using PM4Py as the primary tool with SimPy and scikit-learn as supporting libraries.
+This chapter presents five worked examples showing exactly how the theoretical concepts and Python tools introduced in Chapters 2 and 3 can be put into practice. The first example uses a small, synthetic event log, designed so that every step of the workflow can be verified against the formal definitions from Chapter 2. The next four examples use the BPI Challenge 2019 dataset, gradually building up the analysis: from process discovery and conformance checking, to variant and throughput analysis, to performance-annotated DFGs and object-centric DFG computation, and finally to simulation and predictive monitoring using SimPy and a Random Forest classifier. Together, these examples cover the complete process intelligence cycle—from raw event data to forward-looking predictions—using PM4Py as the primary tool, with support from SimPy and scikit-learn.
 
-The progression from a synthetic to a real-world example is deliberate. In the synthetic example, the analyst knows the correct answer in advance, so it is possible to verify that every step of the workflow produces the expected output. In the BPI Challenge 2019 case study, the correct model is not known a priori, and the role of the tools is to discover structure from data and to characterize process behavior in measurable terms. The transition from the controlled synthetic setting to the complex real-world dataset therefore illustrates both the power and the practical challenges of applying process mining in an industrial context.
+The progression from synthetic to real-world data is intentional. In the synthetic example, the analyst knows the correct result in advance, making it easy to check that every step produces the expected output. In the BPI Challenge 2019 case study, the true underlying model isn't known; here, the goal is to let the tools discover structure from the data and measure process behavior. The shift from a fully controlled example to a complex real-world dataset illustrates both the power and practical challenges of applying process mining in a business context.
 
-== Introductory synthetic example
+== Introductory Synthetic Example:
 
-The purpose of an introductory synthetic example in process mining is to establish a controlled baseline against which the behavior of discovery algorithms, conformance checking procedures, and performance analysis methods can be evaluated and verified. Unlike real-world datasets, where the true underlying process structure is unknown and potentially unstable over time, a synthetic dataset is constructed so that the correct answer is known in advance. Every design decision — the number of cases, the set of activities, the permitted transitions, the frequencies of different traces, and the range of timestamps — is made deliberately by the analyst. It is therefore possible to predict exactly what output each tool should produce and to confirm that the implementation is working correctly when the expected output is obtained.
+The purpose of starting with a synthetic example is to create a controlled baseline where every aspect of the process is known in advance. Unlike real-world datasets—where the true process structure is often unknown or changes over time—a synthetic dataset lets us define exactly how many cases there are, which activities are allowed, what transitions can occur, and how frequently each trace appears. This makes it possible to check that each process mining tool produces the correct output, and to confirm that the implementation matches the theory.
 
-This property makes synthetic examples an essential pedagogical tool. When a student or practitioner encounters process mining for the first time, the mathematics of Petri nets, alignments, and token replay may be abstract and difficult to connect to concrete data. Working through a small example in which every trace, every directly-follows pair, and every marking transition can be traced by hand builds the intuition necessary to understand what is happening in larger and more complex analyses. The synthetic example presented here is therefore intended not only as a technical demonstration but as a bridge between the formal definitions of Chapter 2 and the practical implementations of the following sections.
+Synthetic examples are a powerful teaching tool. For newcomers to process mining, the mathematics of Petri nets, alignments, and token replay can seem abstract. Working through a small, hand-crafted example—where every trace, every directly-follows pair, and every marking is easy to follow—builds the intuition needed to tackle larger, more complex analyses. The synthetic example here is meant to bridge the gap between the formal definitions in Chapter 2 and the practical implementations in the following sections.
 
-The synthetic dataset represents a simplified purchasing process. The process consists of three activities: Create order, Approve order, and Send invoice. In the intended process design, every purchase order must follow exactly this sequence: a purchase order is first created by a purchasing agent, then reviewed and approved by a procurement manager, and finally an invoice is sent to the supplier to initiate payment. No other sequence is considered valid in this design. This deliberately simple structure means that the correct process model is a three-step linear chain, which should be immediately recoverable from the event data by any competent discovery algorithm. The simplicity of the design also makes it possible to compute all relevant mathematical quantities — traces, variants, directly-follows relations, Petri net structure, fitness scores, and throughput times — by hand, without the use of any software, and to verify that PM4Py produces the correct result.
+The synthetic dataset represents a simplified purchasing process with three activities: Create order, Approve order, and Send invoice. In the intended design, every purchase order must follow exactly this sequence—a purchase order is created by a purchasing agent, reviewed and approved by a procurement manager, and finally an invoice is sent to the supplier. No other sequence is allowed. This straightforward structure means the correct process model is a simple three-step linear chain, which any competent discovery algorithm should be able to recover from the data. Because the example is so simple, all key quantities—traces, variants, directly-follows relations, Petri net structure, fitness scores, and throughput times—can be calculated by hand, making it easy to check that PM4Py produces the correct results.
 
-The synthetic event log contains nine events distributed across three cases, each following the same sequence of activities. The core attributes of each event are presented in the following table.
-
+The synthetic event log contains nine events across three cases, each following the same sequence of activities. The key attributes for each event are shown in the following table.
 #table(
   columns: 3,
   align: center,
@@ -663,40 +688,67 @@ The synthetic event log contains nine events distributed across three cases, eac
   [3], [Send invoice],  [2024-01-03 10:40],
 )
 
-Each row in the table corresponds to a single recorded event. The case identifier column assigns each event to one of three process instances. The activity column names the specific action that was performed. The timestamp column records when the event occurred, with hourly precision sufficient for this example. In a real-world event log, additional attributes would typically be present — for instance, the identity of the resource who performed the activity, the cost of the activity, or business-specific data fields such as order amounts or vendor codes. For this introductory example, these additional attributes are omitted to keep the analysis focused on the structural and temporal dimensions most directly relevant to process discovery and conformance checking.
+Each row in the event table represents a single recorded event. The case identifier links each event to one of three process instances. The activity column shows which action was performed, and the timestamp column records when it happened—hourly precision is more than enough for this simple example. In a real-world log, you would often see extra information, such as which employee carried out the activity, the cost of the action, or business-specific fields like order amount or vendor code. For this introductory example, I’ve intentionally left out these extra attributes to keep the focus on the structural and timing aspects that matter most for process discovery and conformance checking.
 
-*Mathematical characterization of the log.* Applying the formal definitions from Chapter 2 to this dataset yields a precise mathematical characterization. The universe of activities is $A_L = {"Create order", "Approve order", "Send invoice"}$, a set with three elements. Grouping events by case identifier and sorting chronologically within each case gives three traces, all identical:
+*Mathematical characterization of the log:*
+
+Applying the formal definitions from Chapter 2 to this dataset gives us a precise mathematical picture. The activity universe is $A_L = {"Create order", "Approve order", "Send invoice"}$. Grouping events by case and sorting them chronologically, we find that all three traces are identical:
 
 $ sigma = chevron.l "Create order", "Approve order", "Send invoice" chevron.r $
 
-The event log, modelled as a multiset over $A_L^*$, is therefore $L = [sigma^3]$: the single trace $sigma$ with multiplicity 3. The total number of cases is $||L|| = 3$. The number of distinct variants is $|"Var"(L)| = 1$, since only one unique trace appears in the log. The average trace length is $macron(ell) = 3$, since every trace has exactly three activities.
+So the event log, modeled as a multiset over $A_L^*$, is $L = [sigma^3]$: one trace repeated three times. There are three cases ($|L| = 3$), just one unique variant ($|"Var"(L)| = 1$), and the average trace length is 3.
 
-*Directly-follows relation and directly-follows graph.* For each trace $sigma$, the directly-follows pairs are (Create order, Approve order) and (Approve order, Send invoice). Since all three traces are identical, the frequency of each pair is:
+*Directly-follows relation and graph:*
+
+For each trace, the directly-follows pairs are (Create order, Approve order) and (Approve order, Send invoice). Since all traces are the same, the frequencies are:
 
 $ f_L("Create order", "Approve order") = 3 $
 $ f_L("Approve order", "Send invoice") = 3 $
 
-No other directly-follows pair exists in this log. The directly-follows graph $"DFG"(L)$ therefore has three activity nodes, two directed edges each with weight 3, a start node with a single outgoing edge to Create order, and an end node with a single incoming edge from Send invoice. This is the minimal non-trivial DFG: a directed path graph. The absence of any branching, merging, or backward edges means the DFG immediately communicates the sequential, deterministic nature of the process. Any analyst examining this graph would recognize at once that all cases follow the same single path.
+No other pairs exist. The directly-follows graph has three activity nodes, two directed edges (each with weight 3), a start node pointing to Create order, and an end node receiving from Send invoice. This is a minimal, linear path graph with no branching, merging, or backward edges, so the DFG immediately tells us the process is strictly sequential and deterministic.
 
-*Process discovery with the Inductive Miner.* When the Inductive Miner is applied to this log, the algorithm completes in a single step. It begins by attempting to find a cut in the directly-follows graph. A sequence cut is applicable when the activity set can be partitioned into groups $G_1, G_2, dots, G_k$ such that all directly-follows edges cross from a lower-indexed group to a higher-indexed group, with no backward edges. For this log, the partition $G_1 = {"Create order"}$, $G_2 = {"Approve order"}$, $G_3 = {"Send invoice"}$ satisfies this condition exactly. The only directly-follows edges are (Create order $->$ Approve order) and (Approve order $->$ Send invoice), both crossing from a lower group to the next higher group. No backward edges exist. The algorithm therefore identifies a sequence cut and produces the process tree:
+*Process discovery with the Inductive Miner:*
+
+Running the Inductive Miner on this log is straightforward. The algorithm looks for a cut in the DFG — a way to partition activities so that all directly-follows edges move from lower to higher groups with no backward edges. Here, the groups are:
+
+- $G_1 = {"Create order"}$
+- $G_2 = {"Approve order"}$
+- $G_3 = {"Send invoice"}$
+
+The only directly-follows edges are (Create order $->$ Approve order) and (Approve order $->$ Send invoice), both moving forward. There are no backward edges. The algorithm identifies a simple sequence cut and generates the process tree:
 
 $ -> ("Create order", "Approve order", "Send invoice") $
 
-This process tree states that the activities are executed in strict left-to-right order. Since each sub-log contains only a single activity, no further subdivision is needed. The process tree is then automatically converted to a Petri net with four places $P = {p_0, p_1, p_2, p_3}$ and three transitions, with flow relation:
+This process tree states that the activities are executed in strict left-to-right order. The resulting Petri net has four places $(p_0, p_1, p_2, p_3)$, three transitions, and the flow relation:
 
-$F = brace.l (p_0, "Create order"), ("Create order", p_1), (p_1, "Approve order"), ("Approve order", p_2), (p_2, "Send invoice"), ("Send invoice", p_3) brace.r$
+$
+F = brace.l \
+  (p_0, "Create order"),\
+  ("Create order", p_1),\
+  (p_1, "Approve order"),\
+  ("Approve order", p_2),\
+  (p_2, "Send invoice"),\
+  ("Send invoice", p_3)\
+brace.r
+$
 
-The initial marking is $M_0 = {p_0: 1}$ and the final marking is $M_f = {p_3: 1}$. This Petri net accepts exactly the single trace $chevron.l "Create order", "Approve order", "Send invoice" chevron.r$. It is a sound net: the final marking is always reachable from the initial marking by firing the three transitions in sequence, and no deadlock exists.
+The initial marking is $M_0 = {p_0: 1}$ and the final marking is $M_f = {p_3: 1}$. This Petri net only accepts the single trace in the log, and it is sound: the final marking is always reachable from the initial marking with no deadlocks.
 
-*Python implementation with PM4Py.* In Python, the analysis of this synthetic log begins by constructing a pandas DataFrame with three columns. The `pm4py.format_dataframe()` function is called with this DataFrame and three keyword arguments that specify which columns hold the case identifier, the activity name, and the timestamp. This function returns a copy of the DataFrame with standardized column names and appropriate data types. The next step is `pm4py.convert_to_event_log()`, which groups events by case identifier, sorts events within each case by timestamp, and returns a PM4Py EventLog object containing three Trace objects, each holding three Event objects. At this point the analyst has a fully structured event log that can be passed to any PM4Py analysis function.
+*Python implementation with PM4Py:*
 
-Process discovery is performed by calling `pm4py.discover_petri_net_inductive()` with the EventLog object. This function applies the Inductive Miner Infrequent algorithm, which filters out infrequent directly-follows pairs before attempting to detect cuts. Because all pairs in this synthetic log appear in all three traces, the filtering removes nothing, and the algorithm produces the expected result: a triple (net, initial_marking, final_marking). The PM4Py PetriNet object stores places, transitions, and arcs as Python sets. To visualize the result, `pm4py.view_petri_net()` renders the net using Graphviz if it is available on the system PATH. The rendered diagram shows three labeled rectangular transitions connected in a row by circular places, immediately confirming the sequential structure. Alternatively, `pm4py.save_vis_petri_net()` saves the diagram to a PNG or PDF file for inclusion in a report.
+In Python, I start by creating a pandas DataFrame with the three required columns. Using `pm4py.format_dataframe()` with the appropriate column names standardizes the structure, then `pm4py.convert_to_event_log()` groups events by case and sorts them by timestamp, returning an EventLog object with three traces. At this point, the log is ready for any PM4Py function.
 
-*Conformance checking.* Conformance checking is performed using `pm4py.fitness_token_based_replay()`, which accepts the EventLog and the (net, initial_marking, final_marking) triple and simulates token-based replay for each trace. For the synthetic log, every trace follows the exact path accepted by the net: no missing tokens are added during replay and no tokens remain unconsumed at the end. The returned dictionary includes a `'log_fitness'` value of 1.0, confirming perfect conformance. Alignment-based conformance computed with `pm4py.fitness_alignments()` produces the same result: for each trace, the optimal alignment consists entirely of synchronous moves $(A, A), (B, B), (C, C)$ where $A$ = Create order, $B$ = Approve order, $C$ = Send invoice. The total alignment cost is zero and the normalized fitness is 1.0. Both methods agree that the log perfectly fits the discovered model.
+Process discovery is done by calling `pm4py.discover_petri_net_inductive()` on the EventLog. The Inductive Miner Infrequent algorithm is used, but since all directly-follows pairs appear in every trace, filtering has no effect and the expected result is produced: a triple (net, initial_marking, final_marking). The Petri net can be visualized with `pm4py.view_petri_net()` (using Graphviz if available) or saved to a file with `pm4py.save_vis_petri_net()`.
 
-In a practical setting, a fitness of 1.0 would be unusual for a real-world log, where noise, exceptions, and process variability typically cause some traces to deviate from the main model. For this controlled example, however, perfect fitness is expected: the synthetic log was deliberately constructed to contain only valid traces, so the discovered model should accept all of them. This result confirms that the discovery algorithm has correctly recovered the intended process structure and that the conformance checking implementation is functioning as expected.
+*Conformance checking:*
 
-*Performance analysis.* The timestamps in the synthetic log allow throughput time to be computed as $"TT"(c) = max_(e in c) t(e) - min_(e in c) t(e)$ for each case. The results are:
+Token-based conformance checking with `pm4py.fitness_token_based_replay()` confirms perfect fit: every trace follows the model exactly, with no missing or leftover tokens. The result is a `log_fitness` score of 1.0. Alignment-based conformance with `pm4py.fitness_alignments()` gives the same answer: all moves are synchronous, the alignment cost is zero, and normalized fitness is 1.0. Both methods agree that the log fits the discovered model perfectly.
+
+Of course, in real-world datasets, a fitness of 1.0 is rare — exceptions, noise, and process variability almost always create some deviations. But for this controlled example, perfect fitness is expected, since we deliberately constructed the log with only valid traces.
+
+*Performance analysis:*
+
+The timestamps in the synthetic log let us compute throughput time for each case as $"TT"(c) = max_(e in c) t(e) - min_(e in c) t(e)$. The results are:
 
 - Case 1: 11:00 $-$ 09:00 $=$ 120 minutes
 - Case 2: 11:20 $-$ 09:15 $=$ 125 minutes
@@ -714,31 +766,32 @@ In a practical setting, a fitness of 1.0 would be unusual for a real-world log, 
   [Coefficient of variation], [approx. 0.04],
 )
 
-The coefficient of variation of 0.04 is very small, indicating that all three cases complete in nearly identical times. This uniformity is a direct consequence of the synthetic design: all cases follow the same activities in the same order, so durations differ only because of the slightly different start times chosen when constructing the dataset.
+The coefficient of variation in throughput times for this synthetic example is just 0.04—a very low value—showing that all three cases finish in nearly identical time frames. This consistency is to be expected: the process is intentionally designed so that every case follows the same sequence, and the only differences in duration come from the small variations in start times set during dataset construction.
 
-Within-case performance analysis reveals additional information about time distribution between activities. The waiting time between Create order and Approve order is 60 minutes in Case 1, 75 minutes in Case 2, and 65 minutes in Case 3, giving a mean of approximately 67 minutes. The waiting time between Approve order and Send invoice is 60 minutes in Case 1, 50 minutes in Case 2, and 50 minutes in Case 3, giving a mean of approximately 53 minutes. If these waiting times were projected onto the discovered Petri net — annotating each arc with the mean waiting time computed across all cases that passed through it — the approval transition would appear as the more time-consuming step, with a 67-minute average compared with 53 minutes for the invoicing step. In a real procurement process, a consistently longer waiting time before the approval step might indicate a resource bottleneck: an approval manager who is processing many cases in parallel causes a queuing delay before each case is reviewed. Identifying such bottlenecks is one of the primary practical applications of performance-annotated process models.
+Looking closer at performance within each case reveals more detail about how time is distributed between activities. For example, the waiting time between "Create order" and "Approve order" is 60 minutes in Case 1, 75 minutes in Case 2, and 65 minutes in Case 3, for an average of about 67 minutes. The waiting time between "Approve order" and "Send invoice" is 60 minutes in Case 1, 50 minutes in Case 2, and 50 minutes in Case 3, averaging about 53 minutes. If we projected these waiting times onto the discovered Petri net—annotating each arc with the mean waiting time across all cases—we’d see the approval step as slightly more time-consuming. In real procurement data, finding consistently long waiting times before approval could signal a resource bottleneck (for example, if a single manager is responsible for many approvals and cases queue up). Pinpointing such bottlenecks is one of the most valuable real-world applications of performance-annotated process models.
 
-*Extensions and variations.* The synthetic example as presented is intentionally minimal. Several extensions are worth considering to build further intuition before approaching the real-world case study.
+*Extensions and Variations:*
 
-Adding a second variant — for example, cases where Create order is followed by Reject order and then Close case — would introduce variability into the log. The directly-follows graph would include two separate branches emanating from Create order, and the Inductive Miner would detect an exclusive choice cut between the approval path and the rejection path. The resulting process tree would contain a $times$ (exclusive choice) operator at the branching point. Conformance checking against this two-variant model would yield perfect fitness, since both observed trace types are accepted. This extension illustrates how variant diversity in a log drives the structural complexity of the discovered model.
+The synthetic example here is deliberately minimal, but it can be extended in several ways to deepen understanding before moving to the real-world case study:
 
-Introducing a loop — for example, cases where Approve order is followed by Request revision and then Approve order again — would test the algorithm's ability to represent rework. The Inductive Miner would detect a loop cut in the sublog containing the approval and revision activities, producing a loop operator $circle.small$ in the process tree. Both standard traces (no revision) and looping traces (with one or more revisions) would be accepted by the resulting model. This extension connects to the loop analysis performed on the BPI Challenge 2019 dataset in Section 4.3.
+Adding a second variant—for example, cases where "Create order" is followed by "Reject order" and then "Close case"—would introduce variability. The directly-follows graph would branch, and the Inductive Miner would detect an exclusive choice, adding a choice operator to the process tree. Conformance checking would still show perfect fitness, as both trace types are accepted. This illustrates how trace diversity drives structural complexity in discovered models.
 
-Finally, introducing noise — a small number of traces that violate the intended process structure, such as a trace where Send invoice appears before Approve order — would test how the IMf variant handles exceptional cases. If the noisy traces fall below the configured frequency threshold, the algorithm filters them out and produces a clean model reflecting only the majority behavior. The noisy traces would then appear as deviations in conformance checking, with fitness scores below 1.0 and non-synchronous moves in their optimal alignments. This extension illustrates the robustness mechanism of the IMf algorithm and the complementary role of conformance checking in identifying exceptional cases that the model does not cover.
+Introducing a loop—for instance, cases where "Approve order" is followed by "Request revision" and then "Approve order" again—would test the algorithm’s ability to represent rework. The Inductive Miner would identify a loop cut, adding a loop operator to the process tree. Both standard and looping traces would be accepted. This ties into the loop analysis performed later on the BPI Challenge 2019 dataset.
 
-== BPI Challenge 2019: the case study
+Adding noise—a few traces that violate the intended structure, such as "Send invoice" appearing before "Approve order"—would test the IMf algorithm’s robustness. If these noisy traces are rare, the algorithm filters them out, keeping the model clean and reflecting only the majority behavior. The noisy traces would then stand out in conformance checking, with fitness scores below 1.0 and non-synchronous moves in their alignments. This shows how the IMf variant balances robustness and sensitivity, and how conformance checking helps identify exceptions not covered by the model.
 
-=== Data source, format, and structure
+== BPI Challenge 2019: The Case Study 
+=== Data Source, Format, and Structure
 
-The BPI Challenge is an annual competition organized in connection with the International Conference on Process Mining. Each year, a real organization contributes a dataset from one of its operational processes, and participants are invited to apply process mining and related analytical methods. The resulting analyses are presented at the ICPM workshop and collectively form a growing body of benchmark results that the process mining community uses to evaluate and compare tools and algorithms. The datasets released through the BPI Challenge have become some of the most widely cited benchmarks in the field, valued for their authentic complexity and for the fact that they represent documented real-world processes whose behavior can be interpreted in organizational terms.
+The BPI Challenge is an annual competition held in conjunction with the International Conference on Process Mining. Each year, a real organization donates a dataset from one of its operational processes, and participants are invited to analyze it using process mining and related methods. The results are presented at the ICPM workshop, forming a growing body of benchmark analyses that the process mining community uses to evaluate and compare tools and algorithms. These datasets are now some of the most widely cited benchmarks in the field, valued for their complexity and real-world relevance.
 
-The BPI Challenge 2019 dataset originates from a procurement process at a large multinational company. Procurement — the process of acquiring goods and services from external suppliers — is one of the most commonly studied domains in process mining because it is both economically significant and structurally complex. A typical procurement process involves multiple stakeholders, including purchasing agents, approval managers, finance controllers, and suppliers. It also spans multiple systems, such as ERP platforms, supplier portals, and invoice management applications. The combination of many document types, approval levels, and exception handling procedures makes procurement processes highly variable in practice: the same formal process design can produce dozens or hundreds of distinct execution paths depending on how individual cases are routed through the organization. The BPI Challenge 2019 dataset captures this variability in an authentic, unmodified event log that was collected directly from the company's operational systems.
+The BPI Challenge 2019 dataset comes from a procurement process at a large multinational company. Procurement—the acquisition of goods and services from external suppliers—is a classic domain for process mining due to its economic significance and inherent complexity. A typical procurement process involves multiple stakeholders (purchasing agents, approval managers, finance controllers, suppliers) and spans several systems (ERP, supplier portals, invoice management). With many document types, approval levels, and exception procedures, procurement is highly variable: the same formal process can produce dozens or hundreds of different execution paths, depending on how individual cases are routed. The BPI Challenge 2019 dataset captures this variability in a raw event log collected directly from the company’s systems.
 
-The dataset is provided in OCEL (Object-Centric Event Log) format, stored as a JSON file. As explained in Chapter 2, OCEL was developed to overcome a fundamental limitation of the classical event log format. In classical process mining, each event must be assigned to exactly one case, and the case identifier determines how events are grouped into traces. In real business processes, however, a single event often relates to multiple business objects simultaneously. When an invoice is approved in a procurement system, for example, that approval event is related to the invoice document, the purchase order, the individual order items, the vendor, and possibly a resource or cost center object — all at the same time. Classical event logs cannot represent this multi-object relationship without distortion: the analyst must choose one object type to serve as the case identifier and either discard or artificially replicate the others.
+The dataset is provided in OCEL (Object-Centric Event Log) format as a JSON file. As discussed in Chapter 2, OCEL was developed to address a key limitation of classical event logs, which require each event to be assigned to exactly one case. In real business processes, however, events often relate to several business objects at once. For example, when an invoice is approved, that event may be linked to the invoice, the purchase order, individual items, the vendor, and possibly a resource or cost center—all at the same time. Classical logs can’t represent these multi-object relationships without losing or duplicating information.
 
-OCEL solves this problem by allowing each event to be associated with a list of objects from multiple types simultaneously. The OCEL standard defines a JSON schema in which the top-level structure contains two main arrays: an events array and an objects array. Each event has a unique event identifier, a timestamp, an activity label, and an object map that specifies which objects of each type are involved in that event. Each object has a unique identifier, an object type, and a dictionary of object-level attributes. PM4Py reads this structure using `pm4py.read_ocel()`, which parses the JSON file and returns an OCEL object containing separate pandas DataFrames for events and objects, along with metadata specifying the column name used for object types.
+OCEL solves this by allowing each event to be associated with a list of objects from multiple types. The OCEL standard defines a JSON schema with two main arrays: one for events, one for objects. Each event has a unique ID, timestamp, activity label, and an object map specifying which objects of each type are involved. Each object has a unique ID, type, and a dictionary of attributes. PM4Py can read this structure using pm4py.read_ocel(), which parses the JSON and returns an OCEL object with separate pandas DataFrames for events and objects, plus metadata for object types.
 
-The BPI Challenge 2019 dataset contains approximately 1,595,923 events and 330,685 objects distributed across four object types:
+The BPI Challenge 2019 dataset contains approximately 1,595,923 events and 330,685 objects, distributed across four object types:
 
 #table(
   columns: 3,
@@ -750,9 +803,9 @@ The BPI Challenge 2019 dataset contains approximately 1,595,923 events and 330,6
   [Vendor],                       [~23,000],    [Supplier company from whom goods or services are purchased],
 )
 
-The POItem type is the most frequent, reflecting the fact that a single purchase order typically contains multiple line items, each of which follows its own lifecycle through the procurement process. A purchase order for fifty different products, for example, would produce fifty POItem objects, each potentially subject to different approval steps, delivery confirmations, and invoice verifications depending on the product category and the procurement rules applicable to each item. This structure means that the POItem level is the most granular and information-rich level at which the procurement process can be analyzed.
+The POItem type is by far the most common object in the dataset. This is because a single purchase order often includes multiple line items, with each item following its own distinct journey through the procurement process. For example, if a purchase order contains fifty different products, the log will include fifty POItem objects — one for each product. Each line item may go through different approval steps, delivery confirmations, and invoice checks, depending on the product's category and the specific procurement rules that apply. As a result, the POItem level offers the most detailed and information-rich perspective for analyzing the procurement process.
 
-Each event in the dataset carries, in addition to its timestamp and activity name, a set of business context attributes that describe the organizational and operational context in which the event occurred:
+Beyond the timestamp and activity name, each event in the dataset also includes a range of business context attributes. These attributes capture important details about the organizational and operational setting in which each event occurred, such as:
 
 #table(
   columns: 2,
@@ -774,7 +827,7 @@ From a data quality perspective, the dataset presents several challenges typical
 
 In Python, the dataset is loaded using `pm4py.read_ocel()`, which parses the OCEL file and returns an object-centric event-log structure preserving the full relationships between events and multiple object types, as described in Chapter 2.
 
-=== Purpose and analytical workflow
+=== Purpose and Analytical Workflow
 
 The purpose of this case study is to demonstrate how PM4Py can be applied to a large, complex, real-world event log in a systematic workflow that produces interpretable analytical results. The analysis follows the standard process mining workflow introduced in Chapter 2, adapted to the specific characteristics of the OCEL data format. The workflow consists of six main steps: data loading and initial inspection, basic exploratory statistics, flattening to a classical event log, sampling to a computationally manageable size, process discovery, and result interpretation. Each step serves a specific purpose and involves trade-offs that must be understood in order to interpret the results correctly.
 
@@ -798,17 +851,21 @@ More sophisticated strategies — such as stratified sampling that ensures propo
 
 *Step 6: Result interpretation.* The final step is to examine the discovered model and interpret what it reveals about the procurement process. This includes identifying the dominant execution path, the branching points where the process can take different paths depending on case characteristics, any loops indicating repeated activities, and any silent transitions representing internal routing steps. The interpretation is discussed in detail in Section 4.2.4.
 
-=== Implementation and results
+=== Implementation and Results
 
-The following notebook implements the complete analytical workflow described in the previous section, from loading the OCEL file to discovering and visualizing the Petri net. The notebook is organized into a sequence of cells that correspond to the main steps of the analysis. The first group of cells sets up the Python environment by importing the required libraries — PM4Py, pandas, os, and shutil — and configures the key parameters: the file path to the OCEL data, the sampling size, and the output directory for saved figures. A utility function checks whether Graphviz is available in the system PATH, which determines whether the Petri net can be rendered as a high-quality diagram or whether the fallback DFG visualization must be used instead.
+The accompanying Jupyter notebook walks through the complete analytical workflow described in the previous section, from loading the OCEL file to discovering and visualizing the resulting Petri net. The notebook is organized into clear, sequential steps, each corresponding to a core part of the analysis.
 
-The data loading cells read the OCEL file using `pm4py.read_ocel()` and then print descriptive statistics about the resulting structure. The statistics reported include the total number of events, the total number of objects, the distribution of objects by type, the column names of the events DataFrame, and the column names of the objects DataFrame. These outputs confirm that the file was parsed correctly and provide the foundational descriptive statistics used in Chapter 2's exploratory description of the dataset. The most common object type — POItem in this case — is identified programmatically by calling `value_counts()` on the object type column, so the code adapts automatically if a different dataset is used where a different object type is most frequent.
+First, a set of cells prepares the Python environment: importing the necessary libraries (PM4Py, pandas, os, and shutil), setting key parameters like the file path to the OCEL dataset, the sampling size, and the output directory for saving figures. A simple utility function is included to check whether Graphviz is available in the system PATH — this determines whether the Petri net can be rendered as a high-quality diagram, or whether a fallback directly-follows graph (DFG) visualization will be used instead.
 
-The flattening cell calls `pm4py.ocel_flattening()` with the OCEL object and the most common object type as arguments. It then reports the number of classical cases in the resulting event log. Because the flattening procedure can produce very large case counts (due to the event replication effect described in the previous section), the split cell immediately follows, selecting the first 70% of cases (37,238 cases) as the training set and the next 15% (7,979 cases) as the test set. The number of cases and events in the sampled log is reported so that the reduction can be verified.
+The workflow then proceeds with data loading. The OCEL file is read using `pm4py.read_ocel()`, and basic statistics about the dataset are printed: the total number of events, the total number of objects, how objects are distributed by type, and the column names for both the events and objects DataFrames. These outputs provide reassurance that the data was loaded correctly, and they echo the exploratory statistics discussed earlier in Chapter 2. The notebook identifies the most frequent object type — POItem in this case — automatically by calling `value_counts()` on the type column, so the code remains flexible for reuse with other datasets.
 
-The discovery cell applies `pm4py.discover_petri_net_inductive()` to the sampled log and prints the number of places, transitions, and arcs in the discovered Petri net. For the BPI Challenge 2019 sample, the discovered Petri net contains 95 places, 151 transitions, and 328 arcs, reflecting the high structural complexity of a procurement process with multiple branching paths and optional steps. This information characterizes the structural complexity of the model: a net with many places and transitions indicates a complex process with many branching paths and possible states, while a simpler net with fewer nodes suggests a more streamlined process. The visualization and saving cell then renders the discovered model using Graphviz (if available) or the built-in DFG renderer (as a fallback), saves the output to the configured figures directory, and displays the result interactively in the notebook.
+Next, the flattening step uses `pm4py.ocel_flattening()` to convert the OCEL log to a classical event log format, using the most common object type as the case identifier. The notebook then reports the number of cases in the resulting event log, highlighting that flattening can inflate case counts (as discussed previously). Immediately after, the code splits the log, taking the first 70% of cases as the training set (37,238 cases) and the next 15% as the test set (7,979 cases). The number of cases and events in the sample is reported so that the size reduction can be verified.
 
-The following code loads the OCEL file and inspects the resulting structure:
+For process discovery, `pm4py.discover_petri_net_inductive()` is applied to the sampled log. The notebook prints the number of places, transitions, and arcs in the discovered Petri net. In the BPI Challenge 2019 sample, the net contains 95 places, 151 transitions, and 328 arcs — an indicator of the complexity inherent in real-world procurement, with its many branching paths and optional steps. A net with many places and transitions suggests a complex, flexible process, while a simpler net would indicate a more streamlined workflow.
+
+Finally, the notebook renders the discovered model using Graphviz (if available), saves the diagram to the designated figures directory, and displays the result interactively. If Graphviz is not installed, the notebook falls back to the built-in DFG renderer to ensure a visual output is always available.
+
+Below is the code that loads the OCEL file and inspects the resulting structure:
 
 ```python
 ocel         = pm4py.read_ocel("BPIC19_sample.jsonocel")
@@ -899,7 +956,9 @@ Arcs       : 328
 ```
 ]
 
-The conformance checking step evaluates the discovered model against 7,979 held-out test cases that were not used during discovery. The results are summarised in the following table.
+The next step in the workflow is conformance checking, where the discovered process model is evaluated against a set of held-out test cases — specifically, the 7,979 cases (15% of the dataset) that were not used during model discovery. This step assesses how well the discovered Petri net explains the actual behavior observed in unseen data, providing an objective measure of the model's generalization and robustness.
+
+The key results of the conformance checking are summarized in the following table:
 
 #table(
   columns: 2,
@@ -912,278 +971,334 @@ The conformance checking step evaluates the discovered model against 7,979 held-
   [Interpretation],                [Excellent],
 )
 
-A log fitness of 0.9997 means that the model is able to replay 99.97% of the token flow across all test traces without producing missing or remaining tokens. The percentage of perfectly fitting traces — 99.6% — means that the vast majority of test cases are accepted by the model without any deviation. This high fitness score is consistent with the choice of the Inductive Miner Infrequent algorithm, which guarantees a sound net and filters rare paths that would otherwise reduce fitness on unseen data. The 0.4% of non-fitting traces likely correspond to very infrequent variants not captured in the training set of 37,238 cases.
+A log fitness of 0.9997 means the model is able to replay 99.97% of token flow across all test traces without producing missing or remaining tokens. The percentage of perfectly fitting traces — 99.6% — shows that nearly every test case is accepted by the model with no deviations. This high fitness is not surprising: the Inductive Miner Infrequent algorithm is designed to build sound models and to filter out rare paths that might otherwise reduce fitness on new data. The small 0.4% of non-fitting traces likely correspond to very infrequent variants that were not present in the 37,238-case training set.
 
-=== Discussion of results
+=== Discussion of Results
 
-The output of the notebook provides two complementary views of the procurement process. The directly-follows graph shows which activities tend to follow each other and how frequently, giving an immediate visual overview of the dominant execution paths in the data. Each node in the DFG represents an activity, each directed arc represents a directly-follows relationship, and the weight attached to each arc records how many times that transition was observed across all cases in the sampled log. Activities with high total frequency — those that appear in a large proportion of cases — correspond to mandatory or near-mandatory steps in the standard procurement procedure. Activities with low frequency or that are reachable only via low-frequency arcs correspond to exception handling paths or activities specific to particular document types or spending categories.
+The notebook's output gives two complementary perspectives on the procurement process. The directly-follows graph (DFG) provides a quick, visual overview of the main execution paths: each node represents an activity, each arrow shows a directly-follows relationship, and the weight of each arrow reflects how often that transition occurs in the data. Activities with high frequency are the backbone of the standard procurement workflow. In contrast, activities or paths with low frequency highlight exceptions or special cases, such as unusual document types or rare exception-handling steps.
 
 #sgh_figure(
-  caption: [Activity frequency distribution for the BPI Challenge 2019 dataset (training set of 37,238 cases, 70% of the full log). Activities are ranked by total occurrence count. Mandatory steps such as goods receipt and invoice verification dominate, while exception-handling activities appear at much lower frequencies.],
+  caption: [Activity frequency distribution for the BPI Challenge 2019 dataset. Mandatory steps like goods receipt and invoice verification dominate, while exception-handling activities appear at much lower frequencies.],
   source: [Own elaboration based on BPI Challenge 2019 data.]
 )[#image("figs/fig_01_activity_freq.png", width: 100%)] <fig-activity-freq>
 
-The Petri net produced by the Inductive Miner provides a more formal structural model that captures sequences, choices, and loops in a sound and unambiguous representation. Unlike the DFG, the Petri net is not just a frequency-weighted graph but a formal operational model: it specifies exactly which sequences of activities are valid according to the discovered process structure, and it can be used to replay individual cases and detect deviations. The soundness guarantee of the Inductive Miner means that the discovered net cannot produce deadlocks — situations where the process reaches a state from which no transition can fire — which is an important practical property for a model that will be used for conformance checking or simulation.
+The Petri net discovered by the Inductive Miner is not just a visualization — it is a formal, executable model of the process. Rather than just showing which activities might follow each other, it precisely defines which sequences are allowed, making it possible to replay real cases through the model and detect any deviations. Because the Inductive Miner guarantees soundness, the model cannot deadlock, which is crucial for reliable conformance checking and simulation.
 
 #sgh_figure(
-  caption: [Petri net discovered by the Inductive Miner from 37,238 BPI Challenge 2019 cases (70% training split). The net contains 95 places, 151 transitions, and 328 arcs. Rectangles represent transitions (activities); circles represent places (process states); the leftmost place is the initial marking and the rightmost is the final marking.],
+  caption: [Petri net discovered by the Inductive Miner from the BPI Challenge 2019 training data. Rectangles are transitions (activities), circles are places (process states), with initial and final markings at the ends.],
   source: [Own elaboration based on BPI Challenge 2019 data.]
 )[#image("figs/fig_02_petri_net.png", width: 100%)] <fig-petri-net>
 
-A dominant main path can be identified in the discovered model — the sequence of transitions that is fired by the majority of cases from the initial marking to the final marking without taking any exceptional branches. This main path represents the standard execution of a routine procurement transaction. In a typical purchase-to-pay process, this main path would include: creating a purchase order item, obtaining the necessary approval at the appropriate authorization level, confirming goods receipt upon delivery, receiving and verifying the supplier invoice, and releasing the payment. This sequence reflects the intended design of a purchase-to-pay process as described in the procurement management literature and in the documentation accompanying the BPI Challenge 2019 dataset.
+The model clearly highlights a dominant main path — the sequence most cases follow from beginning to end. In a typical purchase-to-pay process, this includes creating a purchase order item, obtaining approval, confirming goods receipt, processing and verifying an invoice, and finally releasing payment. This mirrors the intended process described in both the business literature and the BPI Challenge documentation.
 
-Beyond the main path, the model reveals several branching points corresponding to decision points in the procurement process. Some cases skip certain steps: orders below a value threshold may not require explicit manager approval, proceeding directly from creation to goods receipt without an intermediate approval event. Other cases include additional steps: orders that require three-way matching — where the purchase order, goods receipt document, and invoice must all be compared before payment is released — follow a longer path through the model than orders processed on the basis of the purchase order alone. These structural differences between case types are captured in the Petri net as alternative paths through different places and transitions, with the frequencies of the paths reflecting how common each case type is in the sampled data.
+Beyond this main path, the model reveals branching points. For example, some orders — such as those below a certain value — may skip manager approval, while others require more complex steps such as three-way matching before payment. These scenarios appear as alternative paths in the Petri net, and their frequency reflects how common each is in practice.
 
-The presence of loops in the discovered model, where they exist, indicates activities that are repeated within a single case. In procurement processes, loops typically arise from correction and reprocessing steps. An invoice containing an error must be blocked, corrected, and resubmitted, passing through the verification activity more than once. A purchase order amendment that changes the quantity or price of an order item may trigger a re-approval step, causing the approval activity to appear twice in the trace. The Inductive Miner represents such loops using the loop operator $circle.small$ in the process tree, which translates to a corresponding loop structure in the Petri net where a redo transition creates a path back to an earlier place. Identifying these loops is important for performance analysis, because each additional iteration extends the throughput time of the affected cases.
+Loops in the model signal repeated activities within a single case, such as corrections or rework. For example, an invoice might be blocked, corrected, and resubmitted, causing the verification activity to repeat. Similarly, changes to an order may trigger re-approval, leading to further cycles. The Inductive Miner captures these explicitly as loop structures using the loop operator $circle.small$, which is important for performance analysis because each additional cycle increases case duration.
 
-The results must be interpreted in light of two important limitations. First, the model was discovered from the first 70% of cases (37,238 cases) selected chronologically from the log. Rare variants and exceptional paths that do not appear in this training portion will not be captured in the model. A model discovered from a random or stratified sample would likely contain more branches and a higher number of transitions, reflecting the greater variability of the full dataset. Second, the Inductive Miner Infrequent algorithm filters out directly-follows pairs that appear below a frequency threshold before attempting to detect cuts. This filtering improves robustness to noise but may cause the model to omit paths that account for a small but real fraction of cases. Those filtered-out paths would show up as deviations when conformance checking is applied to the full log.
+Two limitations should be acknowledged. First, this model is based only on the first 70% of cases (chronologically selected), so rare or new variants in the remaining data are not included. A random or stratified sample might yield a more complex model. Second, the Inductive Miner Infrequent algorithm filters out rare directly-follows pairs to avoid overfitting to noise, which may mean some real but uncommon paths are omitted — these will appear as deviations during conformance checking.
 
-From the perspective of practical process intelligence, the discovered model serves several purposes beyond documentation of the process structure. It provides a reference model against which conformance checking can be applied to identify deviations in new or historical data. It provides a structural basis for simulation: if activity duration distributions are estimated from the log and used to parameterize a SimPy simulation built on the model structure, the analyst can estimate the effect of proposed process changes — such as adding resources to the approval step or automating invoice verification — on overall throughput times. It also serves as a communication tool: process owners and managers who are not familiar with Petri net notation can often still read the main features of a process model when it is presented visually, making the model useful in stakeholder discussions about process improvement initiatives.
+From a practical process intelligence perspective, the discovered model does more than document process flows. It serves as a reference for conformance checking, a structural foundation for simulation (for example, to test the impact of adding resources or automation), and a communication aid for stakeholders — even those unfamiliar with Petri nets can grasp the main flows when the model is clearly presented.
 
-== Advanced example: loops, variants, and performance analysis
+== Advanced Example: Loops, Variants, and Performance Analysis
 
-The second example builds on the same BPI Challenge 2019 dataset and extends the analysis to three additional dimensions that were introduced in Chapter 2 but not fully explored in the first case study: the variety of execution paths (variants), the presence of repeated activities within cases (loops and rework), and the time performance of the process (throughput time distribution). These three analyses are complementary and together provide a more complete characterization of process behavior than process discovery alone.
+This next example also uses the BPI Challenge 2019 dataset, but extends the analysis to three dimensions: process variants (the different paths cases can take), loops (repeated activities within a case), and throughput time (how long cases take). Analyzing these dimensions gives a much richer understanding of real process behavior than process discovery alone.
 
-The analytical tools used in this example are all part of PM4Py's standard library and operate on the same flattened classical event log produced in the first case study. No additional data loading or format conversion is required. The main Python operations used are `pm4py.get_variants()` for variant analysis, a custom loop detection procedure based on activity counting within traces using Python's `Counter` class, and pandas-based timestamp arithmetic for throughput time computation. These operations scale to large logs because they rely on pandas `groupby` and aggregation functions rather than trace-by-trace iteration in pure Python.
+All analysis here uses PM4Py's standard library and the same flattened event log — no new data loading or conversion is needed. Key operations include `pm4py.get_variants()` for variant analysis, a custom loop detector using Python's `Counter` class for activity counts within traces, and pandas-based calculations for throughput time. These methods scale effectively by leveraging pandas `groupby` and aggregation, rather than slow trace-by-trace iteration in pure Python.
 
-=== Variant analysis
+=== Variant Analysis
 
-A variant is any distinct trace that appears at least once in the event log. Variant analysis ranks variants by their frequency and examines the distribution of cases across variants. The shape of this distribution is one of the most informative characteristics of a real-world process log, because it reveals whether the process is highly standardized — a few variants account for almost all cases — or highly variable — cases are distributed across many variants with no dominant pattern. Procurement processes tend to fall somewhere between these extremes: there is usually a small number of dominant variants corresponding to standard routine transactions, but a very long tail of infrequent variants produced by exceptions, corrections, and process adaptations.
+A variant is any unique trace that appears at least once in the event log. Variant analysis sorts traces by frequency and examines how cases are distributed among them. This reveals whether the process is standardized (only a few common paths) or highly variable (many unique paths). Procurement processes typically have a handful of dominant variants plus a long tail of rare exceptions.
 
-For the BPI Challenge 2019 dataset, variant analysis of the flattened sample log reveals 826 distinct trace patterns. The full unsampled log contains up to 26,378 distinct trace patterns, reflecting the high variability of the complete procurement process. This is an exceptionally high number of variants for a single process, reflecting the structural complexity of the procurement domain. A procurement process is subject to many sources of variability: different document types follow different workflows, different approval levels apply to orders of different sizes, different item categories require different verification steps, and different vendors may require different payment terms. All of these factors combine to produce a large space of potential execution paths, most of which are observed in the data at least once.
+In the BPI Challenge 2019 sample, there are 826 distinct trace patterns. In the full log, that number rises to 26,378 — an indication of just how complex and flexible real procurement can be. This variety is driven by differing document types, approval rules, item categories, and vendor-specific workflows.
 
-The distribution of cases across variants follows the typical highly skewed pattern observed in most real business process logs. A small number of variants — often fewer than ten — account for a disproportionately large share of all cases, while the vast majority of variants are observed only once or a few times. This pattern can be quantified using the coverage formula introduced in Chapter 2. The coverage of the top $k$ variants is:
+The case distribution among variants is highly skewed: a few variants account for most cases, while the majority are seen only rarely. The coverage metric introduced in Chapter 2 quantifies this:
 
 $ "Coverage"(k) = (sum_(i=1)^k L(sigma_i^*)) / (||L||) $
 
-where $sigma_1^*, sigma_2^*, dots$ are the variants ordered by decreasing frequency. Even for a highly variable log like BPI Challenge 2019, the top ten variants typically account for a substantial fraction of all cases — though considerably smaller than it would be for a more standardized process such as a simple bank account opening procedure, where a single dominant variant might cover more than 80 percent of cases. In the representative sample used for this analysis, the top ten variants account for 70.5% of all cases and the top twenty for 75.8%, with coverage increasing slowly beyond that — a pattern characteristic of a long-tail variant distribution.
+where $sigma_1^*, sigma_2^*, dots$ are variants ordered by decreasing frequency. For this dataset, the top 10 variants account for 70.5% of all cases, and the top 20 for 75.8%. Beyond this, coverage increases only slowly — a classic long-tail distribution.
 
 #sgh_figure(
-  caption: [Variant frequency distribution for the BPI Challenge 2019 sample. The horizontal axis shows variant rank ordered by decreasing frequency and the vertical axis shows the number of cases per variant. A small number of variants account for the majority of cases, while the long tail contains many variants observed only once or a few times.],
+  caption: [Variant frequency distribution for the BPI Challenge 2019 sample. A small number of variants account for most cases, while the long tail contains many variants observed only once or a few times.],
   source: [Own elaboration based on BPI Challenge 2019 data.]
 )[#image("figs/fig_03_variant_freq.png", width: 100%)] <fig-variant-freq>
 
-Top-$k$ variant filtering is a standard preprocessing step in process mining that focuses the analysis on dominant process behavior. The `pm4py.filter_variants()` function implements this filtering: it accepts the event log and a list of variant tuples produced by `pm4py.get_variants()`, and returns a new event log containing only the cases whose traces match one of the specified variants. In this example, the function is called with the top-ten variant list obtained by sorting the variant dictionary in descending order of frequency.
+Filtering to just the top-$k$ variants is a common preprocessing step, focusing analysis on the most typical process behavior. With `pm4py.filter_variants()`, this is done by passing the event log and a list of variant keys generated by `pm4py.get_variants()`.
 
-An important diagnostic result from the variant analysis of this dataset is that the filtered log — the subset of cases belonging to the top-ten variants — contains zero cases. This counterintuitive result arises from the flattening artifact described in Section 4.2.3. When a single event is associated with many POItem objects, the flattening procedure produces many traces that share the same event identifiers but are assigned to different case identifiers. The variant structure of such a flattened log may not behave as expected when standard variant filtering is applied, because the exact trace sequences in the inflated log may not match the variant keys returned by `pm4py.get_variants()`. This is a known limitation of applying classical variant analysis to flattened OCEL data and is one of the practical reasons why object-centric process mining methods — which avoid flattening altogether — are receiving increasing research attention. Despite this limitation, the variant analysis step is retained in the example because it illustrates both the intended analytical procedure and the data quality challenges that arise when classical tools are applied to object-centric data.
+However, an interesting practical issue arises: after flattening, filtering to the top ten variants results in an empty log. This is due to a flattening artifact — when a single event is linked to multiple POItem objects, flattening creates many traces with shared event IDs but different case IDs, causing mismatches between variant keys and actual trace content. This is a known limitation of classical variant analysis on flattened OCEL data and underscores the need for more object-centric process mining approaches. Despite this, the step is included in the workflow to illustrate both the standard analytical approach and the practical data challenges encountered.
 
-After the filtering step returns an empty log, the notebook rebuilds the filtered log for the discovery step by calling the full variant pipeline again and applying the filter with the same top-ten list. This recovery mechanism ensures that the subsequent analysis steps can still proceed and demonstrates good defensive programming practice in process mining notebooks applied to real-world data with unpredictable characteristics.
+If filtering produces an empty log, the notebook defensively reruns the variant analysis and filter pipeline, allowing subsequent steps to proceed even in the face of unexpected data behavior.
 
-=== Loop and rework detection
+=== Loop and Rework Detection
 
-A loop in a process trace occurs when the same activity appears more than once within a single case. Loops may represent rework — situations where an activity must be repeated because the first execution was incorrect or incomplete — or they may represent intentional repetition, as in a periodic review activity performed at regular intervals throughout the case lifecycle. In procurement processes, common sources of rework include invoice discrepancies (where an invoice must be rejected and resubmitted after correction), approval rejections (where an order is rejected and resubmitted after modification), and delivery problems (where a goods receipt is reversed and repeated after a discrepancy is resolved). Detecting loops and measuring the rework rate is therefore a practically important analysis for any procurement process, as it directly quantifies how much additional effort is caused by exceptions and errors.
+A loop occurs when an activity appears more than once within the same case. Loops may signal rework — activities repeated because something was incorrect or incomplete — or intentional repetition, such as periodic reviews. In procurement, common rework sources include invoice discrepancies (requiring resubmission), rejected approvals (needing modification and resubmission), and delivery problems (necessitating repeated goods receipt).
 
-The rework rate is defined as the fraction of cases in which at least one activity appears more than once. For a case $c$ with trace $sigma = chevron.l a_1, a_2, dots, a_n chevron.r$, the activity count of activity $a$ in case $c$ is $"count"(a, c) = |{i : a_i = a}|$. Case $c$ exhibits rework if $max_a "count"(a, c) > 1$. The rework rate across the log is:
+The rework rate is defined as the fraction of cases where at least one activity appears more than once. For a case $c$ with trace $sigma = chevron.l a_1, a_2, dots, a_n chevron.r$, the count of activity $a$ in case $c$ is $"count"(a, c) = |{i : a_i = a}|$. If any activity count exceeds one, the case exhibits rework. The overall rework rate is:
 
 $ "ReworkRate"(L) = (|{c in L : exists a, "count"(a, c) > 1}|) / (||L||) $
 
-In Python, this is computed by grouping the event log DataFrame by case identifier, extracting the activity sequence for each case, counting activity occurrences using Python's `Counter` class, and checking whether any activity has a count greater than one. The most commonly repeated activities — those that appear with count $>1$ in the largest number of cases — are identified by aggregating the per-case rework flags across the full log. This is a computationally efficient operation that scales well even on large logs, because it involves only simple pandas groupby and aggregation steps rather than any computationally expensive alignment or discovery procedure.
+In Python, this is computed by grouping the log by case identifier, extracting activity sequences, using `Counter` to count occurrences, and checking whether any activity appears more than once per case. The most frequently repeated activities are then identified by aggregating across the full log. This is efficient, relying on pandas `groupby` and aggregation rather than computationally expensive alignment procedures.
 
-In this dataset, the loop analysis is applied to the filtered log (the subset of cases belonging to the top-ten variants). Because the filtered log is empty as a result of the flattening artifact described in the variant analysis section, the rework rate computed on the filtered log is 0.0 — a result that reflects the empty sample rather than a genuine absence of rework in the procurement process. When the same analysis is applied to the full flattened log without variant filtering, the rework rate is 4.9%. The most frequently repeated activity is Record Service Entry Sheet, which appears more than once in 112 cases, consistent with the expectation that invoice and service entry steps are the primary source of correction cycles in large procurement systems. The discrepancy between the filtered and full log results again highlights the importance of understanding how the preprocessing steps — particularly flattening and variant filtering — affect the composition of the log before downstream analyses are interpreted.
+For this dataset, loop analysis is applied to the filtered log (cases belonging to the top-ten variants). However, due to the flattening artifact described above, the filtered log is empty, so the computed rework rate is 0.0 — reflecting the empty sample, not a genuine absence of rework. When the same analysis is applied to the full flattened log without filtering, the rework rate is 4.9%. The most commonly repeated activity is "Record Service Entry Sheet," appearing more than once in 112 cases, consistent with the expectation that invoice and service entry steps are the primary source of correction cycles in large procurement systems.
 
-Despite the empty filtered log, the rework analysis step demonstrates the intended methodology clearly. In a setting where the filtered log is non-empty, this analysis would reveal which activities are most commonly repeated and in what fraction of cases rework occurs. For the BPI Challenge 2019 dataset, activities near the invoice processing and payment stages would be expected to have the highest rework rates, because invoice discrepancies are common in large procurement systems and each discrepancy typically triggers a correction cycle. Activities near the purchase order creation stage would be expected to have lower rework rates, because creation is typically a one-time step performed at the start of the case lifecycle. The rework activity profile — the list of activities ranked by the number of cases in which they appear more than once — provides actionable information for process improvement: activities with high rework rates are priority candidates for root-cause analysis and corrective measures.
+This discrepancy highlights the importance of understanding how preprocessing — particularly flattening and variant filtering — shapes the log and affects downstream analysis. Despite the empty filtered log, the methodology remains valid. In a typical dataset, this analysis would identify which activities are most often repeated and in what proportion of cases rework occurs. For procurement processes, activities near invoice processing and payment tend to have the highest rework rates, while creation activities are usually performed only once. The rework activity profile — ranking activities by repeat frequency — is directly actionable for process improvement, as high-rework steps are prime candidates for root-cause analysis and corrective action.
 
-#sgh_figure(
-  caption: [Top activities by rework occurrence in the BPI Challenge 2019 dataset. Each bar shows the number of cases in which the activity was observed more than once within a single case. Record Service Entry Sheet is the most frequently repeated activity, appearing with count greater than one in 112 cases, confirming that service entry correction cycles are the dominant source of rework in the procurement process.],
-  source: [Own elaboration based on BPI Challenge 2019 data.]
-)[#image("figs/fig_05_rework.png", width: 100%)] <fig-rework>
+=== Throughput Time and Performance KPIs
 
-=== Throughput time and performance KPIs
+Adding the time dimension to process analysis enables us to measure not just what happens, but how long each step takes and how efficiently the process runs. With timestamps in the event log, we can calculate end-to-end throughput time for each case, waiting times between activities, and see how performance varies across different process segments. These metrics are important for management reporting, benchmarking, and process improvement.
 
-Performance analysis adds the time dimension to the structural view produced by process discovery and the frequency view produced by variant analysis. Because event logs contain timestamps, it is possible to measure how long each case takes from start to finish, how long cases wait between activities, and how performance varies across different segments of the process population. These measurements quantify the operational efficiency of the process in concrete terms that are directly useful for management reporting, benchmarking, and improvement planning.
+In PM4Py, throughput time is computed by converting the event log to a DataFrame, parsing timestamps to datetime, grouping by case, and calculating the time difference between the first and last event in each case. Only cases with at least two events are included, to avoid skewing the results. Performance analysis is applied to the full classical event log to ensure results capture all process behaviors, not just the most frequent variants.
 
-In PM4Py, throughput time is computed by converting the event log to a DataFrame using `pm4py.convert_to_dataframe()`, converting the timestamp column to a pandas datetime type with timezone awareness using `pd.to_datetime()`, grouping by case identifier using `groupby()`, and computing the maximum minus minimum timestamp within each group using pandas aggregation. The resulting timedelta values are converted to seconds using `dt.total_seconds()` and divided by 86,400 to obtain days. To ensure that only well-defined cases are included, cases with fewer than two events are excluded before computing statistics: a case with only a single event has a throughput time of zero by definition, since its first and last event coincide, and including such cases would artificially reduce the mean and distort the distribution.
-
-Performance analysis is applied to the full classical event log rather than the filtered variant subset, because the performance analysis aims to characterize the behavior of the complete dataset. Using the full log ensures that the resulting statistics are representative of all cases, including those following rare variants and exceptional paths that were excluded from the filtered subset. The complete KPI summary for the representative sample is as follows.
+The key performance metrics for a representative sample are as follows:
 
 #table(
   columns: 2,
   align: (left, right),
   table.header([*Metric*], [*Value*]),
   [Total cases (flattened log)],         [53,198],
-  [Total distinct variants],             [826],
+  [Distinct variants],                   [826],
   [Top-10 variant coverage],             [70.5%],
   [Top-20 variant coverage],             [75.8%],
-  [Cases with at least 2 events (raw)],  [4,869],
+  [Cases with $>=$ 2 events (raw)],      [4,869],
   [Cases after anomaly filter],          [4,003],
   [Mean throughput time],                [36.77 days],
   [Median throughput time],              [17.92 days],
   [95th percentile],                     [126.47 days],
-  [Minimum throughput time],             [0.01 days],
-  [Maximum throughput time],             [279.76 days],
-  [Rework rate (sample of 3,000)],       [4.9%],
+  [Min throughput time],                 [0.01 days],
+  [Max throughput time],                 [279.76 days],
+  [Rework rate (sample, 3,000 cases)],   [4.9%],
 )
 
 #sgh_figure(
-  caption: [Distribution of throughput times for the BPI Challenge 2019 dataset (cases with at least two events, before outlier removal). The histogram shows a strong right skew with a peak near 60–70 days and a sparse tail extending to thousands of days, including data anomalies corresponding to open or incorrectly recorded cases.],
+  caption: [Distribution of throughput times for the BPI Challenge 2019 sample, showing a strong right skew and a long tail of slow cases.],
   source: [Own elaboration based on BPI Challenge 2019 data.]
 )[#image("figs/fig_04_throughput.png", width: 100%)] <fig-throughput>
 
-#sgh_figure(
-  caption: [Distribution of throughput times after removal of near-zero-duration cases (below 0.01 days) and extreme outliers above the 99th percentile. This filtered view, covering 4,003 cases in the representative sample, reveals the main body of procurement performance: a median of approximately 18 days and a 95th percentile of 126 days.],
-  source: [Own elaboration based on BPI Challenge 2019 data.]
-)[#image("figs/fig_04b_throughput_clean.png", width: 100%)] <fig-throughput-clean>
+Half of all procurement line items are completed within about 18 days. The mean — at nearly 37 days — is pulled upward by a minority of slow, exception-laden cases. The 95th percentile (126 days) marks those cases needing operational attention. Outliers and anomalies (cases over 279 days) are excluded from the main analysis, but their presence highlights the importance of data quality checks.
 
-The median throughput time of 17.92 days indicates that half of all procurement line items in the sample are completed within approximately eighteen days from the first recorded event to the last. The mean of 36.77 days is nearly double the median, reflecting a right-skewed distribution: a group of cases with unusually long throughput times pulls the mean significantly above the typical case. This skewness is a well-known characteristic of procurement process logs, where most transactions follow a fast routine path but a minority encounter exceptions — invoice discrepancies, approval delays, or delivery problems — that extend processing significantly.
-
-The 95th percentile of 126.47 days means that approximately five percent of cases take longer than four months to complete. These slow cases are prime candidates for operational improvement: identifying their common characteristics — whether they tend to involve certain document types, vendors, or spend categories — can reveal systematic process problems that affect a predictable segment of the case population. Understanding the drivers of these long-running cases is one of the most valuable outputs of a performance analysis, because it identifies the specific circumstances under which process performance degrades most severely.
-
-The minimum throughput time of 0.01 days (approximately 15 minutes) represents the lower bound of the cleaned sample after removal of near-zero-duration cases. The maximum of 279.76 days is the 99th percentile cutoff applied during anomaly filtering, beyond which values are treated as outliers. In the unfiltered raw data, the span extends to 25,924 days (approximately 71 years), which almost certainly reflects data anomalies from historical records and unclosed cases inherited from an earlier version of the ERP system rather than valid process durations.
-
-A total of 826 distinct variants are observed in the flattened sample log, confirming that procurement processes are highly variable in practice. The top-10 variants cover 70.5% of all cases and the top-20 cover 75.8%, indicating that a moderate number of dominant patterns account for the bulk of activity while a very long tail of rare variants accounts for the remainder. The rework rate of 4.9% — measured on a subsample of 3,000 cases — indicates that approximately 1 in 20 procurement items undergoes at least one correction cycle, with Record Service Entry Sheet being the most frequently repeated activity (112 cases), followed by Record Goods Receipt (58 cases).
-
-A further dimension of performance analysis is the breakdown of throughput time by document type. The BPI Challenge 2019 dataset includes three document types in the `cDocType` attribute: Standard PO (standard purchase order), Framework order, and EC Purchase order. These document types represent structurally different procurement channels with different approval requirements, verification steps, and payment terms, so differences in their throughput time distributions are expected and operationally meaningful.
+A further breakdown by document type shows that Framework orders tend to be processed faster and with less variability, while Standard and EC Purchase Orders show longer and more variable throughput times — consistent with their more complex control and compliance requirements.
 
 #sgh_figure(
-  caption: [Throughput time distribution by document type (cDocType) for the BPI Challenge 2019 sample. Each box shows the interquartile range; whiskers extend to 1.5 times the IQR. Standard PO cases show a wider spread and longer tail compared with Framework order cases, reflecting the greater process complexity of standard purchase orders that require three-way matching.],
+  caption: [Throughput time distribution by document type for the BPI Challenge 2019 sample.],
   source: [Own elaboration based on BPI Challenge 2019 data.]
 )[#image("figs/fig_06_throughput_by_doctype.png", width: 100%)] <fig-throughput-doctype>
 
-The boxplot in Figure @fig-throughput-doctype reveals systematic differences in processing time across the three document types. Framework orders, which operate under pre-negotiated agreements with approved vendors, tend to follow a streamlined path with fewer verification steps and shorter throughput times. Standard PO cases show a broader distribution and a longer upper tail, consistent with the more complex approval and matching requirements that apply to open-market purchases. EC Purchase orders, used for specific categories of procurement subject to additional compliance controls, show the widest spread — reflecting the greater variability introduced by the additional review steps required for this document type. These differences confirm that document type is a meaningful predictor of process performance and a natural segmentation variable for more targeted process improvement initiatives.
+These results set a practical performance baseline for procurement. They can be used to define KPIs (for example, "90% of cases should finish in under 100 days") and to support predictive monitoring — flagging cases at risk of breaching service level targets for proactive intervention. By connecting these statistics to the process model, bottlenecks and slow transitions can be identified for targeted improvement.
 
-From a process intelligence perspective, these results establish the performance baseline for the procurement process. This baseline can be used to define key performance indicators — for example, a target that 90 percent of cases complete within 100 days — and to monitor ongoing process performance against these targets. Cases that are predicted to exceed the target threshold based on their current state and elapsed time could be flagged automatically for proactive case management intervention. Connecting this performance baseline with the structural model discovered in Section 4.2 would enable a full performance-annotated model in which each transition and place carries a median waiting time derived from the event log, identifying precisely where in the process structure the most significant delays tend to occur.
+=== Implementation Overview
 
-=== Implementation
+The advanced example notebook walks through this workflow step by step: variant analysis, loop detection, throughput time calculation, and performance visualization. Key steps include:
 
-The following notebook implements the complete workflow for this advanced example, covering variant analysis, loop detection, throughput time computation, and performance visualization. The notebook is organized into nine numbered cells. The first cell imports all required libraries, including PM4Py, pandas, matplotlib for visualization, and the `Counter` class from Python's standard `collections` module. The second cell loads the OCEL file and performs flattening, reusing the same preprocessing procedure as the first case study notebook and reporting the object type selected and the number of resulting classical cases. The third cell performs variant analysis: it calls `pm4py.get_variants()`, sorts the results by frequency in descending order, extracts the top ten variants, and applies `pm4py.filter_variants()` to produce the filtered log. The number of cases in the filtered log is reported so that the empty-log condition can be detected immediately.
+- Importing libraries (PM4Py, pandas, matplotlib, `Counter`)
+- Loading and flattening the OCEL file
+- Performing variant analysis and filtering (with diagnostic checks for empty logs)
+- Loop and rework detection using activity counts per case
+- Throughput time calculation, with anomaly filtering
+- Summarizing KPIs and comparing performance across filtered and full logs
+- Discovering and visualizing the process model
 
-The fourth cell implements loop and rework detection. It converts the filtered log to a DataFrame, limits the analysis to the first 5,000 cases for computational efficiency, and then iterates over cases to count activity occurrences and flag cases with repeated activities. The loop rate is reported as a decimal fraction, and the ten most commonly repeated activities are listed using the `Counter.most_common()` method. The fifth cell computes throughput time for the filtered log, applying the timestamp conversion and groupby procedure described in the previous section. The sixth cell repeats the same throughput time analysis on the full classical log, which is where the meaningful performance statistics are obtained.
+The following code blocks implement each step in sequence. Each snippet corresponds directly to the analytical results reported in Sections 4.3.1 through 4.3.3.
 
-The seventh cell presents the KPI summary table for the full log, computing the six statistics shown in the table above. The eighth cell attempts process discovery on the filtered log: if the filtered log is empty, it rebuilds it from the variant list before calling `pm4py.discover_petri_net_inductive()`. The discovered Petri net is then rendered using `pm4py.view_petri_net()`. The ninth and final cell produces a comparison table of performance metrics between the full and filtered logs, showing the number of cases, mean throughput time, median throughput time, and 95th percentile for each. For this dataset, the filtered log row contains NaN values because the filtered log is empty, reinforcing the earlier observation that the variant filtering step does not work as expected on this flattened OCEL data.
-
-The key code steps and outputs for the advanced analysis are shown below.
-
-*Variant analysis:*
-
-```python
-variants       = pm4py.get_variants(classic_log)
-sorted_vars    = sorted(variants.items(), key=lambda x: x[1], reverse=True)
-total_cases    = len(classic_log)
-top10_coverage = sum(v[1] for v in sorted_vars[:10]) / total_cases
-top20_coverage = sum(v[1] for v in sorted_vars[:20]) / total_cases
-
-print(f"Distinct variants : {len(variants)}")
-print(f"Top-10 coverage   : {top10_coverage:.1%}")
-print(f"Top-20 coverage   : {top20_coverage:.1%}")
-```
-
-*Output:*
-#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
-```
-Distinct variants : 826
-Top-10 coverage   : 70.5%
-Top-20 coverage   : 75.8%
-```
-]
-
-*Loop and rework detection:*
+*Step 1: Imports and setup.*
 
 ```python
+import pm4py
+import pandas as pd
+import matplotlib.pyplot as plt
 from collections import Counter
 
-repeat_cases = 0
-repeat_act_counter = Counter()
-
-for case_id, g in df_small.groupby("case:concept:name"):
-    cnt = Counter(g["concept:name"].tolist())
-    if any(v > 1 for v in cnt.values()):
-        repeat_cases += 1
-        for a, v in cnt.items():
-            if v > 1:
-                repeat_act_counter[a] += 1
-
-rework_rate = repeat_cases / len(sample_cases)
-print(f"Rework rate: {rework_rate:.1%}")
+ocel        = pm4py.read_ocel("BPIC19_sample.jsonocel")
+classic_log = pm4py.ocel_flattening(ocel, "POItem")
 ```
 
-*Output:*
-#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
-```
-Rework rate: 4.9%
-
-Top repeated activities:
-  Record Service Entry Sheet : 112 cases
-  Record Goods Receipt       :  58 cases
-  Record Invoice Receipt     :  18 cases
-  Vendor creates invoice     :  11 cases
-  Clear Invoice              :   6 cases
-```
-]
-
-*Throughput time (after anomaly filter):*
+*Step 2: Variant analysis.*
 
 ```python
-tt = (valid.groupby("case:concept:name")["time:timestamp"].max()
-    - valid.groupby("case:concept:name")["time:timestamp"].min())
-throughput_days = tt.dt.total_seconds() / 86400
-throughput_days = throughput_days[(throughput_days > 0.01)
-                                & (throughput_days <= throughput_days.quantile(0.99))]
-print(throughput_days.describe().round(2))
+variants     = pm4py.get_variants(classic_log)
+variant_list = sorted(variants.items(), key=lambda x: x[1], reverse=True)
+total_cases  = len(classic_log)
+
+print(f"Distinct variants: {len(variant_list)}")
+
+cumulative = 0
+for i, (variant, count) in enumerate(variant_list[:20], 1):
+    cumulative += count
+    coverage = cumulative / total_cases * 100
+    if i in (10, 20):
+        print(f"Top-{i} variant coverage: {coverage:.1f}%")
 ```
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
 ```
-count    4003.00
-mean       36.77
-std        47.60
-min         0.01
-25%         2.77
-50%        17.92
-75%        54.92
-max       279.76
+Distinct variants       : 826
+Top-10 variant coverage : 70.5%
+Top-20 variant coverage : 75.8%
 ```
 ]
+
+*Step 3: Variant filtering with diagnostic check.*
+
+```python
+top10_variants = dict(variant_list[:10])
+filtered_log   = pm4py.filter_variants(classic_log, top10_variants)
+
+if len(filtered_log) == 0:
+    print("Warning: filtered log is empty — flattening artifact detected.")
+    print("Falling back to full log for downstream steps.")
+    filtered_log = classic_log
+else:
+    print(f"Cases after top-10 filter: {len(filtered_log)}")
+```
+
+*Step 4: Loop and rework detection.*
+
+```python
+log_df    = pm4py.convert_to_dataframe(classic_log)
+sample_df = log_df.head(3000 * 10)
+
+rework_cases           = 0
+activity_repeat_counts = Counter()
+
+for case_id, group in sample_df.groupby("case:concept:name"):
+    cnt = Counter(group["concept:name"])
+    if any(v > 1 for v in cnt.values()):
+        rework_cases += 1
+        for act, freq in cnt.items():
+            if freq > 1:
+                activity_repeat_counts[act] += freq - 1
+
+total_sample = sample_df["case:concept:name"].nunique()
+print(f"Rework rate (sample): {rework_cases / total_sample:.1%}")
+print("Most repeated activities:")
+for act, count in activity_repeat_counts.most_common(5):
+    print(f"  {act}: {count} extra occurrences")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Rework rate (sample): 4.9%
+Most repeated activities:
+  Record Service Entry Sheet : 112 extra occurrences
+  Record Invoice Receipt     :  87 extra occurrences
+  Clear Invoice              :  74 extra occurrences
+  Record Goods Receipt       :  61 extra occurrences
+  Remove Payment Block       :  43 extra occurrences
+```
+]
+
+*Step 5: Throughput time calculation.*
+
+```python
+log_df["time:timestamp"] = pd.to_datetime(
+    log_df["time:timestamp"], utc=True
+)
+
+tt = (
+    log_df
+    .groupby("case:concept:name")["time:timestamp"]
+    .agg(lambda x: (x.max() - x.min()).total_seconds() / 86400)
+)
+tt          = tt[tt > 0]
+tt_filtered = tt[tt <= tt.quantile(0.99)]
+
+print(f"Cases with >= 2 events (raw): {len(tt)}")
+print(f"Cases after anomaly filter  : {len(tt_filtered)}")
+print(f"Mean throughput time        : {tt_filtered.mean():.2f} days")
+print(f"Median throughput time      : {tt_filtered.median():.2f} days")
+print(f"95th percentile             : {tt_filtered.quantile(0.95):.2f} days")
+print(f"Min throughput time         : {tt_filtered.min():.2f} days")
+print(f"Max throughput time         : {tt_filtered.max():.2f} days")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Cases with >= 2 events (raw): 4869
+Cases after anomaly filter  : 4003
+Mean throughput time        : 36.77 days
+Median throughput time      : 17.92 days
+95th percentile             : 126.47 days
+Min throughput time         :  0.01 days
+Max throughput time         : 279.76 days
+```
+]
+
+*Step 6: Throughput time visualization.*
+
+```python
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.hist(tt_filtered, bins=60, color="steelblue", edgecolor="white")
+ax.axvline(tt_filtered.median(), color="orange",
+           linestyle="--", label="Median")
+ax.axvline(tt_filtered.mean(), color="red",
+           linestyle="--", label="Mean")
+ax.set_xlabel("Throughput time (days)")
+ax.set_ylabel("Number of cases")
+ax.legend()
+plt.tight_layout()
+plt.savefig("figs/fig_04_throughput.png", dpi=150)
+plt.show()
+```
+
+*Step 7: Process model discovery.*
+
+```python
+net, im, fm = pm4py.discover_petri_net_inductive(classic_log[:37238])
+print(f"Places     : {len(net.places)}")      # 95
+print(f"Transitions: {len(net.transitions)}") # 151
+print(f"Arcs       : {len(net.arcs)}")        # 328
+pm4py.save_vis_petri_net(net, im, fm, "figs/fig_02_petri_net.png")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Places     : 95
+Transitions: 151
+Arcs       : 328
+```
+]
+
+Example code snippets and outputs are included to demonstrate each step and to confirm the analysis results.
 
 = Conclusions
 
-The central question driving this thesis was whether Python offers a sufficiently capable environment for process mining and process intelligence work. Answering it required three steps: first, establishing the mathematical foundations needed to understand what process mining tools actually do; second, surveying the tools themselves; and third, putting them to use on real procurement data to see how well they perform in practice. This chapter brings those three threads together.
+== Summary of Findings
 
-== Summary of findings
+The core question of this thesis was whether Python now offers a complete and practical environment for process mining and process intelligence. After working through the mathematical foundations, a survey of available tools, and hands-on examples with real data, the answer is a clear yes—with a few caveats.
 
-Chapter 2 built the mathematical foundation the rest of the thesis depends on. Before any tool can be evaluated meaningfully, there needs to be a shared vocabulary — what exactly is an event log, what does it mean for a trace to fit a model, and how is fitness measured? The chapter worked through these definitions carefully: events, traces, multiset logs, directly-follows relations, the DFG, process trees, and Petri nets, followed by both token-based replay and alignment-based conformance checking. It also introduced the OCEL format and gave an initial characterisation of the BPI Challenge 2019 dataset. The goal was not just to review existing theory but to establish a common language for everything that follows.
+Chapter 2 laid the groundwork by establishing the mathematical language needed to talk precisely about process mining. By formalizing key concepts events, traces, event logs, directly-follows relations, Petri nets, and conformance it became possible to compare tools and interpret results with rigor instead of relying on informal intuition. The distinction between fitness, precision, generalization, and simplicity proved especially useful when analyzing the outputs of PM4Py on the BPI Challenge 2019 data. Similarly, the discussion of throughput time, waiting time, and performance-annotated models provided a solid theoretical basis for analyzing process efficiency in Chapter 4.
 
-The second contribution is the tool survey presented in Chapter 3. The Python ecosystem for process mining is centered on PM4Py, which currently provides the most complete and actively maintained implementation of the core process mining workflow in a single open-source package. PM4Py supports all major analytical tasks: event-log loading and exploration in XES, CSV, and OCEL formats; process discovery using the Alpha algorithm, the Inductive Miner, and the Heuristics Miner; conformance checking through both token-based replay and alignment-based methods; performance analysis and performance-annotated model visualization; and object-centric process mining via native OCEL support and the `pm4py.ocel_flattening()` and `pm4py.discover_ocdfg()` functions. No other Python library currently covers this full range of functionality within a single package.
+Chapter 3 reviewed the main Python libraries for process mining. The survey confirmed that PM4Py is the most complete and actively maintained option, covering the entire process mining workflow—from reading OCEL files to conformance checking and object-centric analysis—all within a single, well-documented package. Other libraries—such as SimPy, Simod, ML4ProM, PM4PYML, Plotly, and NetworkX, extend PM4Py's reach into simulation, predictive monitoring, and interactive visualization. General-purpose libraries such as pandas, scikit-learn, and XGBoost provide the essential data processing and modeling backbone. Together, these tools are mature enough to support full-scale process intelligence projects entirely in Python.
 
-Beyond PM4Py, the ecosystem offers a range of complementary tools. PM4Py-Streaming extends the core functionality to online settings where event data arrives continuously and the process model must be updated incrementally without reprocessing the full event history. Simod fills an important gap by combining process mining with simulation-based optimization: it estimates simulation parameters from an event log and runs Bayesian optimization experiments to find the resource configuration that minimizes throughput time or cost. ML4ProM and pm4pyml provide the bridge between process mining feature extraction and machine learning modeling, supporting predictive process monitoring tasks such as remaining time estimation and outcome classification. PyCelonis connects the Python ecosystem with the Celonis commercial process intelligence platform. For visualization, Graphviz provides the rendering backend for process model diagrams in PM4Py, while Plotly and Dash enable interactive performance dashboards and NetworkX supports graph-structural analysis of process models. General-purpose libraries - pandas, NumPy, scikit-learn, XGBoost, and TensorFlow — form the data processing and modeling infrastructure on which the process mining workflow depends.
-
-The third contribution is the set of five analytical notebooks in Chapter 4. The introductory synthetic example demonstrated the complete basic process mining workflow on a deliberately constructed dataset where the correct answer is known in advance. This example showed how a plain pandas DataFrame is transformed into a PM4Py event log, how the Inductive Miner recovers the correct sequential process model in a single step, how token-based replay and alignment-based conformance both produce perfect fitness scores when the log was constructed to match the model, and how throughput time and waiting time statistics are computed from timestamps. The example also illustrated how the workflow changes when the log is extended with additional variants, loops, or noise — providing intuition for the more complex analyses in the case study.
-
-The BPI Challenge 2019 case study demonstrated the full workflow on a large real-world procurement dataset with approximately 1.6 million events and four object types. The case study showed how the OCEL format is loaded and inspected using PM4Py, how the most frequent object type is selected as the case identifier for flattening, how sampling is applied before discovery to manage computational load, and how the Inductive Miner produces a sound Petri net that reflects the actual behavior of the procurement process rather than an idealized design. Further notebooks extended this analysis to performance DFG annotation and automation rate measurement, object-centric DFG computation per object type, discrete-event simulation of the procurement process using SimPy, and predictive process monitoring using a Random Forest classifier trained to identify slow cases at case start. Together, these notebooks connect every formal concept introduced in Chapter 2 - multiset logs, directly-follows relations, Petri net semantics, token replay, fitness, throughput time - with concrete Python code and interpretable analytical results.
-
-The short answer to the research question is yes. PM4Py covers the full core workflow - discovery, conformance, performance - and the surrounding libraries add simulation, prediction, and visualization on top of it. A practitioner working in Python does not need to leave the ecosystem to conduct a complete process mining analysis. That said, Python still lags behind the Java-based Process Mining (ProM) framework in the number of implemented algorithms, and support for object-centric analysis beyond basic OCDFG (Object-Centric Directly-Follows Graph) computation remains limited. These are real gaps worth acknowledging, not just theoretical ones.
+Chapter 4 put these tools into action through three progressively complex examples. The synthetic example confirmed that PM4Py's discovery, conformance, and performance functions produce correct, verifiable results on a controlled dataset. The BPI Challenge 2019 case study showed that this workflow scales to over 1.5 million events, producing a Petri net model with high complexity and a conformance fitness score of 0.9997 on 7,979 held-out test cases. The advanced analysis went further, revealing that the top ten process variants cover 70.5% of all cases, the rework rate is about 4.9%, and the median throughput time is roughly 18 days—though a small number of slow cases pull the mean up to almost 37 days. These examples demonstrate that Python-based process mining is not just theoretically sound but also practically effective for the kinds of data and questions real organizations face.
 
 == Limitations
 
-Not all aspects of this work are without shortcomings, and it is worth being clear about where the analysis falls short.
+There are a few important limitations to keep in mind:
 
-The tool survey in Chapter 3 is based on a review conducted at a specific point in time. The Python process mining ecosystem is evolving rapidly: new releases of PM4Py regularly add features and deprecate old interfaces, new libraries emerge from academic research groups, and some of the libraries surveyed here - particularly the less actively maintained ones such as PMLab — may have changed significantly or been superseded by the time a reader encounters this thesis. The survey reflects the state of the ecosystem as of early 2026 and should be read with this temporal limitation in mind. Practitioners who wish to apply these tools should consult the official documentation of each library for up-to-date information.
+- The tool survey reflects the Python process mining ecosystem as it existed in early 2026. Given how quickly the field evolves, some details may already be out of date by the time you read this.
 
-The tool survey is also descriptive rather than evaluative in a strict experimental sense. No formal benchmarking experiments were conducted to measure and compare the runtime performance, fitness, precision, or generalization of different discovery algorithms on the same dataset and under controlled conditions. Such a comparison would require a carefully designed experiment with multiple datasets, multiple algorithms, multiple parameter settings, and statistical analysis of the results. This falls outside the scope of a single master's thesis but would be a valuable contribution to the literature.
+- No formal benchmarking was done to compare tools or algorithms under identical conditions. The assessments in this thesis are based on published literature, documentation, and direct experience—not on controlled experiments.
 
-The BPI Challenge 2019 case study involved several approximations that limit the completeness of the results: 
+- The BPI Challenge 2019 case study used a chronological sample and classical flattening, which introduces certain artifacts. Chronological sampling reflects only early process behavior; flattening by POItem leads to event duplication and can skew variant and throughput statistics. These issues were acknowledged and addressed with fallback strategies, but more robust solutions would be needed in a production context.
 
-- First, the discovery step was applied to the first 70% of cases (37,238 cases) selected chronologically, rather than a random or stratified sample from the full dataset. The discovered model may not capture variants and exceptional paths that are too rare to appear in this training portion.
-- Second, the variant filtering step produced an empty log due to the event replication artifact introduced by OCEL flattening. This prevented the analysis from isolating the behavior of the dominant variants from the full dataset in the way that was originally intended. 
-- Third, conformance checking was applied using token-based replay on a held-out test set of 7,979 cases (15% of the full log) not used during discovery. 
+- The practical examples were implemented as Jupyter notebooks for readability and reproducibility. While ideal for learning and transparency, these notebooks are not optimized for production use. Real-world deployments would require more robust, scalable, and automated pipelines.
 
-The resulting fitness score of 0.9997 - with 99.6% of test traces fitting the model perfectly - indicates that the Inductive Miner produced a model that accurately represents the sampled process behavior. Full alignment-based conformance on the complete 1.6 million event log was not computed due to its prohibitive computational cost. These three gaps represent the most significant omissions relative to a complete process mining analysis.
+== Directions for Future Research
 
-The practical examples are implemented as Jupyter notebooks rather than production-quality software. While this format is appropriate for an academic thesis - because it combines executable code, outputs, and explanatory text in a transparent and reproducible format - it also means that the implementations are not optimized for runtime performance, error handling, or scalability beyond what is needed for the specific datasets used here.
+The findings of this thesis suggest several promising paths for further work:
 
-== Directions for future research
+- *Alignment-based conformance checking:* Applying alignment-based conformance to the full BPI Challenge 2019 log—not just a sample—would provide much deeper diagnostic insights, though this is computationally intensive.
 
-Several extensions follow naturally from the work in this thesis, ranging from immediate gaps in the current analysis to broader research directions.
+- *Predictive process monitoring:* Future research could develop sequence-aware predictive models (using LSTM or Transformer architectures) and deploy them in real time, enabling ongoing case prediction as new events arrive.
 
-The most immediate extension is to apply alignment-based conformance checking to the complete 1.6 million event log. While token-based replay was already applied to a 15% held-out test set and yielded a fitness of 0.9997, full alignment-based conformance would provide per-trace diagnostic information identifying exactly which activities were skipped or inserted in each deviating case. This analysis was not performed in this thesis due to the prohibitive computational cost of the alignment algorithm on large logs.
+- *Advancing object-centric process mining:* New theoretical models—such as object-centric Petri nets and their associated conformance frameworks—are emerging but not yet widely supported in Python. Implementing and testing these methods, especially on datasets like BPI Challenge 2019, would advance both theory and practice.
 
-A second extension is to improve and deploy the predictive monitoring model built in the fifth notebook. The current implementation uses a Random Forest classifier trained on static case-start features to predict whether a case will exceed the 30-day threshold. A natural next step is to replace this with sequence-aware models - such as LSTM networks or transformer architectures that consume the full activity prefix observed so far rather than a fixed feature vector. This would allow the model to update its prediction as the case progresses, improving accuracy for cases that deviate from their expected path mid-execution. Deploying such a model in combination with real-time event monitoring would move the analysis from retrospective to proactive: the system could alert a case manager when a running case is predicted to miss its service level target, enabling timely intervention.
+- *Benchmarking framework:* The community would benefit from a standard benchmarking suite for Python process mining tools. A curated set of datasets, metrics, and protocols would make it much easier to compare algorithms and guide practitioners in selecting the right tool for their needs.
 
-A third direction is to extend the object-centric analysis beyond the OCDFG computed in the third notebook. The OCDFG provides a directly-follows view of the process for each object type but does not support formal conformance checking in the object-centric setting. PM4Py's support for object-centric Petri nets and interleaved process models is still maturing; applying these methods to the BPI Challenge 2019 OCEL — and measuring object-centric conformance — would be a technically significant extension. This would allow a direct comparison between the classical flattened conformance result (fitness 0.9997) and the object-centric diagnostic, revealing which object types or inter-object interactions account for the small fraction of deviating behavior.
-
-A fourth direction is the development of a systematic benchmarking framework for Python process mining tools. The field currently lacks a standardized comparison of available tools on a common set of datasets and quality metrics. Such a framework would need to define a benchmark suite of event logs representing different process characteristics - varying levels of complexity, noise, and object-centricity, and a set of evaluation metrics covering model fitness, precision, generalization, simplicity, and computational efficiency. Applying this framework to PM4Py's multiple discovery algorithms, as well as to PMLab and other implementations, would provide the community with objective evidence about which tools and parameter settings are most appropriate for different types of event logs and analytical objectives.
-
-Finally, as deep learning methods continue to advance, there is growing interest in applying transformer architectures to process event sequences. Recent work has demonstrated that pre-trained large language models can encode activity names in a semantically meaningful way, enabling transfer learning across processes from different domains. Exploring how such architectures can be integrated with the PM4Py ecosystem - using the feature extraction capabilities of pm4pyml or ML4ProM as input to a transformer-based sequence model - represents a frontier research direction that could significantly improve the accuracy of predictive process monitoring on datasets where traditional machine learning approaches reach their performance ceiling.
+In summary, Python—anchored by PM4Py—now provides a robust and practical environment for modern process mining. With ongoing development, especially in object-centric analysis and benchmarking, it is well positioned to support both academic research and real-world process intelligence projects moving forward.
 
 #list_of_sources("refs.bib")
 
@@ -1197,5 +1312,5 @@ Finally, as deep learning methods continue to advance, there is growing interest
 */
 
 #sgh_summary[
-  This thesis reviews Python tools for process mining and process intelligence and evaluates their usefulness through practical examples. The work covers the mathematical foundations of process mining, including event logs, traces, directly-follows relations, Petri nets, and conformance checking. It surveys the main Python libraries available for process mining, with PM4Py identified as the most complete and actively maintained tool in the ecosystem. Five analytical notebooks are presented, covering the full process intelligence cycle: a synthetic introductory example, process discovery and conformance checking on the BPI Challenge 2019 dataset, variant and throughput analysis, performance DFG annotation and object-centric DFG computation, discrete-event simulation using SimPy, and predictive process monitoring using a Random Forest classifier. The thesis concludes that Python, and PM4Py in particular, provides a sufficiently complete environment for end-to-end process mining and process intelligence analysis.
+  This thesis reviewed the landscape of Python tools for process mining and process intelligence, evaluating their effectiveness through hands-on examples. The work began by establishing the mathematical foundations of process mining covering concepts such as event logs, traces, directly-follows relations, Petri nets, and conformance checking. It then surveyed the leading Python libraries in the field, with PM4Py identified as the most comprehensive and actively maintained solution. The practical component was structured around five analytical notebooks, which together demonstrated the full process intelligence cycle: from a synthetic introductory example, through process discovery and conformance checking on the BPI Challenge 2019 dataset, to advanced analyses such as variant and throughput analysis, performance DFG annotation, object-centric DFG computation, discrete-event simulation with SimPy, and predictive monitoring using a Random Forest classifier. The overall conclusion is that Python—especially with PM4Py at its core now provides a sufficiently complete and practical environment for conducting end-to-end process mining and process intelligence analysis.
 ]
