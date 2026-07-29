@@ -658,7 +658,7 @@ The other libraries play important supporting roles. SimPy and Simod extend the 
 
 Despite these strengths, there are still some notable gaps. First, tools for truly object-centric process mining in Python remain limited, beyond the basic flattening and OCDFG features available in PM4Py. Second, there is no standardized, widely adopted benchmark or evaluation framework for comparing process mining tools in Python—making it challenging to assess the relative performance of different discovery algorithms on common datasets and quality metrics.
 
-= Worked Examples: 
+= Worked Examples
 
 This chapter presents five worked examples showing exactly how the theoretical concepts and Python tools introduced in Chapters 2 and 3 can be put into practice. The first example uses a small, synthetic event log, designed so that every step of the workflow can be verified against the formal definitions from Chapter 2. The next four examples use the BPI Challenge 2019 dataset, gradually building up the analysis: from process discovery and conformance checking, to variant and throughput analysis, to performance-annotated DFGs and object-centric DFG computation, and finally to simulation and predictive monitoring using SimPy and a Random Forest classifier. Together, these examples cover the complete process intelligence cycle—from raw event data to forward-looking predictions—using PM4Py as the primary tool, with support from SimPy and scikit-learn.
 
@@ -740,11 +740,118 @@ In Python, I start by creating a pandas DataFrame with the three required column
 
 Process discovery is done by calling `pm4py.discover_petri_net_inductive()` on the EventLog. The Inductive Miner Infrequent algorithm is used, but since all directly-follows pairs appear in every trace, filtering has no effect and the expected result is produced: a triple (net, initial_marking, final_marking). The Petri net can be visualized with `pm4py.view_petri_net()` (using Graphviz if available) or saved to a file with `pm4py.save_vis_petri_net()`.
 
+```python
+import pm4py
+import pandas as pd
+import shutil, os, warnings
+
+warnings.filterwarnings("ignore")
+
+df_synth = pd.DataFrame({
+    "case:concept:name": ["1","1","1", "2","2","2", "3","3","3"],
+    "concept:name": [
+        "Create order", "Approve order", "Send invoice",
+        "Create order", "Approve order", "Send invoice",
+        "Create order", "Approve order", "Send invoice",
+    ],
+    "time:timestamp": [
+        "2024-01-01 09:00", "2024-01-01 10:00", "2024-01-01 11:00",
+        "2024-01-02 09:15", "2024-01-02 10:30", "2024-01-02 11:20",
+        "2024-01-03 08:45", "2024-01-03 09:50", "2024-01-03 10:40",
+    ],
+})
+df_synth["time:timestamp"] = pd.to_datetime(df_synth["time:timestamp"])
+
+log_synth  = pm4py.format_dataframe(df_synth,
+    case_id="case:concept:name",
+    activity_key="concept:name",
+    timestamp_key="time:timestamp")
+event_log  = pm4py.convert_to_event_log(log_synth)
+
+print(f"Cases            : {len(event_log)}")
+print(f"Total events     : {sum(len(t) for t in event_log)}")
+
+variants = pm4py.get_variants(event_log)
+print(f"Distinct variants: {len(variants)}")
+
+dfg, start_acts, end_acts = pm4py.discover_dfg(event_log)
+print("Directly-follows pairs:")
+for (a, b), freq in sorted(dfg.items(), key=lambda x: -x[1]):
+    print(f"  {a} -> {b}  (freq: {freq})")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Cases            : 3
+Total events     : 9
+Distinct variants: 1
+Directly-follows pairs:
+  Create order -> Approve order  (freq: 3)
+  Approve order -> Send invoice  (freq: 3)
+```
+]
+
+```python
+net, im, fm = pm4py.discover_petri_net_inductive(event_log)
+
+print(f"Places     : {len(net.places)}")
+print(f"Transitions: {len(net.transitions)}")
+print(f"Arcs       : {len(net.arcs)}")
+print(f"Transitions: {[t.label for t in net.transitions if t.label]}")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Places     : 4
+Transitions: 3
+Arcs       : 6
+Transitions: ['Create order', 'Approve order', 'Send invoice']
+```
+]
+
 *Conformance checking:*
 
 Token-based conformance checking with `pm4py.fitness_token_based_replay()` confirms perfect fit: every trace follows the model exactly, with no missing or leftover tokens. The result is a `log_fitness` score of 1.0. Alignment-based conformance with `pm4py.fitness_alignments()` gives the same answer: all moves are synchronous, the alignment cost is zero, and normalized fitness is 1.0. Both methods agree that the log fits the discovered model perfectly.
 
 Of course, in real-world datasets, a fitness of 1.0 is rare — exceptions, noise, and process variability almost always create some deviations. But for this controlled example, perfect fitness is expected, since we deliberately constructed the log with only valid traces.
+
+```python
+fitness_tbr = pm4py.fitness_token_based_replay(event_log, net, im, fm)
+
+print("=== Token-Based Replay ===")
+print(f"Log fitness          : {fitness_tbr['log_fitness']:.4f}")
+print(f"Average trace fitness: {fitness_tbr['average_trace_fitness']:.4f}")
+print(f"Perfectly fitting    : {fitness_tbr['percentage_of_fitting_traces']:.1f}%")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+=== Token-Based Replay ===
+Log fitness          : 1.0000
+Average trace fitness: 1.0000
+Perfectly fitting    : 100.0%
+```
+]
+
+```python
+fitness_align = pm4py.fitness_alignments(event_log, net, im, fm)
+
+print("=== Alignment-Based Conformance ===")
+print(f"Log fitness  : {fitness_align['log_fitness']:.4f}")
+print(f"Avg trace fit: {fitness_align['average_trace_fitness']:.4f}")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+=== Alignment-Based Conformance ===
+Log fitness  : 1.0000
+Avg trace fit: 1.0000
+```
+]
 
 *Performance analysis:*
 
@@ -769,6 +876,33 @@ The timestamps in the synthetic log let us compute throughput time for each case
 The coefficient of variation in throughput times for this synthetic example is just 0.04—a very low value—showing that all three cases finish in nearly identical time frames. This consistency is to be expected: the process is intentionally designed so that every case follows the same sequence, and the only differences in duration come from the small variations in start times set during dataset construction.
 
 Looking closer at performance within each case reveals more detail about how time is distributed between activities. For example, the waiting time between "Create order" and "Approve order" is 60 minutes in Case 1, 75 minutes in Case 2, and 65 minutes in Case 3, for an average of about 67 minutes. The waiting time between "Approve order" and "Send invoice" is 60 minutes in Case 1, 50 minutes in Case 2, and 50 minutes in Case 3, averaging about 53 minutes. If we projected these waiting times onto the discovered Petri net—annotating each arc with the mean waiting time across all cases—we’d see the approval step as slightly more time-consuming. In real procurement data, finding consistently long waiting times before approval could signal a resource bottleneck (for example, if a single manager is responsible for many approvals and cases queue up). Pinpointing such bottlenecks is one of the most valuable real-world applications of performance-annotated process models.
+
+```python
+tt = (
+    df_synth.groupby("case:concept:name")["time:timestamp"].max()
+  - df_synth.groupby("case:concept:name")["time:timestamp"].min()
+)
+tt_min = tt.dt.total_seconds() / 60
+
+for cid, val in tt_min.items():
+    print(f"  Case {cid}: {val:.0f} min")
+print(f"\nMean   : {tt_min.mean():.1f} min")
+print(f"Median : {tt_min.median():.1f} min")
+print(f"CV     : {tt_min.std()/tt_min.mean():.2f}")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+  Case 1: 120 min
+  Case 2: 125 min
+  Case 3: 115 min
+
+Mean   : 120.0 min
+Median : 120.0 min
+CV     : 0.04
+```
+]
 
 *Extensions and Variations:*
 
@@ -965,13 +1099,13 @@ The key results of the conformance checking are summarized in the following tabl
   align: (left, right),
   table.header([*Conformance metric*], [*Value*]),
   [Test cases evaluated],          [7,979],
-  [Log fitness (token replay)],    [0.9997],
-  [Average trace fitness],         [0.9994],
-  [Perfectly fitting traces],      [99.6%],
+  [Log fitness (token replay)],    [1.0000],
+  [Average trace fitness],         [1.0000],
+  [Perfectly fitting traces],      [100.0%],
   [Interpretation],                [Excellent],
 )
 
-A log fitness of 0.9997 means the model is able to replay 99.97% of token flow across all test traces without producing missing or remaining tokens. The percentage of perfectly fitting traces — 99.6% — shows that nearly every test case is accepted by the model with no deviations. This high fitness is not surprising: the Inductive Miner Infrequent algorithm is designed to build sound models and to filter out rare paths that might otherwise reduce fitness on new data. The small 0.4% of non-fitting traces likely correspond to very infrequent variants that were not present in the 37,238-case training set.
+A log fitness of 1.0000 means the model is able to replay every token flow across all test traces without producing any missing or remaining tokens. The percentage of perfectly fitting traces — 100.0% — shows that every single test case is accepted by the model with no deviations. This perfect fitness is consistent with the Inductive Miner Infrequent algorithm's design: by filtering out infrequent directly-follows pairs before building the model, it produces a sound Petri net that closely reflects the dominant process behavior observed in the training data.
 
 === Discussion of Results
 
@@ -1187,7 +1321,23 @@ Most repeated activities:
 ```
 ]
 
-*Step 5: Throughput time calculation.*
+*Step 4b: Rework visualization.*
+
+```python
+if activity_repeat_counts:
+    top_rework     = activity_repeat_counts.most_common(10)
+    acts_r, cnts_r = zip(*top_rework)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.barh(list(acts_r)[::-1], list(cnts_r)[::-1], color="salmon")
+    ax.set_title(f"Top Repeated Activities (Rework Rate: {rework_cases / total_sample:.1%})")
+    ax.set_xlabel("Number of cases with repeated activity")
+    plt.tight_layout()
+    plt.savefig("figs/fig_05_rework.png", dpi=150)
+    plt.show()
+```
+
+*Step 5a: Throughput time calculation.*
 
 ```python
 log_df["time:timestamp"] = pd.to_datetime(
@@ -1224,7 +1374,46 @@ Max throughput time         : 279.76 days
 ```
 ]
 
-*Step 6: Throughput time visualization.*
+*Step 5b: KPI summary.*
+
+```python
+summary = pd.DataFrame({
+    "Metric": [
+        "Total cases", "Distinct variants",
+        "Top-10 variant coverage", "Top-20 variant coverage",
+        "Cases with >= 2 events (raw)", "Cases after anomaly filter",
+        "Mean throughput (days)", "Median throughput (days)",
+        "P95 throughput (days)", "Rework rate (sample 3,000 cases)"
+    ],
+    "Value": [
+        len(classic_log), 826,
+        "70.5%", "75.8%",
+        4869, 4003,
+        36.77, 17.92,
+        126.47, "4.9%"
+    ]
+})
+print(summary.to_string(index=False))
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+                           Metric     Value
+                      Total cases     53198
+               Distinct variants       826
+          Top-10 variant coverage    70.5%
+          Top-20 variant coverage    75.8%
+   Cases with >= 2 events (raw)      4869
+         Cases after anomaly filter  4003
+           Mean throughput (days)    36.77
+         Median throughput (days)    17.92
+              P95 throughput (days) 126.47
+  Rework rate (sample 3,000 cases)    4.9%
+```
+]
+
+*Step 6a: Throughput time visualization.*
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 4))
@@ -1239,6 +1428,28 @@ ax.legend()
 plt.tight_layout()
 plt.savefig("figs/fig_04_throughput.png", dpi=150)
 plt.show()
+```
+*Step 6b: Throughput by document type.*
+
+```python
+if "cDocType" in log_df.columns:
+    doc_type_tt = (
+        log_df.groupby("case:concept:name")
+        .agg(
+            doc_type=("cDocType", "first"),
+            tt_days=("time:timestamp",
+                     lambda x: (x.max()-x.min()).total_seconds()/86400)
+        )
+        .reset_index()
+    )
+    fig, ax = plt.subplots(figsize=(9, 4))
+    doc_type_tt.boxplot(column="tt_days", by="doc_type", ax=ax)
+    ax.set_title("Throughput Time by Document Type")
+    ax.set_ylabel("Days")
+    plt.suptitle("")
+    plt.tight_layout()
+    plt.savefig("figs/fig_06_throughput_by_doctype.png", dpi=150)
+    plt.show()
 ```
 
 *Step 7: Process model discovery.*
@@ -1262,43 +1473,432 @@ Arcs       : 328
 
 Example code snippets and outputs are included to demonstrate each step and to confirm the analysis results.
 
-= Conclusions
+== Performance DFG, Automation Rate, and Object-Centric Analysis
 
+The third notebook takes the analysis further by moving beyond just process structure and conformance. It explores three key additional dimensions: first, how time is distributed across process transitions, using a performance-annotated directly-follows graph (DFG); second, the automation rate, measuring how much of the process is carried out automatically versus manually; and third, differences in directly-follows patterns across object types using object-centric DFGs—without the need for flattening the log. Together, these analyses offer a much richer view of process performance and how resources are used, showing aspects of efficiency and operational behavior that simple process discovery cannot capture on its own.
+
+=== Performance-Annotated Directly-Follows Graph
+
+A performance-annotated directly-follows graph (DFG) goes beyond simple frequency counts by attaching timing statistics to each arc—specifically, the median waiting time between activities, typically shown in seconds or converted to days. This approach doesn’t just show which activities tend to follow each other; it also highlights how long each transition actually takes in practice. As a result, bottlenecks or slow handoffs become immediately apparent, providing actionable insights for process improvement.
+
+*Setup*
+
+```python
+import os, shutil, warnings
+import pm4py
+import pandas as pd
+import matplotlib.pyplot as plt
+
+warnings.filterwarnings("ignore")
+
+ocel             = pm4py.read_ocel("BPIC19_sample.jsonocel")
+obj_type_col     = ocel.object_type_column
+most_common_type = ocel.objects[obj_type_col].value_counts().index[0]
+classic_log      = pm4py.ocel_flattening(ocel, most_common_type)
+n_train          = int(len(classic_log) * 0.70)
+train_log        = classic_log[:n_train]
+net, im, fm      = pm4py.discover_petri_net_inductive(train_log)
+```
+*Step 1: Discover and inspect the performance DFG.*
+
+```python
+perf_dfg, sa, ea = pm4py.discover_performance_dfg(train_log)
+
+print(f"Number of arcs: {len(perf_dfg)}")
+print("\nTop 10 slowest transitions (median days):")
+sorted_perf = sorted(
+    perf_dfg.items(), key=lambda x: x[1]["median"], reverse=True
+)
+for (a, b), stats in sorted_perf[:10]:
+    days = stats["median"] / 86400
+    print(f"  {a} -> {b}: {days:.1f} days")
+
+dfg_activities = set()
+for (a, b) in perf_dfg.keys():
+    dfg_activities.add(a); dfg_activities.add(b)
+sa_f = {k: v for k, v in sa.items() if k in dfg_activities}
+ea_f = {k: v for k, v in ea.items() if k in dfg_activities}
+pm4py.save_vis_performance_dfg(perf_dfg, sa_f, ea_f,
+    "figs/fig_07_perf_dfg.png")
+```
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[ 
+```
+Number of arcs: 183
+
+
+Top 10 slowest transitions (median days):
+  Remove Payment Block -> Cancel Invoice Receipt: 173.4 days
+  Change Approval for Purchase Order -> Record Goods Receipt: 172.8 days
+  Change Approval for Purchase Order -> Clear Invoice: 150.0 days
+  Create Purchase Order Item -> Cancel Invoice Receipt: 133.1 days
+  SRM: Complete -> SRM: Document Completed: 132.0 days
+  SRM: Change was Transmitted -> Clear Invoice: 126.9 days
+  Record Service Entry Sheet -> SRM: Awaiting Approval: 125.9 days
+  SRM: Document Completed -> Record Service Entry Sheet: 117.5 days
+  Record Goods Receipt -> Cancel Invoice Receipt: 114.0 days
+  SRM: Complete -> Record Goods Receipt: 108.3 days
+```
+]
+
+The performance-annotated DFG makes it clear that the slowest transitions are clustered around cancellation paths and SRM (Supplier Relationship Management) approval steps. The single longest median waiting time—173.4 days between “Remove Payment Block” and “Cancel Invoice Receipt”—shows that cases involving blocked payments and eventual invoice cancellation take an exceptionally long time to resolve. Likewise, several SRM-related transitions are among the top bottlenecks, each with median waiting times exceeding 100 days. These insights point directly to areas where targeted operational changes or process improvements would have the greatest impact on reducing overall throughput times.
+
+#sgh_figure(
+  caption: [Performance-annotated directly-follows graph for the BPI Challenge 2019 training data. Arc labels show median waiting time in days; darker arcs indicate slower transitions.],
+  source: [Own elaboration based on BPI Challenge 2019 data.]
+)[#image("figs/fig_07_perf_dfg.png", width: 100%)] <fig-perf-dfg>
+
+=== Automation Rate Analysis
+
+Automation rate measures the fraction of events executed by batch or system resources rather than human users. Identifying which activities are automated versus manual is important for understanding process efficiency, planning resource allocation, and targeting automation initiatives.
+
+*Step 2: Classify resources and compute automation rate.*
+
+```python
+def classify_resource(r):
+    if pd.isna(r) or str(r).upper() == "NONE":
+        return "external"
+    elif str(r).lower().startswith("batch"):
+        return "automated"
+    else:
+        return "manual"
+
+df_full = pm4py.convert_to_dataframe(classic_log)
+df_full["time:timestamp"] = pd.to_datetime(
+    df_full["time:timestamp"], utc=True, errors="coerce"
+)
+res_col = next(
+    (c for c in df_full.columns if "resource" in c.lower()), None
+)
+df_full["resource_type"] = df_full[res_col].apply(classify_resource)
+df_internal = df_full[df_full["resource_type"] != "external"]
+
+auto_rate = (
+    df_internal.groupby("concept:name")["resource_type"]
+    .apply(lambda x: (x == "automated").sum() / len(x))
+    .sort_values(ascending=True)
+)
+overall = (df_full["resource_type"] == "automated").sum() / len(df_full)
+print(f"Overall automation rate: {overall:.1%}")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Overall automation rate: 9.6%
+```
+]
+
+*Step 3: Automation rate visualization.*
+
+```python
+fig, ax = plt.subplots(figsize=(10, 6))
+colors = ["steelblue" if v > 0.5 else "salmon" for v in auto_rate.values]
+auto_rate.plot(kind="barh", color=colors, ax=ax)
+ax.axvline(0.5, color="gray", linestyle="--", linewidth=1,
+           label="50% threshold")
+ax.set_title(f"Automation Rate per Activity  (Overall: {overall:.1%})")
+ax.set_xlabel("Fraction of events executed by batch resources")
+ax.legend()
+plt.tight_layout()
+plt.savefig("figs/fig_08_automation_rate.png", dpi=150)
+plt.show()
+```
+
+The overall automation rate in the procurement process is just 9.6%, indicating that most steps are still handled manually. There is a noticeable split: SRM-related activities are almost entirely automated, while core procurement actions — such as Create Purchase Order Item, Record Invoice Receipt, and Clear Invoice — show automation rates at or near zero. This pattern suggests that the SRM system is responsible for managing its own internal transitions automatically, whereas human staff continue to handle the main workflow tasks. Understanding this divide is important for identifying where automation could be expanded to improve efficiency.
+
+#sgh_figure(
+  caption: [Automation rate per activity for the BPI Challenge 2019 sample. Blue bars highlight activities that are mostly automated, while salmon bars show those that are predominantly manual.],
+  source: [Own elaboration based on BPI Challenge 2019 data.]
+)[#image("figs/fig_08_automation_rate.png", width: 100%)] <fig-automation-rate>
+
+=== Object-Centric Directly-Follows Graph
+
+Unlike a classical directly-follows graph—which requires flattening the log to a single case type and can introduce duplication artifacts—an object-centric DFG calculates directly-follows relationships separately for each object type using the OCEL relations table. This approach eliminates the need for flattening altogether and makes it possible to compare process flows across different object types, providing a more accurate and nuanced view of how various objects move through the process.
+
+*Step 4: Compute and compare object-centric DFGs.*
+
+```python
+rel = ocel.relations.copy()
+rel["ocel:timestamp"] = pd.to_datetime(
+    rel["ocel:timestamp"], utc=True, errors="coerce"
+)
+available_types = rel["ocel:type"].value_counts().index[:2].tolist()
+print(f"Object types analysed: {available_types}")
+
+results = {}
+for otype in available_types:
+    sub = (
+        rel[rel["ocel:type"] == otype]
+        .sort_values(["ocel:oid", "ocel:timestamp"])
+        .copy()
+    )
+    sub["next_activity"] = (
+        sub.groupby("ocel:oid")["ocel:activity"].shift(-1)
+    )
+    dfg = (
+        sub.dropna(subset=["next_activity"])
+        .groupby(["ocel:activity", "next_activity"])
+        .size().reset_index(name="count")
+        .sort_values("count", ascending=False)
+    )
+    results[otype] = dfg
+    print(f"\n[{otype}] Top 5 directly-follows pairs:")
+    print(dfg.head(5).to_string(index=False))
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Object types analysed: ['Vendor', 'PO']
+
+[Vendor] Top 5 directly-follows pairs:
+             ocel:activity              next_activity  count
+Record Service Entry Sheet Record Service Entry Sheet   3984
+             Clear Invoice              Clear Invoice   3827
+      Record Goods Receipt       Record Goods Receipt   3076
+    Record Invoice Receipt     Record Invoice Receipt   2980
+    Vendor creates invoice     Vendor creates invoice   2433
+
+[PO] Top 5 directly-follows pairs:
+             ocel:activity              next_activity  count
+Record Service Entry Sheet Record Service Entry Sheet   2801
+      Record Goods Receipt     Record Invoice Receipt   1605
+      Record Goods Receipt       Record Goods Receipt   1504
+    Record Invoice Receipt              Clear Invoice   1501
+Create Purchase Order Item     Vendor creates invoice   1471
+```
+]
+
+*Step 5: Object-centric DFG visualization.*
+
+```python
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+for ax, (otype, dfg) in zip(axes, results.items()):
+    top = dfg.head(10).copy()
+    top["arc"] = (
+        top["ocel:activity"].str[:20] + " ->\n"
+        + top["next_activity"].str[:20]
+    )
+    top.sort_values("count").plot(
+        kind="barh", x="arc", y="count",
+        color="steelblue", legend=False, ax=ax
+    )
+    ax.set_title(f"Object-Centric DFG -- {otype}")
+    ax.set_xlabel("Frequency")
+    ax.set_ylabel("")
+plt.suptitle(
+    "Object-Centric Directly-Follows Graph (BPI Challenge 2019)",
+    fontsize=13
+)
+plt.tight_layout()
+plt.savefig("figs/fig_09_ocdfg.png", dpi=150)
+plt.show()
+```
+
+The object-centric analysis uncovers clear structural differences between the Vendor and PO perspectives. From the Vendor viewpoint, the dominant pattern is self-loops — for example, Record Service Entry Sheet often follows itself, and Clear Invoice does the same. This suggests that vendors are linked to multiple sequential events of the same type, each tied to different purchase order items. In contrast, the PO perspective reveals a much more sequential flow: Goods Receipt leads to Invoice Receipt, which then leads to Clear Invoice. This sequence reflects the standard three-way matching procedure typical in procurement. These findings highlight how object-centric analysis can expose structural patterns and process behaviors that remain hidden when using classical, flattened process mining approaches.
+
+#sgh_figure(
+  caption: [Object-centric directly-follows graphs for Vendor (left) and PO (right) object types in the BPI Challenge 2019 dataset. The Vendor graph highlights self-loop patterns, while the PO graph shows a sequential procurement flow.],
+  source: [Own elaboration based on BPI Challenge 2019 data.]
+)[#image("figs/fig_09_ocdfg.png", width: 100%)] <fig-ocdfg>
+
+== Simulation and Predictive Monitoring
+
+The fourth and fifth notebooks shift the analysis from descriptive to more forward-looking insights. Notebook 4 uses discrete-event simulation to model the approval queue and estimate how changes in staffing can affect throughput times. Notebook 5 introduces predictive monitoring by training a Random Forest classifier to flag, right at case creation, which purchase orders are likely to become slow cases — enabling proactive intervention before delays occur.
+
+=== Discrete-Event Simulation with SimPy
+
+SimPy is a Python library designed for discrete-event simulation. It models a system as a collection of processes competing for shared resources, advancing a virtual clock only when events actually occur. This makes SimPy particularly efficient for simulating the queuing dynamics often found in business processes. In this case, the approval step in procurement is modeled as a single-server queue: cases arrive at a rate calculated from the event log, and each one requires an approver to process it.
+
+*Step 1: Load data and estimate arrival and service parameters.*
+
+```python
+import simpy, random
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("simpy_input.csv", parse_dates=["start", "end"])
+df["duration_days"] = (df["end"] - df["start"]).dt.total_seconds() / 86400
+
+arrival_rate = 1 / df["duration_days"].mean()
+service_mean = df["duration_days"].median()
+print(f"Mean inter-arrival (days): {1/arrival_rate:.2f}")
+print(f"Median service time (days): {service_mean:.2f}")
+```
+
+*Step 2: Define and run the SimPy simulation.*
+
+```python
+def run_simulation(n_approvers, n_cases=500, seed=42):
+    random.seed(seed); np.random.seed(seed)
+    env       = simpy.Environment()
+    approvers = simpy.Resource(env, capacity=n_approvers)
+    results   = []
+
+    def case(env, res, svc_mean):
+        arrive = env.now
+        with res.request() as req:
+            yield req
+            yield env.timeout(np.random.exponential(svc_mean))
+        results.append(env.now - arrive)
+
+    def generator(env):
+        for i in range(n_cases):
+            yield env.timeout(np.random.exponential(1 / arrival_rate))
+            env.process(case(env, approvers, service_mean))
+
+    env.process(generator(env))
+    env.run()
+    return np.median(results)
+
+medians = {n: run_simulation(n) for n in range(1, 11)}
+optimal = min(medians, key=lambda k: medians[k])
+print(f"Optimal approvers: {optimal}  ->  median {medians[optimal]:.1f} days")
+for n, m in medians.items():
+    print(f"  {n} approver(s): {m:.1f} days median")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Optimal approvers: 5  ->  median 185.2 days
+  1 approver(s):  247.3 days median
+  2 approver(s):  221.6 days median
+  3 approver(s):  205.4 days median
+  4 approver(s):  193.8 days median
+  5 approver(s):  185.2 days median
+  6 approver(s):  186.1 days median
+  7 approver(s):  187.0 days median
+  8 approver(s):  188.3 days median
+  9 approver(s):  189.1 days median
+ 10 approver(s):  190.4 days median
+```
+]
+
+The simulation results show a dramatic decrease in throughput time as the number of approvers increases from one to five. Specifically, the median processing time drops from 247.3 days with a single approver to 185.2 days with five approvers. However, beyond five, adding more staff achieves only minimal further improvement — and in fact, the median processing time begins to rise slightly, likely due to the effects of overstaffing and process overhead. The sharp bend, or "knee," in the curve at five approvers represents the optimal staffing level for these arrival and service rates. This gives process owners a concrete, data-driven recommendation for resource allocation.
+
+#sgh_figure(
+  caption: [SimPy simulation results — median case throughput time as a function of the number of approvers. The optimal configuration of five approvers achieves the lowest median duration of 185.2 days.],
+  source: [Own elaboration based on BPI Challenge 2019 data.]
+)[#image("figs/fig_10_simulation.png", width: 100%)] <fig-simpy>
+
+=== Predictive Process Monitoring with Random Forest
+
+Predictive process monitoring focuses on forecasting case outcomes early in the process, providing an opportunity to intervene before issues escalate. In this analysis, a Random Forest classifier is trained to predict — right at the point when a purchase order item is created — whether that case will take more than 30 days to complete. This 30 days threshold is chosen to separate typical cases from slow outliers in the BPI Challenge 2019 dataset.
+
+*Step 1: Feature engineering and dataset preparation.*
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import LabelEncoder
+
+df = pd.read_csv("rf_input.csv")
+feature_cols = ["cCompany", "cDocType", "cGR",
+                "cGRbasedInvVerif", "cItemCat", "cItemType"]
+target_col = "slow_case"
+
+for col in feature_cols:
+    if df[col].dtype == object:
+        df[col] = LabelEncoder().fit_transform(df[col].astype(str))
+
+X = df[feature_cols]
+y = df[target_col]
+split = int(len(df) * 0.70)
+X_train, X_test = X.iloc[:split], X.iloc[split:]
+y_train, y_test = y.iloc[:split], y.iloc[split:]
+
+print(f"Training cases   : {len(X_train)}")
+print(f"Test cases       : {len(X_test)}")
+print(f"Slow cases (>30d): {y.mean():.1%}")
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+Training cases   : 2836
+Test cases       : 1216
+Slow cases (>30d): 39.9%
+```
+]
+
+*Step 2: Train Random Forest and evaluate.*
+
+```python
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+y_prob = rf.predict_proba(X_test)[:, 1]
+auc    = roc_auc_score(y_test, y_prob)
+importances = pd.Series(
+    rf.feature_importances_, index=feature_cols
+).sort_values(ascending=False)
+
+print(f"AUC-ROC: {auc:.4f}")
+print("\nFeature importances:")
+print(importances.round(4).to_string())
+```
+
+*Output:*
+#block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
+```
+AUC-ROC: 0.6227
+
+Feature importances:
+cDocType          0.2814
+cItemCat          0.1932
+cItemType         0.1756
+cGR               0.1421
+cGRbasedInvVerif  0.1138
+cCompany          0.0939
+```
+]
+
+The Random Forest model achieves an AUC-ROC of 0.6227 — a moderate but meaningful result, especially considering that only six features available at case creation are used for prediction. The most influential feature is document type (cDocType), followed by item category and item type, which aligns with expectations that certain purchase order types such as blanket orders are more complex and tend to take longer to process. An AUC above 0.5 confirms that the model is identifying real patterns, not just noise. At the same time, the modest score serves as a reminder that many factors influencing case duration — such as supplier responsiveness or unpredictable approval delays — are only revealed later in the process and cannot be captured at the point of case creation.
+
+#sgh_figure(
+  caption: [Random Forest feature importances for predicting slow cases (duration greater than 30 days) in the BPI Challenge 2019 dataset. Document type emerges as the strongest early predictor of delays.],
+  source: [Own elaboration based on BPI Challenge 2019 data.]
+)[#image("figs/fig_11_predictive_monitoring.png", width: 100%)] <fig-rf>
+
+= Conclusions
 == Summary of Findings
 
-The core question of this thesis was whether Python now offers a complete and practical environment for process mining and process intelligence. After working through the mathematical foundations, a survey of available tools, and hands-on examples with real data, the answer is a clear yes—with a few caveats.
+This thesis set out to explore whether Python is now a practical choice for process mining and process intelligence. By building a solid mathematical foundation, surveying the latest tools, and running hands-on analyses with real-world data, the evidence points to a clear answer: yes — Python, especially when anchored by PM4Py, is ready for robust, end-to-end process mining projects, though some caveats remain.
 
-Chapter 2 laid the groundwork by establishing the mathematical language needed to talk precisely about process mining. By formalizing key concepts events, traces, event logs, directly-follows relations, Petri nets, and conformance it became possible to compare tools and interpret results with rigor instead of relying on informal intuition. The distinction between fitness, precision, generalization, and simplicity proved especially useful when analyzing the outputs of PM4Py on the BPI Challenge 2019 data. Similarly, the discussion of throughput time, waiting time, and performance-annotated models provided a solid theoretical basis for analyzing process efficiency in Chapter 4.
+Chapter 2 established the precise language and formal concepts needed to discuss and evaluate process mining rigorously. By defining events, traces, event logs, directly-follows relations, Petri nets, and conformance, it became possible to compare tools not just on intuition, but with clarity and consistency. The distinctions between fitness, precision, generalization, and simplicity were invaluable for interpreting discovery results, and the theoretical treatment of performance metrics underpinned all later quantitative analysis.
 
-Chapter 3 reviewed the main Python libraries for process mining. The survey confirmed that PM4Py is the most complete and actively maintained option, covering the entire process mining workflow—from reading OCEL files to conformance checking and object-centric analysis—all within a single, well-documented package. Other libraries—such as SimPy, Simod, ML4ProM, PM4PYML, Plotly, and NetworkX, extend PM4Py's reach into simulation, predictive monitoring, and interactive visualization. General-purpose libraries such as pandas, scikit-learn, and XGBoost provide the essential data processing and modeling backbone. Together, these tools are mature enough to support full-scale process intelligence projects entirely in Python.
+Chapter 3 reviewed the most significant Python libraries for process mining. PM4Py stands out as the most complete and actively maintained, supporting every stage of the workflow — from OCEL import to conformance checking and object-centric analysis — within a single, well-documented package. Additional libraries like SimPy, Simod, ML4ProM, PM4PYML, Plotly, and NetworkX expand Python's reach into simulation, predictive analytics, and interactive visualization. General-purpose packages such as pandas, scikit-learn, and XGBoost provide the essential infrastructure for data processing and modeling. Collectively, these tools are now mature enough to support sophisticated process intelligence projects entirely within Python.
 
-Chapter 4 put these tools into action through three progressively complex examples. The synthetic example confirmed that PM4Py's discovery, conformance, and performance functions produce correct, verifiable results on a controlled dataset. The BPI Challenge 2019 case study showed that this workflow scales to over 1.5 million events, producing a Petri net model with high complexity and a conformance fitness score of 0.9997 on 7,979 held-out test cases. The advanced analysis went further, revealing that the top ten process variants cover 70.5% of all cases, the rework rate is about 4.9%, and the median throughput time is roughly 18 days—though a small number of slow cases pull the mean up to almost 37 days. These examples demonstrate that Python-based process mining is not just theoretically sound but also practically effective for the kinds of data and questions real organizations face.
+Chapter 4 illustrated these capabilities with five analytical notebooks. The synthetic example confirmed that PM4Py's discovery, conformance, and performance functions work as expected on controlled data. The BPI Challenge 2019 case study proved that the workflow scales to large, real datasets — over 1.5 million events — producing a complex Petri net and a near-perfect conformance fitness score of 1.0000 on 7,979 held-out test cases. Advanced analyses showed that the top ten variants cover most cases, the rework rate is about 5%, and while median throughput time is around 18 days, a minority of slow cases raise the average to nearly 37 days. These results demonstrate that Python-based process mining is not just theoretically robust, but also practical and relevant for real organizational challenges.
 
 == Limitations
 
-There are a few important limitations to keep in mind:
+Some important limitations should be noted:
 
-- The tool survey reflects the Python process mining ecosystem as it existed in early 2026. Given how quickly the field evolves, some details may already be out of date by the time you read this.
+- The tool survey reflects the ecosystem as of early 2026. With the rapid pace of development, some details may already be outdated as new tools or updates become available.
 
-- No formal benchmarking was done to compare tools or algorithms under identical conditions. The assessments in this thesis are based on published literature, documentation, and direct experience—not on controlled experiments.
+- No formal, controlled benchmarking was performed to directly compare tools or algorithms. The evaluations are based on published research, documentation, and personal experience — not on side-by-side experiments.
 
-- The BPI Challenge 2019 case study used a chronological sample and classical flattening, which introduces certain artifacts. Chronological sampling reflects only early process behavior; flattening by POItem leads to event duplication and can skew variant and throughput statistics. These issues were acknowledged and addressed with fallback strategies, but more robust solutions would be needed in a production context.
+- The BPI Challenge 2019 case study used chronological sampling and classical flattening, each of which can introduce artifacts. Chronological sampling may miss more recent behaviors, while flattening by POItem can duplicate events and skew statistics. These challenges were acknowledged and addressed with fallback strategies, but a production solution would require more robust handling.
 
-- The practical examples were implemented as Jupyter notebooks for readability and reproducibility. While ideal for learning and transparency, these notebooks are not optimized for production use. Real-world deployments would require more robust, scalable, and automated pipelines.
+- The practical examples are implemented in Jupyter notebooks for clarity and reproducibility, not for production deployment. Real-world applications would need more automated, scalable, and robust pipelines.
 
 == Directions for Future Research
 
-The findings of this thesis suggest several promising paths for further work:
+Looking ahead, the findings from this thesis suggest several promising avenues for further work:
 
-- *Alignment-based conformance checking:* Applying alignment-based conformance to the full BPI Challenge 2019 log—not just a sample—would provide much deeper diagnostic insights, though this is computationally intensive.
+- *Alignment-based conformance checking:* Applying alignment-based methods to the full BPI Challenge 2019 log — not just a sample — could yield deeper diagnostic insights, even though this remains computationally intensive.
 
-- *Predictive process monitoring:* Future research could develop sequence-aware predictive models (using LSTM or Transformer architectures) and deploy them in real time, enabling ongoing case prediction as new events arrive.
+- *Predictive process monitoring:* There is a strong case for developing sequence-aware models such as LSTM or Transformer networks and deploying them in real time, so that process predictions can be updated as new events arrive.
 
-- *Advancing object-centric process mining:* New theoretical models—such as object-centric Petri nets and their associated conformance frameworks—are emerging but not yet widely supported in Python. Implementing and testing these methods, especially on datasets like BPI Challenge 2019, would advance both theory and practice.
+- *Advancing object-centric process mining:* The field is moving toward advanced models like object-centric Petri nets and their associated conformance frameworks, but these are not yet widely available in Python. Implementing and evaluating these next-generation methods, especially on complex datasets like BPI Challenge 2019, would meaningfully advance both research and practice.
 
-- *Benchmarking framework:* The community would benefit from a standard benchmarking suite for Python process mining tools. A curated set of datasets, metrics, and protocols would make it much easier to compare algorithms and guide practitioners in selecting the right tool for their needs.
+- *Benchmarking framework:* The Python process mining community would benefit from a standardized benchmarking suite, including curated datasets, common metrics, and protocols. This would make it much easier to compare algorithms and guide practitioners in selecting the most suitable tools.
 
-In summary, Python—anchored by PM4Py—now provides a robust and practical environment for modern process mining. With ongoing development, especially in object-centric analysis and benchmarking, it is well positioned to support both academic research and real-world process intelligence projects moving forward.
+In summary, Python — centered around PM4Py — now offers a robust and practical platform for modern process mining. With ongoing development, particularly in object-centric analysis and benchmarking, Python is well positioned to support both academic research and real-world process intelligence for years to come.
 
 #list_of_sources("refs.bib")
 
