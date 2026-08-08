@@ -1,6 +1,9 @@
 // Template for the thesis
 #import "SGH-thesis.typ": *
 
+// Importing Fletcher for diagrams
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge,
+
 // table colors
 #show: sgh_stripped_tables
 
@@ -36,6 +39,29 @@
   line(length: 100%, stroke: 0.5pt + gray)
 }
 
+// making a formal example (for small, simple examples)
+// Define a dedicated counter for your example blocks
+#let example-counter = counter("example-block")
+
+#let sgh_example(content, title: "Example") = figure(
+  kind: "example",
+  supplement: title,
+  block(
+    breakable: true,
+      fill: orange.lighten(95%),
+    inset: 10pt,
+    radius: 1pt,
+    width: 100%,
+    align(left)[
+      #example-counter.step()
+      #text(weight: "bold")[
+        #title #context example-counter.display()
+      ]
+      #v(6pt)
+      #content
+    ]
+  )
+)
 
 // ----------------------------------------------------------------------------
 // Title page
@@ -440,8 +466,6 @@ To illustrate, consider $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D c
 
 === Petri Nets
 
-// TODO (MR): xxx
-
 The main model representation used in this thesis is the Petri net, which is the standard output format of PM4Py and most other process mining tools. A Petri net is formally defined as a triple $N = (P, T, F)$ where:
 
 - $P$ is a finite set of *places*, represented as circles,
@@ -450,24 +474,104 @@ The main model representation used in this thesis is the Petri net, which is the
 
 For a transition $t in T$, its *preset* is $bullet t = {p in P : (p, t) in F}$ (input places) and its *postset* is $t bullet = {p in P : (t, p) in F}$ (output places).
 
+// TODO (MR): This is the common notation used for discussing the
+// structural graph definition. Here we use a more formal mathematical
+// notation, so it’s natural to write $Pre(t)$ and $Post(t)$,
+// especially when referring to $p \in Pre(t)$ rather than $p \in
+// \bullet t$.
+
 A *marking* $M: P -> NN_0$ assigns a non-negative integer number of *tokens* to each place. The pair $(N, M)$ is called a marked Petri net. A transition $t$ is *enabled* in marking $M$ if every input place holds at least one token: $M(p) >= 1$ for all $p in bullet t$. Firing an enabled transition $t$ produces a new marking $M'$:
 
 $ M'(p) = cases(
-  M(p) - 1 & "if" p in bullet t " and " p in.not t bullet,
-  M(p) + 1 & "if" p in t bullet " and " p in.not bullet t,
-  M(p)     & "otherwise"
+  M(p) - 1 &: "if" p in bullet t " and " p in.not t bullet,
+  M(p) + 1 &: "if" p in t bullet " and " p in.not bullet t,
+  M(p)     &: "otherwise"
 ) $
 
-An *accepting Petri net* $(N, M_0, M_f)$ specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there exists a firing sequence of transitions whose labels match $sigma$ and that leads from $M_0$ to $M_f$.
+An *accepting Petri net* $(N, M_0, M_f)$ specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there exists a firing sequence of transitions whose labels match $sigma$ and that leads from $M_0$ to $M_f$. 
 
-To illustrate, consider the sequential process $A -> B -> D$. The Petri net has places $P = {p_0, p_1, p_2, p_3}$, transitions $T = {A, B, D}$, and flow $F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)}$. Initial marking $M_0 = {p_0: 1}$, final marking $M_f = {p_3: 1}$.
+// TODO (MR): What does "to illustrate..." refer to in the paragraph
+// below? This has been corrected; please apply the same revision
+// throughout the document.
 
-Replaying the trace $chevron.l A, B, D chevron.r$:
-- Step 1: $A$ is enabled ($p_0$ has 1 token). Fire $A$: $M_1 = {p_1: 1}$.
-- Step 2: $B$ is enabled ($p_1$ has 1 token). Fire $B$: $M_2 = {p_2: 1}$.
-- Step 3: $D$ is enabled ($p_2$ has 1 token). Fire $D$: $M_3 = {p_3: 1} = M_f$. Accepted.
+// TODO (MR): The following example is difficult to follow without an
+// actual figure of the network. I added this graph using Fletcher;
+// please include similar graphs for any other such examples.
 
-If instead the trace $chevron.l A, D chevron.r$ is replayed: after firing $A$, the marking is $M_1 = {p_1: 1}$. Transition $D$ requires $p_2$ to hold a token, but $p_2 = 0$. $D$ is not enabled, and the trace cannot be completed without artificially adding tokens. This correctly reflects that $B$ cannot be skipped in this model.
+
+
+#sgh_example[
+    To illustrate the above concepts, consider the sequential process with activities $A -> B -> D$. Figure~@fig-petri-net-accepting shows the Petri net that models this process. The Petri net has places
+    $ P = {p_0, p_1, p_2, p_3}, $
+    transitions
+    $ T = {A, B, D}, $
+    and flow
+    $ F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)} . $
+    To complete the accepting Petri net definition, we add the initial  and the final markings
+    $ M_0 = {p_0: 1}, M_f = {p_3: 1}. $
+
+#sgh_figure(
+    caption: [The Petri net used in the example of an accepting Petri net],
+    source: [Own elaboration]
+)[
+    #let pn_place(pos, label, name, tint: green, ..args) = node(
+	pos, align(center, label),
+        name: name,
+        shape: circle,
+	width: 1.8em,
+	fill: tint.lighten(80%),
+	stroke: 1pt + tint.darken(20%),
+	corner-radius: 5pt,
+	..args,
+    )
+
+    #let pn_tran(pos, label, name, tint: orange, ..args) = node(
+	pos, align(center, label),
+        name: name,
+	width: 1.5em,
+        height: 3em,
+	fill: tint.lighten(80%),
+	stroke: 1pt + tint.darken(10%),
+	corner-radius: 1pt,
+	..args,
+    )
+
+    #scale(60%)[
+        #diagram(
+            spacing: 10pt,
+            cell-size: (8mm, 8mm),
+            edge-stroke: 1pt,
+            edge-corner-radius: 5pt,
+            debug: false,
+            mark-scale: 70%,
+
+            pn_place((0, 0), [$p_0$], <p0>),
+            pn_place((4, 0), [$p_1$], <p1>),
+            pn_place((8, 0), [$p_2$], <p2>),
+            pn_place((12, 0), [$p_3$], <p3>),
+
+            pn_tran((2, 0), [$A$], <t1>),
+            pn_tran((6, 0), [$B$], <t2>),
+            pn_tran((10, 0), [$D$], <t3>),
+
+
+            edge(<p0>, <t1>, "-|>"),
+            edge(<t1>, <p1>, "-|>"),
+            edge(<p1>, <t2>,"-|>"),
+            edge(<t2>, <p2>,"-|>"),
+            edge(<p2>, <t3>,"-|>"),
+            edge(<t3>, <p3>,"-|>"),            
+            
+        )]
+]<fig-petri-net-accepting>
+
+    The following trance $chevron.l A, B, D chevron.r$ is accepted because there is a firing sequence of transitions leading from the marking $M_0$ to $M_f$:
+    - Step 1: $A$ is enabled ($p_0$ has 1 token). Fire $A$: $M_1 = {p_1: 1}$.
+    - Step 2: $B$ is enabled ($p_1$ has 1 token). Fire $B$: $M_2 = {p_2: 1}$.
+    - Step 3: $D$ is enabled ($p_2$ has 1 token). Fire $D$: $M_3 = {p_3: 1} = M_f$. Accepted.
+
+    Consider the other trace $chevron.l A, D chevron.r$. Firing transition $A$ first yields marking $M_1 = {p_1: 1}$. However, place $p_2$ is empty in $M_1$, so transition $D$ is not enabled. The trace cannot be completed without artificially adding tokens, correctly reflecting that $B$ cannot be skipped in this model.    
+]<ex-accepting-pn>
 
 In process mining, transitions correspond to activities, places represent states between activities, and tokens represent the current execution state of a process instance. Petri nets are valuable because they support both visual interpretation and formal analysis of properties such as reachability and soundness, and because PM4Py uses them as the primary model format for conformance checking and performance analysis.
 
@@ -481,19 +585,37 @@ $ "fitness"(sigma) = 1/2 (1 - p/c) + 1/2 (1 - r/q) $
 
 where $p$ is the number of missing tokens added during replay, $c$ is the total number of tokens consumed, $r$ is the number of remaining tokens at the end, and $q$ is the total number of tokens produced. A value of 1 indicates a perfectly fitting trace; lower values indicate more deviation. The overall log fitness is the weighted average of trace fitness values across all cases @vanderAalst2022.
 
-To illustrate token-based replay, consider the net $A -> B -> D$ and the trace $sigma = chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, the marking is ${p_1: 1}$. Transition $D$ requires $p_2$, which has no token: one missing token is added ($p = 1$), $D$ fires, and the final marking is reached. However, $p_1$ still holds a token that was never consumed because $B$ was not observed ($r = 1$). With $c = 2$ and $q = 2$:
+// TODO (MR): You should explain what are consumed and produces
+// tokens. This is not clear for readers not into process
+// mining. Also, maybe explain why $p$ is devided by $c$ and $r$ by
+// $q$ and not the other way around.
 
-$ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 0.5 $
-
+#sgh_example()[
+    We continue with the example @ex-accepting-pn. To illustrate token-based replay, consider the net $A -> B -> D$ from example @ex-accepting-pn showed at the figure @fig-petri-net-accepting. Consider the trace $sigma = chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, the marking is ${p_1: 1}$. Transition $D$ requires $p_2$ to have at least one token, which is missing. This one missing token is added resulting in a marking ${p_1: 1, p_2: 1}$. Thus, $p = 1$. Once this token is added, the transition $D$ fires, and the final marking ${p_1: 1, p_3: 1}$ is reached. However, the place $p_1$ still holds a token that was never consumed because $B$ was not fired resulting in  $r = 1$. With $c = 2$ and $q = 2$:
+    $ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 1/2 . $
 This value reflects the significant deviation: one activity was skipped and one token was left unconsumed.
+]<ex-fitness>
+
+// TODO (MR): You need to be more precise when describing how one
+// marking changes into another. In the above example, I added all the
+// required information. This also refers to the previous example.
+
+// TODO (MR): In the following paragraph, you use the word
+// "move". What is it as it seems like this is just activity.
 
 The second approach is *alignment-based conformance*, which finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$ where $a_i$ is a move in the log and $b_i$ is a move in the model:
 
-- *Synchronous move* $(a, a)$: $a$ occurs in both the log and the model — no deviation.
-- *Log move* $(a, >>)$: $a$ occurs in the log but not at this point in the model — unexpected behavior observed.
-- *Model move* $(>>, a)$: $a$ is expected by the model but absent in the log — expected behavior was skipped.
+- _Synchronous move_ $(a, a)$: $a$ occurs in both the log and the model — no deviation.
+- _Log move_ $(a, >>)$: $a$ occurs in the log but not at this point in the model — unexpected behavior observed.
+- _Model move_ $(>>, a)$: $a$ is expected by the model but absent in the log — expected behavior was skipped.
 
 The cost of an alignment is the total number of non-synchronous moves. The *optimal alignment* minimizes this cost and is found by solving a shortest-path problem in an alignment state space, typically using the $A^*$ algorithm.
+
+// TODO (MR): The following example is the continuation of the two
+// previous examples. Change this into a formal example; refrence the
+// previous two examples. Also, the table should be formal.
+
+// START EXAMPL
 
 For the same example — trace $chevron.l A, D chevron.r$ against the model accepting $chevron.l A, B, D chevron.r$:
 
@@ -508,6 +630,8 @@ For the same example — trace $chevron.l A, D chevron.r$ against the model acce
 
 Cost: 1. The alignment shows precisely that the only deviation is the absence of activity $B$. This level of diagnostic detail is more informative than the token-based fitness score alone, because it identifies exactly which activity was missed and at which point in the trace.
 
+// END EXMAPLE
+
 Alignment-based conformance provides more precise and detailed diagnostic information than token replay, but it is also more computationally expensive, particularly for long traces and large models. In practice, token replay is often used for a quick overall fitness estimate, while alignment-based conformance is applied when detailed per-trace diagnostics are needed.
 
 Deviations identified through conformance checking may reflect data quality issues, exceptional cases, policy violations, or genuine changes in the process over time. Understanding the nature and frequency of deviations is one of the main outputs of a conformance checking study.
@@ -516,11 +640,24 @@ Deviations identified through conformance checking may reflect data quality issu
 
 Performance analysis adds a time dimension to the structural view produced by process discovery and conformance checking. Because event logs contain timestamps, it is possible to measure the duration of individual activities, the waiting time between activities, and the total throughput time for each case. These measurements can be projected onto the process model to produce a *performance-annotated* view that highlights where time is spent or lost in the process.
 
-The *throughput time* of a case $c$ is the elapsed time between the timestamp of its first and last recorded event:
+// TODO (MR): This is literary not true. For example, in the sepsis
+// log example, the blood work is done evey two days as revealed by
+// timestamps. However, the time to actually do the test is literary
+// in hours. It's not possible to compute the time required to make a
+// transition. What we can get from the log is the time between the
+// timestamps, thus, ectivities but not the duration of the
+// activities. Also, what about the first and the last activity in a
+// trace?
 
-$ "TT"(c) = max_{e in c} t(e) - min_{e in c} t(e) $
+The *throughput time* of a case $c$ is the elapsed time between the timestamp of its first and last recorded event:
+$ "TT"(c) = max_{e in c} t(e) - min_{e in c} t(e) , $
+where $t(e)$ is the timestamp of the event $e in c$. 
 
 The *waiting time* between two consecutive activities $a_i$ and $a_(i+1)$ in a trace is the elapsed time between the completion of $a_i$ and the start of $a_(i+1)$. The *service time* of an activity is its own execution duration, measurable when both a start event and a complete event are recorded for the same activity instance.
+
+// TODO (MR): Technically, we can have the to consecutive events with
+// the same activity, different timestamps and different lifecycle
+// attributes (start, completed). It's not common in practice, though.
 
 Several summary statistics are routinely reported to characterize throughput time across all cases in the log:
 
@@ -536,9 +673,16 @@ Several summary statistics are routinely reported to characterize throughput tim
   [Coefficient of variation], [Standard deviation divided by mean — measures variability],
 )
 
+// TODO (MR): Again, table!
+
 The coefficient of variation is particularly informative: a low value indicates that most cases complete in a similar time, while a high value indicates high variability, which may point to bottlenecks, resource constraints, or exceptional cases that require special handling.
 
 When throughput times or waiting times are projected onto the process model — associating each arc or transition with the median or mean duration computed from all cases passing through it — a performance-annotated model is obtained. This visualization immediately shows which transitions have the longest associated waiting times and are therefore candidates for process improvement. For example, if two activities are always directly connected in the model but a consistently long delay is observed between them in the data, this suggests a bottleneck or resource constraint at that point in the process.
+
+// TODO (MR): Usually, for mathematical analysis, we attach a
+// transition duration distribution, for example, a given transition
+// may have a duration given by the exponential distribution with a
+// given intensity.
 
 Process intelligence extends these ideas by connecting process data with forecasting, simulation, and optimization. Once the event log has been analyzed and a performance baseline has been established, it becomes possible to predict future outcomes for running cases, test the effects of proposed process changes through simulation, or build real-time monitoring dashboards that alert managers when a case is projected to exceed a target throughput time. The mathematical foundations introduced in this chapter therefore remain relevant across the full scope of process intelligence, not only for the basic retrospective tasks of discovery and conformance checking.
 
@@ -546,9 +690,13 @@ Process intelligence extends these ideas by connecting process data with forecas
 
 From the implementation point of view, event data are typically represented in Python either as tabular data structures or as specialized log objects. The simplest tabular representation uses three core columns: case identifier, activity label, and timestamp. This format is easy to inspect and manipulate using the `pandas` library, which provides the DataFrame structure used throughout the Python data science ecosystem.
 
-Process mining libraries then convert such tables into richer event-log objects that preserve trace structure and support discovery algorithms. In PM4Py, the conversion is performed by `pm4py.format_dataframe`, which requires the analyst to specify which columns hold the case identifier, activity name, and timestamp, followed by `pm4py.convert_to_event_log` to produce the internal event-log object. The resulting object supports all PM4Py discovery, conformance, and performance functions directly. This conversion step is demonstrated in the introductory synthetic example in Chapter 4, where a plain pandas DataFrame with three columns is transformed into an input suitable for the Inductive Miner.
+// TODO (MR): Usually, when talking about the XES structure, we have
+// case id, event id, and then attributes e.g., activity, timestamp,
+// cost, resource, and so on. Thus, 4 columns. 
 
-A more advanced representation is the *Object-Centric Event Log (OCEL)*. Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
+Process mining libraries then convert such tables into richer event-log objects that preserve trace structure and support discovery algorithms. In PM4Py, the conversion is performed by `pm4py.format_dataframe`, which requires the analyst to specify which columns hold the case identifier, activity name, and timestamp, followed by `pm4py.convert_to_event_log` to produce the internal event-log object. The resulting object supports all PM4Py discovery, conformance, and performance functions directly. This conversion step is demonstrated in the introductory synthetic example in Chapter 4, where a plain pandas DataFrame with three columns is transformed into an input suitable for the Inductive Miner#footnote[More information about the XES standard can be found at #link("https://ieeexplore.ieee.org/document/10025658")[#raw("https://ieeexplore.ieee.org/document/10025658")].].
+
+A more advanced representation is the second version of the *Object-Centric Event Log (OCEL)*.#footnote[More information about the OCEL standard can be found at #link("https://www.ocel-standard.org/")[#raw("https://www.ocel-standard.org/")].] Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
 
 *Flattening* is the process of converting an OCEL into a classical event log by selecting one object type as the case identifier. In PM4Py, the function `pm4py.ocel_flattening(ocel, object_type)` performs this step. When one event is related to multiple objects of the selected type, that event appears in multiple cases in the flattened log, which inflates the case count. When the selected object type is not directly linked to all events, some events may be lost during flattening. Managing these artifacts is an important preprocessing step before applying classical discovery algorithms to object-centric data.
 
@@ -571,6 +719,8 @@ The dataset contains approximately 1,595,923 events and 330,685 objects distribu
   [Domain],         [Procurement],
 )
 
+// TODO (MR): Table, again!
+
 After flattening with respect to the POItem object type — selected because it is the most frequent type in the log — the classical event log contains one case per distinct POItem object. The full dataset produces a flattened log with a large number of cases; in the sample used for the practical examples in Chapter 4, the flattened log contains 53,198 cases.
 
 #table(
@@ -584,6 +734,8 @@ After flattening with respect to the POItem object type — selected because it 
   [Minimum],                      [0.0 days],
   [Maximum],                      [25,670.6 days],
 )
+
+// TODO (MR): Table, again! Also, refrences to chapters, again!
 
 The mean throughput time of 72.3 days and median of 64.3 days indicate that a typical purchase order item takes roughly two months to process from first to last recorded event. The 95th percentile of 143 days shows that a minority of cases take significantly longer. The maximum of over 25,000 days almost certainly represents either an open case that was never formally closed or a data anomaly. The distribution of throughput times is right-skewed, which is typical of procurement processes where the majority of cases are completed within a predictable time range but a small number of exceptions take much longer.
 
