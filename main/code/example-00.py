@@ -1,4 +1,16 @@
+# Simple artificial example
+
+# ---------------------------------------------------------------------------------------
+# General imports
+# ---------------------------------------------------------------------------------------
+
+from networkx import inverse_line_graph
 import pandas as pd
+import pm4py as pm
+
+# ---------------------------------------------------------------------------------------
+# Specific imports
+# ---------------------------------------------------------------------------------------
 
 from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.algo.discovery.inductive import algorithm as inductive_miner
@@ -7,6 +19,7 @@ from pm4py.visualization.petri_net import visualizer as pn_visualizer
 
 # ---------------------------------------------------------------------------------------
 # Definitions
+# ---------------------------------------------------------------------------------------
 
 def build_toy_event_log() -> pd.DataFrame:
     """
@@ -42,14 +55,25 @@ def build_toy_event_log() -> pd.DataFrame:
     df["time:timestamp"] = pd.to_datetime(df["time:timestamp"])
     return df
 
-build_toy_event_log()
+a = build_toy_event_log()
+print(a)
 
-# MR: Why the names? I feel that CaseID, Activity and Timestamp are
-# better names.
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+# TODO (MR): These names are taken from the IEEE 1849-2016
+# standard. Perhaps, we should descsribe the basic of this in the
+# thesis?
 
-# MR: Is this the standard format of the data? So we've got the case
-# ID, then we've got the type of activity, and then we've got the
-# timestamp. What are the typical formats used in process mining?
+# standard prefixes
+# concept: semantic information (case name, activity name)
+# time: temporal atribute
+# org: organizational data
+# lifecycle: lifecycle state, e.g., complete
+
+# general structures → prefix:attribute_name
+# standard prefixes → belong to event
+# case: prefix → belong to trace (case level)
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
 
 # ---------------------------------------------------------------------------------------
 
@@ -63,6 +87,17 @@ def convert_to_event_log(df: pd.DataFrame):
 
 d = build_toy_event_log()
 d1 = convert_to_event_log(d) # this is a typical format
+
+d
+type(d1)
+
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+# TODO (MR): This are all public properties. Do we need to see what they are?
+
+for p in dir(d1):
+    print(p)
+
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 
 # ---------------------------------------------------------------------------------------
 
@@ -86,11 +121,20 @@ def inspect_input_structures(log) -> None:
 
 inspect_input_structures(d1)
 
-for s in dir(d1):
-    print(s)
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+# TODO (MR): Comverting to more standard data structures
 
-# MR: There is a lot of methods and properties of those objects. What
-# are those methods and properties?
+pm.convert_to_dataframe(d1[0])
+pm.convert_to_dataframe(d1)
+
+# TODO (MR): This is how we can convert it to markdown
+a = pm.convert_to_dataframe(d1)
+print(a.to_markdown(index = False))
+
+# TODO (MR): Comverting to a CSV to direct use in typst document
+a.to_csv()
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
 
 # ---------------------------------------------------------------------------------------
 
@@ -129,8 +173,12 @@ def run_inductive_miner(log):
 
 r1 = run_inductive_miner(d1)
 
-# MR: What is the result of this algorithm? Is it a Petri net or
-# another model? Also, it lacks a mathematical description.
+type(r1)
+len(r1)
+r1[0]
+r1[1]
+r1[2]
+r1[3]
 
 # ---------------------------------------------------------------------------------------
 
@@ -170,18 +218,10 @@ def inspect_output_structures(tree, net, im, fm) -> None:
 tree, net, im, fm = run_inductive_miner(d1)
 
 inspect_output_structures(tree, net, im, fm)
-d
 
-# MR: What is the connection between the initial data as are displayed
-# in the data frame and the resulting net? It seems that we have only
-# three activities, A, B and C, but in the final net we have four
-# places how these relate to each other.
 
 # ---------------------------------------------------------------------------------------
-
 ## Example
-
-
 
 # Creating a basic data structure.
 a = convert_to_event_log(build_toy_event_log())
@@ -196,11 +236,10 @@ inspect_output_structures(tree, net, im, fm)
 gviz = pn_visualizer.apply(net, im, fm)
 pn_visualizer.view(gviz)
 
-# MR: Now I understand how it works and what is the result, but you
-# need to describe precisely in the text and also give me the
-# mathematics for the algorithm itself.
-
 # This saves the visualization to a particular location.
 pn_visualizer.save(gviz, "./fig1.png")
 
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+# TODO (MR): Is it the example in the thesis?
+# ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 

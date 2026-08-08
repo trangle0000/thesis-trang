@@ -1,12 +1,13 @@
-// Import szablonu pracy dyplomowej zgodnej z wymaganiami SGH
+// Template for the thesis
 #import "SGH-thesis.typ": *
-// #import "@preview/callisto:0.2.4"
 
+// Importing Fletcher for diagrams
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge,
 
-// ustawienie kolorowania tabel
+// table colors
 #show: sgh_stripped_tables
 
-// zmiana wielkość czcionki w tabelach
+// changing font size in tables
 #show table.cell: set text(size: 9pt)
 
 // grey background for all block-level code/output
@@ -18,6 +19,52 @@
   it
 )
 
+// summary at the beginning of each chapter
+#let chapterSummary(q, a: none) = {
+    quote(
+        text(fill: rgb("#B0C4DE").darken(50%))[#q],
+        block: true,
+        attribution: a
+    )
+}
+
+// including code from a file from line to line
+#let includeCode(path, from: 1, to: none) = {
+  let lines = read(path).split("\n")
+  let to = if to == none { lines.len() } else { to }
+  let selected = lines.slice(from - 1, to)
+  show raw: set text(size: 8pt)
+  line(length: 100%, stroke: 0.5pt + gray)
+  raw(selected.join("\n"), lang: "r", block: true)
+  line(length: 100%, stroke: 0.5pt + gray)
+}
+
+// making a formal example (for small, simple examples)
+// Define a dedicated counter for your example blocks
+#let example-counter = counter("example-block")
+
+#let sgh_example(content, title: "Example") = figure(
+  kind: "example",
+  supplement: title,
+  block(
+    breakable: true,
+      fill: orange.lighten(95%),
+    inset: 10pt,
+    radius: 1pt,
+    width: 100%,
+    align(left)[
+      #example-counter.step()
+      #text(weight: "bold")[
+        #title #context example-counter.display()
+      ]
+      #v(6pt)
+      #content
+    ]
+  )
+)
+
+// ----------------------------------------------------------------------------
+// Title page
 // ----------------------------------------------------------------------------
 
 #show: sgh.with(
@@ -32,8 +79,17 @@
   language: "en"
 )
 
+// ----------------------------------------------------------------------------
+// Table of contentes
+// ----------------------------------------------------------------------------
+
 #table_of_contents()
 
+// ----------------------------------------------------------------------------
+// Body
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
 = Introduction
 
 == Background and motivation
@@ -82,59 +138,102 @@ With this thesis, I aim to contribute by offering a comprehensive, practice-orie
 
 == Methodology
 
-This thesis combines a structured literature review with hands-on demonstrations. The work is organized into four main phases:
+This thesis is a structured review combined with empirical demonstration. The work follows four sequential phases.
 
-*Phase 1: Building the theoretical foundation.* In Chapter 2, I introduce and formalize the key mathematical concepts that underpin process mining. Most of these definitions are drawn from van der Aalst (Aalst, 2022). Starting with this theoretical groundwork helps establish a shared vocabulary for comparing different tools and for interpreting the practical examples that follow.
+*Phase 1: Theoretical foundation.* The mathematical concepts required to understand process mining are introduced and formalized in Chapter 2. The primary source for these definitions is van der Aalst @vanderAalst2022. Establishing this theoretical foundation before describing tools is important because it provides a common vocabulary for comparing different implementations and for interpreting the results of the practical examples.
 
-*Phase 2: Surveying the tools.* I identify relevant Python libraries through a mix of academic sources—such as publications from ICPM and related conferences—as well as searching the Python Package Index (PyPI), exploring GitHub repositories, and reviewing references within the PM4Py documentation. For each tool, I look at its main analytical focus, the data formats it can handle, the algorithms it implements, and signs of active development and community support (such as recent updates and quality of documentation). The tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and supporting data processing packages.
+// TODO (MR): Here you use literally number 2 as a reference to the
+// second chapter. This should be done through the formal reference to
+// a label given to a second chapter. Please correct this in the whole
+// document.
 
-*Phase 3: Practical implementation.* To show how these tools work in real scenarios, I developed five Jupyter notebooks that together demonstrate a complete process intelligence workflow. The first notebook introduces the basics using a small, hand-crafted dataset where the expected outcomes are clear. The remaining notebooks use the BPI Challenge 2019 procurement dataset and gradually build up the analysis: starting with process discovery and conformance checking, then adding variant analysis and throughput measurement, followed by performance analysis and object-centric directly-follows graph computation, and finally, process simulation and predictive modeling using a Random Forest classifier to flag cases likely to exceed a 30-day completion time. Each notebook combines executable Python code, outputs, and saved figures, ensuring that all results are fully reproducible.
+*Phase 2: Tool survey.* Python libraries are identified through a combination of academic sources — papers and conference proceedings from ICPM and related venues — the Python Package Index (PyPI), GitHub repositories related to process mining and process intelligence, and cross-references within the PM4Py documentation. For each tool, the following aspects are examined: the primary analytical task it supports, the data formats it accepts, the algorithms it implements, and the level of active maintenance and community support as indicated by recent commit history and documentation quality. Tools are organized into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages.
 
-*Phase 4: Synthesizing findings and drawing conclusions.* In Chapter 5, I bring together insights from the tool survey and the practical examples to answer the research question, discuss limitations, and suggest directions for future research.
+*Phase 3: Practical implementation.* Five Jupyter notebooks are developed to demonstrate the process intelligence workflow end to end. The first notebook uses a small hand-built dataset to introduce the core steps of process mining in a setting where the expected output is known. The remaining four notebooks work with the BPI Challenge 2019 procurement dataset and progressively build up the analysis: the second covers process discovery and conformance checking, the third adds variant analysis and throughput measurement, the fourth examines process performance using a performance-annotated DFG and computes an object-centric directly-follows graph, and the fifth models the process using discrete-event simulation and builds a Random Forest classifier to flag cases likely to exceed a 30-day completion threshold. Each notebook combines executable Python code with printed outputs and saved figures, making the results fully reproducible.
 
-It’s important to note that this thesis is descriptive and demonstrative rather than experimental or comparative. I do not conduct formal benchmarking or direct comparisons of algorithm performance, such as runtime or accuracy, as this would require a controlled experimental setup beyond the scope of this work. Instead, my contribution lies in organizing, explaining, and demonstrating the available tools in a way that is accessible and practical for both researchers and practitioners.
+*Phase 4: Synthesis and conclusions.* The results of the tool survey and the practical examples are combined in Chapter 5, where the research question is answered, the limitations of the work are acknowledged, and directions for future research are proposed.
+
+The methodology is descriptive and demonstrative rather than evaluative in a strict experimental sense. No formal benchmarking is performed — the thesis does not measure and compare the runtime, fitness scores, or precision values of multiple discovery algorithms on the same dataset. Such a comparison would require a controlled experimental design and falls outside the scope of this work. The contribution instead lies in the structured organization, explanation, and demonstration of the available tools.
 
 == Structure of the thesis
 
-The rest of this thesis is organized as follows:
+The remainder of this thesis is organized as follows.
 
-*Chapter 2* Lays out the mathematical foundations of process mining. Here, I define key concepts like events, traces, and event logs, and explain how directly-follows relations are used in process discovery. I also describe the main types of process models used in this thesis—directly-follows graphs, process trees, and Petri nets—and introduce the principles of conformance checking and performance analysis. This chapter also covers the Object-Centric Event Log (OCEL) format and takes an exploratory look at the BPI Challenge 2019 dataset.
+// TODO (MR): Again here, use formal refrences to the chapters.
 
-*Chapter 3* Reviews the primary Python tools available for process mining and process intelligence. The tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages. Each category is discussed in terms of the tasks it supports and the specific tools it includes. The chapter ends with a summary table that compares the main features of the reviewed tools.
+*Chapter 2* Introduces the mathematical foundations of process mining. It formally defines events, traces, and event logs, explains directly-follows relations and their role in process discovery, describes the main process model representations used in this thesis — the directly-follows graph, the process tree, and the Petri net — and introduces the concepts of conformance checking and performance analysis. It also explains the structure of the Object-Centric Event Log (OCEL) format and provides an exploratory description of the BPI Challenge 2019 dataset.
 
-*Chapter 4* Provides a step-by-step walkthrough of five practical Jupyter notebooks, covering the full process intelligence workflow. The first notebook uses a synthetic event log to introduce core process mining ideas. The second and third notebooks apply these methods to real procurement data from the BPI Challenge 2019, resulting in a Petri net model, conformance scores, and throughput time distributions. The fourth notebook adds a performance perspective by annotating directly-follows graphs with median waiting times, measuring the level of automation, and computing object-type-specific DFGs from the OCEL relations. The fifth and final notebook looks ahead, using SimPy to simulate throughput times under different resource scenarios and applying a Random Forest model to predict whether a case will be completed quickly or slowly based on early features.
+*Chapter 3* Reviews the main Python tools available for process mining and process intelligence. The tools are organized into five categories — core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages — and each category is described in terms of the tasks it supports and the tools it contains. The chapter concludes with a comparative summary table.
 
-*Chapter 5* Summarizes the main findings, discusses the thesis’s limitations, and suggests directions for future research.
+// TODO (MR): There is a problem with the use of `-`, `--`, and
+// `---`. This should be corrected in the whole document.
 
+*Chapter 4* Walks through five practical notebooks that together cover the full process intelligence cycle. The first notebook introduces process mining concepts using a synthetic event log. The second and third apply these concepts to real procurement data from the BPI Challenge 2019, producing a Petri net model, a conformance score, and a throughput time distribution. The fourth notebook adds a performance perspective by annotating the directly-follows graph with median waiting times, measuring the share of automated activities, and computing a per-object-type DFG directly from the OCEL relations table. The fifth notebook closes the cycle with forward-looking analyses: a SimPy simulation that estimates how throughput time changes under different resource assumptions, and a Random Forest model that classifies whether a case will be slow or fast based on features observed at the start of execution.
+
+*Chapter 5* Summarizes the main findings of the thesis, discusses its limitations, and proposes directions for future research.
+
+// ----------------------------------------------------------------------------
 = The mathematics of process mining
 
-To truly understand process mining, it’s important that everyone speaks the same language. Without precise definitions, terms like “fitness” or “conformance” can mean different things to different people, making it difficult to compare tools or algorithms in a meaningful way. This chapter lays out the core mathematical concepts that will be used throughout the thesis: events, traces, event logs, directly-follows relations (and their variants), process discovery and modeling, conformance checking, and performance analysis. Each concept is illustrated with a simple example, so the formal definitions are always connected to something concrete. I’ll also explain how event data are represented in Python and give a first look at the BPI Challenge 2019 dataset, which forms the basis for the case study in Chapter 4.
+#chapterSummary[Understanding process mining properly requires a shared vocabulary. Without clear definitions, terms like "fitness" or "conformance" mean different things to different people, and comparing two tools or algorithms becomes guesswork. This chapter introduces the core mathematical concepts used throughout the thesis: events, traces, and event logs; directly-follows relations and variants; process discovery and process models; conformance checking; and performance analysis. Each concept is illustrated with a small worked example so that the formal definition connects directly to something concrete. The chapter also explains how event data are represented in Python and provides an exploratory description of the BPI Challenge 2019 dataset that is used in the case study in Chapter 4.]
 
-== Event Logs and Traces
+// TODO (MR): I wrote a very simple function that adds a slight color
+// variation to the summary of the chapter. Use it for all chapters.
 
-At the heart of process mining is the event — the most basic piece of data we work with. Each event captures the fact that a particular activity was carried out for a particular instance of a process, at a particular moment in time. More formally, let $cal(U)_C$ be the set of all possible case identifiers, $cal(U)_A$ the set of all activity names, and $cal(U)_T$ the set of all timestamps, with $cal(U)_T$ ordered chronologically.
+// TODO (MR): The following chapter introduces particular mathematical
+// notation. At the beginning of the chapter give the source that you
+// are following.
 
-An event $e$ is a tuple $e = (c, a, t)$, where $c in cal(U)_C$ is the case identifier, $a in cal(U)_A$ is the activity name, and $t in cal(U)_T$ is the timestamp. In practice, events might also include extra attributes like the resource that performed the activity, the organizational unit, or other business-specific data. For most process discovery tasks, only these three are strictly necessary.
+== Event logs and traces
 
-A trace is simply the sequence of activities that make up a single case, ordered by when they happened. If $A$ is the set of all activity names, a trace $sigma$ is a sequence $chevron.l a_1, a_2, dots, a_n chevron.r$, with each $a_i in A$, ordered by timestamp. The set of all possible traces is written as $A^*$.
+An event is the basic unit of data in process mining. Each event records that a specific activity was performed for a specific process instance at a specific point in time. Formally, let $cal(U)_C$ be the universe of case identifiers, $cal(U)_A$ be the universe of activity names, and $cal(U)_T$ be the universe of timestamps, where $cal(U)_T$ is totally ordered by the natural chronological ordering $<=$.
 
-An event log $L$ collects the traces from many process cases. Since the same sequence of activities can happen in more than one case, the event log is modeled as a multiset over $A^*$, denoted $L in cal(B)(A^*)$, where $cal(B)$ represents the multiset operator. A multiset is a function $m: X -> NN_0$ that tells us how many times each possible trace occurs in the log. For a trace $sigma in A^*$, the value $L(sigma)$ gives the number of cases where that exact sequence was observed.
+An *event* $e$ is a tuple $e = (c, a, t) in cal(U)_C times cal(U)_A times cal(U)_T$ where $c in cal(U)_C$ is a case identifier, $a in cal(U)_A$ is an activity name, and $t in cal(U)_T$ is a timestamp. In practice, events may carry additional attributes such as the name of the resource that performed the activity, the organizational unit, the cost, or business-specific data fields. These attributes extend the basic definition without changing its core structure. For the purposes of process discovery, only the case identifier, activity name, and timestamp are strictly required.
 
-To make this more concrete, let’s look at the following nine events:
-#table(
-  columns: 4,
-  align: (center, left, center, center),
-  table.header([*Event ID*], [*Activity*], [*Case ID*], [*Timestamp*]),
-  [e1], [Create order],  [1], [09:00],
-  [e2], [Approve order], [1], [10:00],
-  [e3], [Send invoice],  [1], [11:00],
-  [e4], [Create order],  [2], [09:15],
-  [e5], [Approve order], [2], [10:30],
-  [e6], [Send invoice],  [2], [11:20],
-  [e7], [Create order],  [3], [08:45],
-  [e8], [Reject order],  [3], [09:50],
-  [e9], [Close case],    [3], [10:40],
-)
+A *trace* is the projection of all events belonging to a single case onto the sequence of their activity names, ordered by timestamp. Let $A$ be a finite set of activity names. A trace $sigma$ is a finite sequence of activity names written as $sigma = chevron.l a_1, a_2, dots, a_n chevron.r$, where each $a_i in A$ and the order of elements follows the chronological order of the underlying events. The set of all finite sequences over $A$ is denoted $A^*$.
+
+// TODO (MR): (1) What if there are two activities with the same
+// timestamp? How do we order these activities? This is why we usually
+// need event id coming from the eventlog. (2) Where does the symbol
+// $A^*$ come from?
+
+// TODO (MR): Also, this is essentially the XES format (a list of
+// traces). You are working with the OCEL format. Mayby we should
+// start with describing both formats?
+
+An *event log* $L$ collects traces from many cases. Because the same sequence of activities can occur in more than one case, the log is modelled as a multiset over $A^*$, written $L in cal(B)(A^*)$, where $cal(B)$ denotes the multiset operator. A multiset is a function $m: X -> NN_0 = {0} union NN = {0,1,2, ...}$ that assigns a non-negative integer, multiplicity, to each element of $X$. For a trace $sigma in A^*$, the value $L(sigma)$ gives the number of cases in which that exact trace $sigma$ (a sequence of events) was observed. To make this concrete, consider the following nine events given in the table~@tab-eventlog-1.
+
+#sgh_table(
+    caption: [An example eventlog containing three cases, each three events long. Each event has two properties: acvitivity name and timestamp.],
+    source: [Own elaboration.]
+)[
+    #table(
+        columns: 4,
+        align: (center, left, center, center),
+        table.header([*Event ID*], [*Activity*], [*Case ID*], [*Timestamp*]),
+        [e1], [Create order],  [1], [09:00],
+        [e2], [Approve order], [1], [10:00],
+        [e3], [Send invoice],  [1], [11:00],
+        [e4], [Create order],  [2], [09:15],
+        [e5], [Approve order], [2], [10:30],
+        [e6], [Send invoice],  [2], [11:20],
+        [e7], [Create order],  [3], [08:45],
+        [e8], [Reject order],  [3], [09:50],
+        [e9], [Close case],    [3], [10:40],
+    )]<tab-eventlog-1>
+
+// TODO (MR): You should use the #sgh_table() function. It provides
+// the title and the source arguments. This must be corrected in the
+// whole document. Also, is this table generated from some eventlog?
+// If so, it should be saved by the script to the external file (csv)
+// and read here. We do not want any manual copying.
+
+// TODO (MR): Also, it seems that the natural hierarchy is first
+// case_id, then event_id, and only then properties of the event, like
+// the name of activity or the timestamp.
+
+// TODO (MR): In the above table I changed all of these, but you have
+// to change it in the whole document.
 
 Grouping by case identifier and ordering by timestamp gives three traces:
 
@@ -142,41 +241,82 @@ Grouping by case identifier and ordering by timestamp gives three traces:
 - Case 2: $sigma_2 = chevron.l "Create order", "Approve order", "Send invoice" chevron.r$
 - Case 3: $sigma_3 = chevron.l "Create order", "Reject order", "Close case" chevron.r$
 
-Since $sigma_1 = sigma_2$, the event log can be written as the multiset $L = [sigma_1^2, sigma_3^1]$ — the approval path occurs twice and the rejection path once. In total, the log contains three cases, two unique variants, and the average trace length is $(3 + 3 + 3) / 3 = 3$.
+Because $sigma_1 = sigma_2$, the event log is the multiset $L = [sigma_1^2, sigma_3^1]$. This log has two distinct trace patterns: the approval path (observed twice) and the rejection path (observed once). The total number of cases is $||L|| = 3$, the number of distinct variants is 2, and the average trace length is $(3 + 3 + 3)/3 = 3$.
 
-Before applying any process discovery algorithms, it is common practice to calculate a few summary statistics for the event log. These include:
+// TODO (MR): You need to introduce the notation for the multisets
+// with the superscripts. This is not clear for somebody that is not
+// already familiar with the multisets.
 
-- The number of distinct variants, which is simply the count of unique trace patterns that appear in the log.
-- The average trace length, calculated as the total number of activities across all cases divided by the number of cases.
-- The variant frequency distribution, which ranks each trace pattern by how often it occurs.
+// TODO (MR): Also, you use the word 'variants' but it has not been
+// defined. Is it the same as 'trace'?
 
-In real-world event logs, the frequency distribution of variants is usually very uneven: a small number of trace variants account for the majority of cases, while most variants occur only once or twice. This kind of skewed distribution is important to recognize, as it influences decisions about filtering and sampling before running discovery algorithms.
+Several summary statistics are routinely computed from a log before applying any discovery algorithm. The *number of distinct variants* is
+$ |{"Var"}(L)| = |{sigma in A^* : L(sigma) > 0}| . $
+The *average trace length* is
+$ macron(ell) = (sum_(sigma in L) L(sigma) dot |sigma|) / (||L||) . $
 
-Analyzing traces is valuable for understanding both the structure and the variability of a process. If most cases follow the same sequence, the process is likely stable and predictable. But if there are many different variants, the process is more flexible, or potentially chaotic — and might need a more adaptable model to describe it effectively. That’s why, when analysts work with a new event log, one of the first things they look at is the distribution of trace frequencies: it provides a quick sense of how complex and variable the process really is.
+
+The *variant frequency distribution* ranks traces by their multiplicity in descending order. In real-world logs this distribution is typically highly skewed: a small number of variants account for the large majority of cases, while many variants are observed only once or twice. This skewness is important because it guides decisions about filtering and sampling before applying discovery algorithms.
+
+// TODO (MR): At least some of the formulae should be displayed. In
+// particular, anything that that is a fraction (like $a/b$) should be
+// displayed equation. I did it for the above paragraph, but you
+// should correct this in the while document.
+
+// TODO (MR): (1) Also, What is this notation ${"Var"}(L)$? It should
+// be $"Var"(L)$ probably. (2) Sometimes you use `||` for the size of
+// the set, and sometimes `|`. Maybe the second one is better but use
+// it consistently.
+
+Traces are useful for studying both the structure and the variability of a process. When most cases follow the same sequence, the process is stable and predictable. When many distinct sequences appear, the process is more variable and may require a more flexible model to represent it accurately. The distribution of trace frequencies is therefore one of the first things an analyst examines when working with a new event log, as it gives an immediate indication of how complex and varied the underlying process is.
+
+// TODO (MR): This notation implies that only the sequence of
+// activities counts, but not other properties, for example,
+// timestamps. So, you may have the same sequences of activities, but
+// other properties may be completely different, but still for you
+// that's going to be the same traces. Is that precisely what you
+// want? Usually a trace is a sequence of events, not the projection
+// of this sequence on a given property.
 
 == Activities, variants, and directly-follows relations
 
-One of the key ways to understand the structure of a process is by looking at the directly-follows relationship between activities in the event log. Simply put, activity $b$ is said to directly follow activity $a$ in a trace if $a$ comes immediately before $b$ in the sequence.
-
-Formally, for a trace $sigma = chevron.l a_1, dots, a_n chevron.r$, we say $b$ directly follows $a$ (written as $a >_sigma b$) if there is some position $i$ in the trace such that $a_i = a$ and $a_(i+1) = b$.
-
-To extend this idea to the entire event log $L$, we look at all traces and collect every pair of activities where one directly follows the other anywhere in any trace. This gives us the set of directly-follows pairs for the whole log:
-
+One of the most important structural relationships between activities in a log is the directly-follows relation. Activity $b$ directly follows activity $a$ in trace $sigma$ if $a$ appears immediately before $b$ in $sigma$. Formally, for a trace $sigma = chevron.l a_1, dots, a_n chevron.r$, the relation $a >_sigma b$ holds if there exists some index $i$ such that $a_i = a$ and $a_(i+1) = b$. The directly-follows relation of the full log $L$ is then:
 $ >_L = union.big_(sigma in "support"(L)) >_sigma $
 
-The *frequency* of a directly-follows pair $(a, b)$ counts how many times $b$ immediately follows $a$ across all traces in the log:
+// TODO (MR): (1) The mathematical formula is part of the sentence, so
+// in particular in the above formula you need to have a dot at the
+// end of the formula because it is the end of the sentence. You need
+// to correct this in the whole document.
 
+// TODO (MR): (2) Do you mean the above notation to define the
+// relation $>_L$? The formula looks weird because there is a lot of
+// empty space around the union symbol. Mayby something like this is
+// better
+// $ >_L quad quad := union.big_(sigma in supp(L)) >_sigma $
+// but it's still not the best. 
+
+// TODO (MR): (3) The support of an event log is not defined. Also, do
+// you mean the base set (underliying set of traces)? If so, the
+// symbol is $Set(L)$.
+
+The *frequency* of a directly-follows pair $(a, b)$ counts how many times $b$ immediately follows $a$ across all traces in the log:
 $ f_L(a, b) = sum_(sigma in L) L(sigma) dot |{i : a_i = a, a_(i+1) = b}| $
 
-The directly-follows graph (DFG) is a useful way to visualize the flow of activities in an event log. For a given log $L$, the DFG is defined as a directed, weighted graph $"DFG"(L) = (A_L, E_L, f_L)$, where:
+// TODO (MR): (1) Again, the formula is a part of sentence. (2) I
+// don't get this formula. You sum over all traces, and for each trace
+// you take the number of such traces in a log $L(sigma)$ multiplied
+// by how many times the pair $(a,b)$ appears in the given
+// trace. Again, there is no distinction between traces with different
+// properties. (3) Also, what is the meaning of $sigma in L$? What did
+// you introduced $"support"(L)$, which probably should be $Set(L)$?
 
-- $A_L$ is the set of activities that appear in at least one trace,
-- $E_L$ is the set of directed edges representing directly-follows relationships between activities, and
-- $f_L$ assigns a frequency to each edge, indicating how often a particular directly-follows pair occurs in the log.
+The *directly-follows graph* (DFG) of a log $L$ is the directed weighted graph $"DFG"(L) = (A_L, E_L, f_L)$ where $A_L$ is the set of activities appearing in at least one trace, $E_L = >_L$ is the set of directed edges, and $f_L$ assigns each edge its frequency. In addition, a start node and an end node are included, with edges from the start node to every activity that begins at least one trace, and edges from every activity that ends at least one trace to the end node. These edges are weighted by the frequency of each start and end activity.
 
-To give a complete picture, the DFG also includes a special start node and end node. The start node connects to every activity that begins at least one trace, and every activity that ends a trace connects to the end node. The weights on these edges reflect how often each activity starts or ends a trace.
+// TODO (MR): The definition of the graph is not complete. How do the
+// edges are defined?
 
-Using the event log from the previous example, we can list all the directly-follows pairs and count how many times each one appears:
+Using the log from the previous section, the directly-follows pairs and their frequencies are:
+
 #table(
   columns: 3,
   align: (left, left, center),
@@ -187,52 +327,117 @@ Using the event log from the previous example, we can list all the directly-foll
   [Reject order],  [Close case],    [1],
 )
 
-The DFG reveals two distinct execution paths: the approval path ($"Create" -> "Approve" -> "Send"$, frequency 2) and the rejection path ($"Create" -> "Reject" -> "Close"$, frequency 1). This already suggests an exclusive choice after Create order — something a discovery algorithm would later formalize into a proper model. The DFG gives a quick visual overview of which activities tend to follow each other and how often, which makes it a useful first step in any process analysis. That said, it does not distinguish between control-flow patterns such as sequences, choices, and parallel branches, which limits how far you can go with it on its own.
+// TODO (MR): You should not use "the log from prefious section". This
+// is a table and it does have its number. Use it. Correct this in the
+// whole document.
 
-A variant is any trace $sigma$ with $L(sigma) > 0$. The variant set is $"Var"(L) = {sigma in A^* : L(sigma) > 0}$. Variant analysis ranks variants by frequency and examines the proportion of cases accounted for by the top-$k$ variants. The coverage of the top $k$ variants is:
+// TODO (MR): Also, can we have a figure here showing the graph? Also,
+// all of it should be in a Python script, that creates these
+// elements.
 
+The DFG reveals two distinct execution paths through the process: the approval path (Create $->$ Approve $->$ Send, frequency 2) and the rejection path (Create $->$ Reject $->$ Close, frequency 1). This already suggests the presence of an exclusive choice after Create order, which a process discovery algorithm would later formalize. The DFG provides a quick visual overview of which activities tend to follow each other and how often. However, it does not distinguish between control-flow patterns such as sequences, choices, and parallel branches, which limits its usefulness for deeper structural analysis.
+
+// TODO (MR): This is the definition of the variant, but you use it
+// much earlier.
+
+A *variant* is any trace $sigma$ with $L(sigma) > 0$. The variant set is $"Var"(L) = {sigma in A^* : L(sigma) > 0}$. Variant analysis ranks variants by frequency and examines the proportion of cases accounted for by the top-$k$ variants. The *coverage* of the top $k$ variants is:
 $ "Coverage"(k) = (sum_(i=1)^k L(sigma^*_i)) / (||L||) $
+where $sigma^*_1, sigma^*_2, dots$ are the variants ordered by decreasing frequency. Filtering the log to retain only the top-$k$ variants is a standard preprocessing step that focuses the analysis on dominant behavior and reduces the influence of noise and exceptional cases. In the BPI Challenge 2019 dataset, the full log contains 26,378 distinct variants after flattening, illustrating how variable real procurement processes can be in practice.
 
-where $sigma^*_1, sigma^*_2, dots$ are the variants ordered by decreasing frequency.
+// TODO (MR): (1) Again, formulae are parts of sentences, missing coma
+// here. (2) The frequency is defined here only for a pair of
+// activities $(a,b)$. Thus, you don't have the definition of the
+// frequencey of a variant! (3) What is the difference between the
+// trace and a variant. They seem to be the same thing.
 
-Beyond variants, simple summary counts are also worth looking at early on — the number of events per activity, the total number of cases, the number of distinct variants, and the average trace length. These give the analyst a quick sense of the overall complexity and variability of the process before moving on to more detailed techniques.
+// TODO (MR): Also, you already used the "flattening" in the above
+// paragraph. But this would required an introduction to the OCEL
+// format
 
-== Process Discovery and Process Models
+Simple counts — the number of events per activity, the total number of cases, the number of distinct variants, and the average trace length — also provide a useful initial summary of the log. These statistics help the analyst understand the overall complexity and variability of the process before applying more detailed techniques.
 
-Process discovery is the task of building a process model directly from an event log, without relying on any pre-existing reference model. A good discovered model needs to balance four quality dimensions:
+== Process discovery and process models
 
-- *Fitness* measures whether the model can reproduce the behavior observed in the log. A model with high fitness accepts most of the traces that actually occurred — ideally all of them. Formally, if $cal(L)(M)$ denotes the language (the set of accepted traces) of model $M$, then high fitness means $"Var"(L) subset.eq cal(L)(M)$, or at least most of $"Var"(L)$ is covered.
+Process discovery is the task of constructing a process model directly from an event log, without using any prior reference model. A good discovered model must balance four quality dimensions:
 
-- *Precision* measures whether the model avoids accepting behavior that was never observed. A model with low precision is too permissive — it allows many traces that never appeared in the log. A model that simply accepts any sequence of any activity would have perfect fitness but zero precision.
+- *Fitness* measures whether the model can reproduce the traces observed in the log. A model with high fitness accepts most of the behavior that actually occurred. A model with perfect fitness would accept every trace in the log. Formally, if $cal(L)(M)$ denotes the language (set of accepted traces) of model $M$, then high fitness means $"Var"(L) subset.eq cal(L)(M)$ or at least most of $"Var"(L)$ is covered.
 
-- *Generalization* reflects how well the model handles cases that were not seen during discovery but are still plausible given the process structure. A model that memorizes every observed trace exactly — without allowing for any unseen but valid behavior — is said to overfit the log.
+// TODO (MR): OK, so this is very confusing, partially because of the
+// language. I understand that "language" of the model is a set of all
+// traces that a model an produce (while simulating). Thus, the
+// condition is that all traces from the data can be simulated or
+// "$"Var"(L)$ is covered", but these seem to be the same thing? Also,
+// the "language of the model", is it a standard naming? Also, "a
+// model accepts a trace"? Again, is it the standard naming?
 
-- *Simplicity* refers to how easy the model is to read and interpret. Simpler models are generally preferred when they still achieve acceptable fitness and precision. The most common simplicity measure is the total number of nodes and arcs in the model.
+- *Precision* measures whether the model avoids accepting behavior that was never observed. A model with low precision is too general and allows many traces that do not appear in the log. A model that simply allows any sequence of any activity has perfect fitness but zero precision.
 
-These four dimensions are in tension with each other. Improving fitness often comes at the cost of precision, since a more permissive model accepts a wider range of behavior. Finding the right balance is one of the central challenges in process discovery, and different algorithms handle this trade-off differently. For large and noisy real-world logs, robustness to noise and computational efficiency are also practical factors that influence which algorithm to use.
+- *Generalization* reflects how well the model handles cases that were not seen during discovery but are still plausible given the process structure. A model that memorizes every observed trace exactly without allowing for any unseen but valid behavior is said to overfit the log.
+
+- *Simplicity* refers to how easy the model is to read and interpret. Simpler models are generally preferred when they still achieve acceptable fitness and precision. The most common simplicity measure is the total number of nodes and arcs in the model representation.
+
+// TODO (MR): OK, but if it's given here, it referes to the
+// DFG. Clearly, when we use a different notation, like C-nets, Petri
+// nets and so on, the values of this metric are different.
+
+These four dimensions are in tension with each other. Improving fitness often reduces precision, since a more permissive model accepts a wider range of behavior. Finding an appropriate balance is one of the central challenges in process discovery, and different algorithms make different trade-offs among these dimensions. For large and noisy real-world logs, robustness to noise and computational efficiency are also practical considerations that influence algorithm selection.
+
+// TODO (MR): I would like you to discuss `genralization` and
+// `simplicity` in more details. Specifically, if a model allows for
+// generalization, it breaks precision. Also, simplicity narrows the
+// traces that can be generated by a model, thus, will nerf the
+// abiblity of the model to be more general (generalization) but,
+// potentially, fitness, as well.
 
 === The Alpha algorithm
 
 The Alpha algorithm is one of the earliest and most well-known process discovery algorithms. It works by analyzing the directly-follows relations in the log and inferring causal dependencies between activities, then using those dependencies to construct a Petri net.
 
-The algorithm starts by computing four binary relations between all pairs of activities in $A_L$:
+// TODO (MR): You cannot describe the algoritym that produces a Patri
+// net without first introducing the model itself. 
+
+The algorithm begins by computing four binary relations between all pairs of activities in $A_L$ based on directly-follows information:
 
 - $a -> b$ (direct succession): $b$ directly follows $a$ in at least one trace
 - $a >> b$ (causality): $a -> b$ holds but $b -> a$ does not — $a$ appears to cause $b$
 - $a || b$ (parallelism): both $a -> b$ and $b -> a$ hold — the two activities can appear in either order
 - $a hash b$ (independence): neither $a -> b$ nor $b -> a$ holds — the activities never directly follow each other
 
-From these relations, the algorithm identifies all pairs $(A, B)$ of non-empty activity sets where every activity in $A$ causes every activity in $B$ (i.e., $a >> b$ for all $a in A, b in B$), all activities within $A$ are independent of each other, and all activities within $B$ are independent of each other. The maximal such pairs become places in the Petri net, each connecting the activities in $A$ as input transitions to the activities in $B$ as output transitions.
+// TODO (MR): I do have a problem with notation here. You already
+// introduce notation for the directly-follows relation. Here you use
+// a different one (the one that I actually prefer). You need to make
+// it consistent.
 
-To illustrate, consider the log $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D chevron.r^3]$.
+The algorithm then identifies all pairs $(A, B)$ of non-empty activity sets where every activity in $A$ causes every activity in $B$ (i.e., $a >> b$ for all $a in A, b in B$), all activities within $A$ are independent of each other, and all activities within $B$ are independent of each other. The maximal such pairs become places in the discovered Petri net, each connecting the activities in $A$ as input transitions to the activities in $B$ as output transitions.
 
-The directly-follows pairs are $A -> B$, $A -> C$, $B -> D$, $C -> D$, which gives the causal relations $A >> B$, $A >> C$, $B >> D$, $C >> D$. Since neither $B -> C$ nor $C -> B$ holds, we have $B hash C$.
+// TODO (MR): What is the meaning of maxima here? This is crucial!
 
-The maximal causal pairs are $({A}, {B, C})$, $({B}, {D})$, and $({C}, {D})$. Adding an initial place connected to $A$ and a final place connected from $D$, the result is a Petri net where $A$ leads to an exclusive choice between $B$ and $C$ (since $B hash C$), and both paths converge at $D$. This correctly represents both variants in the log.
+// TODO (MR): I merged the two following paragraphs. This is because
+// you cannot have a paragraph composed of a single, short sentence.
 
-The Alpha algorithm is historically important — it was the first to show that a process model can be derived automatically from event data alone. That said, it has well-documented limitations: it handles loops poorly, is sensitive to noise and infrequent behavior, cannot represent all control-flow patterns correctly, and fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
+To illustrate, consider the log $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D chevron.r^3]$. Directly-follows pairs: $A -> B$, $A -> C$, $B -> D$, $C -> D$. Relations: $A >> B$, $A >> C$, $B >> D$, $C >> D$. Neither $B -> C$ nor $C -> B$ holds, so $B hash C$.
 
-=== The Inductive Miner and Process Trees
+// TODO (MR): Also, $a hash d$. 
+
+The maximal causal pairs are $({A}, {B, C})$, $({B}, {D})$, and $({C}, {D})$. Adding an initial place connected to $A$ and a final place connected from $D$, the algorithm produces a Petri net with $A$ at the start, a place branching to both $B$ and $C$ (representing an exclusive choice, since $B hash C$), and places from $B$ and $C$ each leading to $D$, which produces the final token. This correctly represents both variants in the log.
+
+// TODO (MR): OK. First of all, the pairs you have are not maximal. For
+// example, $({B, C}, {D})$ also is a causal pair. Also, it's a
+// maximal pair. Thus, We have the following places: i (input), o
+// (output), p1 (for $({A}, {B, C})$) and p2 for $({B, C}, {D})$. Each
+// activity is a transition. Eventually, we end up with the following
+// Petri net.
+
+//                  ↗ [B] ↘
+// (i) → [A] → (p1)         (p2) → [D] → (o)
+//                  ↘ [C] ↗
+
+// You are right that the split (and join) are XOR. Again, you need to
+// introduce the Petri net model before.
+
+The Alpha algorithm is historically important because it was the first algorithm to demonstrate that a process model can be derived automatically from event data alone. However, it has well-documented limitations: it handles loops poorly, it is sensitive to noise and infrequent behavior, it cannot represent all control-flow patterns correctly, and it fails on logs where certain activity combinations violate its structural assumptions. More robust algorithms have since been developed to address these weaknesses.
+
+=== The Inductive Miner and process trees
 
 The Inductive Miner is a more recent and widely used discovery algorithm that addresses many of the limitations of the Alpha algorithm. It works by recursively dividing the event log into smaller sublogs based on detected control-flow patterns — sequences, exclusive choices, parallel branches, and loops. Each subdivision corresponds to a node in a *process tree*.
 
@@ -245,47 +450,130 @@ A process tree is a hierarchical model in which leaf nodes represent individual 
 
 Process trees always produce *sound* models, meaning they cannot result in deadlocks or incomplete executions. Every process tree can be automatically converted into a corresponding Petri net, so the two representations are interchangeable for analytical purposes.
 
+// TODO (MR): You should explain what deadlocks, livelocks, dead
+// transitions and unreachable states are.
+
 The Inductive Miner algorithm discovers a process tree using a divide-and-conquer strategy. Starting with the full log, it attempts to detect a *cut* — a partition of activities into groups that correspond to one of the four operators. If a sequence cut is detected, the log is split into sublogs for each group and the algorithm recurses. If an exclusive choice cut is detected, the log is split by separating cases that contain each group's activities. If a parallel cut is detected, the log is projected onto each group. If a loop cut is detected, the body and redo sublogs are separated. If no cut is detected, a fall-through strategy is applied.
 
 The *Inductive Miner Infrequent (IMf)* variant, which is used in this thesis via PM4Py, filters out infrequent directly-follows pairs before attempting to detect cuts. This makes the algorithm more robust to noise and exceptional cases in large real-world logs, at the cost of some fitness on rare variants.
 
 To illustrate, consider $L = [chevron.l A, B, D chevron.r^4, chevron.l A, C, D chevron.r^3]$. The algorithm first detects a sequence cut: $A$ is always first and $D$ is always last, so the partition $A_1 = {A}$, $A_2 = {B, C}$, $A_3 = {D}$ is valid. Recursing on $A_2 = {B, C}$: the sub-log is $[chevron.l B chevron.r^4, chevron.l C chevron.r^3]$ and no directly-follows relation exists between $B$ and $C$, so an exclusive choice cut applies. The final process tree is $->(A, times(B, C), D)$: always start with $A$, exclusively choose $B$ or $C$, then always end with $D$. This correctly represents both variants in the log and produces a sound Petri net automatically.
 
+// TODO (MR): (1) I really think, that this example should be expanded
+// with precisely how to cuts are found, how the tree looks like and
+// how the Perti net is created based on the tree. (2) Again, you need
+// to have a definition of the Petri net model before algorithms.
+
 === Petri Nets
 
-The main model representation used in this thesis is the Petri net, which is also the standard output format for PM4Py and most other process mining tools. A Petri net provides a flexible and formal way to describe how activities in a process are connected and how cases move through the process.
+The main model representation used in this thesis is the Petri net, which is the standard output format of PM4Py and most other process mining tools. A Petri net is formally defined as a triple $N = (P, T, F)$ where:
 
-Formally, a Petri net is defined as a triple $N = (P, T, F)$, where:
+- $P$ is a finite set of *places*, represented as circles,
+- $T$ is a finite set of *transitions*, represented as rectangles, with $P inter T = emptyset$,
+- $F subset.eq (P times T) union (T times P)$ is the *flow relation*, defining the directed arcs between places and transitions.
 
-- $P$ is a finite set of *places* (usually drawn as circles),
-- $T$ is a finite set of *transitions* (usually shown as rectangles), with $P$ and $T$ being disjoint ($P inter T = emptyset$),
-- $F subset.eq (P times T) union (T times P)$ is the set of directed arcs, connecting places to transitions and transitions to places.
+For a transition $t in T$, its *preset* is $bullet t = {p in P : (p, t) in F}$ (input places) and its *postset* is $t bullet = {p in P : (t, p) in F}$ (output places).
 
-For any transition $t in T$:
+// TODO (MR): This is the common notation used for discussing the
+// structural graph definition. Here we use a more formal mathematical
+// notation, so it’s natural to write $Pre(t)$ and $Post(t)$,
+// especially when referring to $p \in Pre(t)$ rather than $p \in
+// \bullet t$.
 
-- The *preset* $bullet t$ is the set of input places (all places with an arc going to $t$),
-- The *postset* $t bullet$ is the set of output places (all places with an arc coming from $t$).
+A *marking* $M: P -> NN_0$ assigns a non-negative integer number of *tokens* to each place. The pair $(N, M)$ is called a marked Petri net. A transition $t$ is *enabled* in marking $M$ if every input place holds at least one token: $M(p) >= 1$ for all $p in bullet t$. Firing an enabled transition $t$ produces a new marking $M'$:
 
-A *marking* $M$ assigns a non-negative integer (a number of tokens) to each place. The combination $(N, M)$ is called a marked Petri net. A transition $t$ is *enabled* in marking $M$ if every input place of $t$ has at least one token. When $t$ fires, it consumes a token from each input place and produces a token in each output place, resulting in a new marking.
+$ M'(p) = cases(
+  M(p) - 1 &: "if" p in bullet t " and " p in.not t bullet,
+  M(p) + 1 &: "if" p in t bullet " and " p in.not bullet t,
+  M(p)     &: "otherwise"
+) $
 
-An *accepting Petri net* specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there is a sequence of transition firings, matching the labels in $sigma$, that leads from $M_0$ to $M_f$.
+An *accepting Petri net* $(N, M_0, M_f)$ specifies an initial marking $M_0$ and a final marking $M_f$. A trace $sigma = chevron.l a_1, dots, a_n chevron.r$ is accepted if there exists a firing sequence of transitions whose labels match $sigma$ and that leads from $M_0$ to $M_f$. 
 
-As a simple example, consider a sequential process $A -> B -> D$:
+// TODO (MR): What does "to illustrate..." refer to in the paragraph
+// below? This has been corrected; please apply the same revision
+// throughout the document.
 
-- Places: $P = {p_0, p_1, p_2, p_3}$,
-- Transitions: $T = {A, B, D}$,
-- Flow: $F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)}$,
-- Initial marking: $M_0 = {p_0: 1}$, Final marking: $M_f = {p_3: 1}$.
+// TODO (MR): The following example is difficult to follow without an
+// actual figure of the network. I added this graph using Fletcher;
+// please include similar graphs for any other such examples.
 
-If we replay the trace $chevron.l A, B, D chevron.r$:
 
-- Step 1: $A$ is enabled because $p_0$ has a token. Firing $A$ moves the token to $p_1$.
-- Step 2: $B$ is enabled because $p_1$ now has a token. Firing $B$ moves the token to $p_2$.
-- Step 3: $D$ is enabled because $p_2$ has a token. Firing $D$ moves the token to $p_3$, which matches the final marking. This trace is accepted.
 
-If we try to replay $chevron.l A, D chevron.r$: after firing $A$, the token is at $p_1$. $D$ requires a token at $p_2$, but $p_2$ is empty, so $D$ is not enabled and the trace cannot be completed. This correctly shows that $B$ cannot be skipped in this model.
+#sgh_example[
+    To illustrate the above concepts, consider the sequential process with activities $A -> B -> D$. Figure~@fig-petri-net-accepting shows the Petri net that models this process. The Petri net has places
+    $ P = {p_0, p_1, p_2, p_3}, $
+    transitions
+    $ T = {A, B, D}, $
+    and flow
+    $ F = {(p_0,A),(A,p_1),(p_1,B),(B,p_2),(p_2,D),(D,p_3)} . $
+    To complete the accepting Petri net definition, we add the initial  and the final markings
+    $ M_0 = {p_0: 1}, M_f = {p_3: 1}. $
 
-In process mining, transitions represent activities, places represent the state between activities, and tokens represent the current execution state of a process instance. Petri nets are highly valuable because they are both easy to visualize and allow for formal analysis of properties like reachability and soundness. They are also the primary model format used by PM4Py for tasks such as conformance checking and performance analysis.
+#sgh_figure(
+    caption: [The Petri net used in the example of an accepting Petri net],
+    source: [Own elaboration]
+)[
+    #let pn_place(pos, label, name, tint: green, ..args) = node(
+	pos, align(center, label),
+        name: name,
+        shape: circle,
+	width: 1.8em,
+	fill: tint.lighten(80%),
+	stroke: 1pt + tint.darken(20%),
+	corner-radius: 5pt,
+	..args,
+    )
+
+    #let pn_tran(pos, label, name, tint: orange, ..args) = node(
+	pos, align(center, label),
+        name: name,
+	width: 1.5em,
+        height: 3em,
+	fill: tint.lighten(80%),
+	stroke: 1pt + tint.darken(10%),
+	corner-radius: 1pt,
+	..args,
+    )
+
+    #scale(60%)[
+        #diagram(
+            spacing: 10pt,
+            cell-size: (8mm, 8mm),
+            edge-stroke: 1pt,
+            edge-corner-radius: 5pt,
+            debug: false,
+            mark-scale: 70%,
+
+            pn_place((0, 0), [$p_0$], <p0>),
+            pn_place((4, 0), [$p_1$], <p1>),
+            pn_place((8, 0), [$p_2$], <p2>),
+            pn_place((12, 0), [$p_3$], <p3>),
+
+            pn_tran((2, 0), [$A$], <t1>),
+            pn_tran((6, 0), [$B$], <t2>),
+            pn_tran((10, 0), [$D$], <t3>),
+
+
+            edge(<p0>, <t1>, "-|>"),
+            edge(<t1>, <p1>, "-|>"),
+            edge(<p1>, <t2>,"-|>"),
+            edge(<t2>, <p2>,"-|>"),
+            edge(<p2>, <t3>,"-|>"),
+            edge(<t3>, <p3>,"-|>"),            
+            
+        )]
+]<fig-petri-net-accepting>
+
+    The following trance $chevron.l A, B, D chevron.r$ is accepted because there is a firing sequence of transitions leading from the marking $M_0$ to $M_f$:
+    - Step 1: $A$ is enabled ($p_0$ has 1 token). Fire $A$: $M_1 = {p_1: 1}$.
+    - Step 2: $B$ is enabled ($p_1$ has 1 token). Fire $B$: $M_2 = {p_2: 1}$.
+    - Step 3: $D$ is enabled ($p_2$ has 1 token). Fire $D$: $M_3 = {p_3: 1} = M_f$. Accepted.
+
+    Consider the other trace $chevron.l A, D chevron.r$. Firing transition $A$ first yields marking $M_1 = {p_1: 1}$. However, place $p_2$ is empty in $M_1$, so transition $D$ is not enabled. The trace cannot be completed without artificially adding tokens, correctly reflecting that $B$ cannot be skipped in this model.    
+]<ex-accepting-pn>
+
+In process mining, transitions correspond to activities, places represent states between activities, and tokens represent the current execution state of a process instance. Petri nets are valuable because they support both visual interpretation and formal analysis of properties such as reachability and soundness, and because PM4Py uses them as the primary model format for conformance checking and performance analysis.
 
 == Conformance Checking
 
@@ -299,32 +587,41 @@ This method simulates each trace from the log on the Petri net model by moving t
 
 $ "fitness"(sigma) = 1/2 (1 - p/c) + 1/2 (1 - r/q) $
 
-where:
+where $p$ is the number of missing tokens added during replay, $c$ is the total number of tokens consumed, $r$ is the number of remaining tokens at the end, and $q$ is the total number of tokens produced. A value of 1 indicates a perfectly fitting trace; lower values indicate more deviation. The overall log fitness is the weighted average of trace fitness values across all cases @vanderAalst2022.
 
-- $p$ = number of missing tokens added,
-- $c$ = total number of consumed tokens,
-- $r$ = number of remaining tokens at the end,
-- $q$ = total number of produced tokens.
+// TODO (MR): You should explain what are consumed and produces
+// tokens. This is not clear for readers not into process
+// mining. Also, maybe explain why $p$ is devided by $c$ and $r$ by
+// $q$ and not the other way around.
 
-A fitness value of 1 means the trace fits the model perfectly; lower values indicate greater deviation. The overall fitness for the log is measured as the weighted average of all trace fitness values @vanderAalst2022.
+#sgh_example()[
+    We continue with the example @ex-accepting-pn. To illustrate token-based replay, consider the net $A -> B -> D$ from example @ex-accepting-pn showed at the figure @fig-petri-net-accepting. Consider the trace $sigma = chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, the marking is ${p_1: 1}$. Transition $D$ requires $p_2$ to have at least one token, which is missing. This one missing token is added resulting in a marking ${p_1: 1, p_2: 1}$. Thus, $p = 1$. Once this token is added, the transition $D$ fires, and the final marking ${p_1: 1, p_3: 1}$ is reached. However, the place $p_1$ still holds a token that was never consumed because $B$ was not fired resulting in  $r = 1$. With $c = 2$ and $q = 2$:
+    $ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 1/2 . $
+This value reflects the significant deviation: one activity was skipped and one token was left unconsumed.
+]<ex-fitness>
 
-*Example:* Consider the process model $A -> B -> D$ and the trace $chevron.l A, D chevron.r$ (activity $B$ is skipped). After firing $A$, there is a token at $p_1$. $D$ requires a token at $p_2$, which is not present, so one missing token is added ($p = 1$). After firing $D$, there is still a token left at $p_1$ ($r = 1$). With $c = 2$ and $q = 2$:
+// TODO (MR): You need to be more precise when describing how one
+// marking changes into another. In the above example, I added all the
+// required information. This also refers to the previous example.
 
-$ "fitness" = 1/2 (1 - 1/2) + 1/2 (1 - 1/2) = 0.5 $
+// TODO (MR): In the following paragraph, you use the word
+// "move". What is it as it seems like this is just activity.
 
-This reflects a significant deviation: one activity was skipped, and one token was left unconsumed.
+The second approach is *alignment-based conformance*, which finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$ where $a_i$ is a move in the log and $b_i$ is a move in the model:
 
-*2. Alignment-based conformance*
+- _Synchronous move_ $(a, a)$: $a$ occurs in both the log and the model — no deviation.
+- _Log move_ $(a, >>)$: $a$ occurs in the log but not at this point in the model — unexpected behavior observed.
+- _Model move_ $(>>, a)$: $a$ is expected by the model but absent in the log — expected behavior was skipped.
 
-This approach finds the closest valid execution in the model for each observed trace. An *alignment* is a sequence of move pairs $(a_i, b_i)$, where $a_i$ is a move in the log and $b_i$ is a move in the model:
+The cost of an alignment is the total number of non-synchronous moves. The *optimal alignment* minimizes this cost and is found by solving a shortest-path problem in an alignment state space, typically using the $A^*$ algorithm.
 
-- *Synchronous move* $(a, a)$: Activity occurs in both log and model — no deviation.
-- *Log move* $(a, >>)$: Activity occurs in the log but not in the model at this point — unexpected behavior.
-- *Model move* $(>>, a)$: Activity expected by the model but missing from the log — expected behavior was skipped.
+// TODO (MR): The following example is the continuation of the two
+// previous examples. Change this into a formal example; refrence the
+// previous two examples. Also, the table should be formal.
 
-The cost of an alignment is the number of non-synchronous moves, and the optimal alignment minimizes this cost, usually found by solving a shortest-path problem (commonly with the $A^*$ algorithm).
+// START EXAMPL
 
-*Example:* Comparing $chevron.l A, D chevron.r$ to the model accepting $chevron.l A, B, D chevron.r$:
+For the same example — trace $chevron.l A, D chevron.r$ against the model accepting $chevron.l A, B, D chevron.r$:
 
 #table(
   columns: 3,
@@ -335,53 +632,85 @@ The cost of an alignment is the number of non-synchronous moves, and the optimal
   [D],  [D],  [Synchronous],
 )
 
-The alignment cost is 1, pinpointing that the only deviation is the absence of activity $B$. This is more informative than a fitness score alone, as it shows exactly what was missed and where.
+Cost: 1. The alignment shows precisely that the only deviation is the absence of activity $B$. This level of diagnostic detail is more informative than the token-based fitness score alone, because it identifies exactly which activity was missed and at which point in the trace.
 
-Alignment-based conformance gives much more detailed diagnostic information than token replay, but it is also more computationally intensive, especially for long traces and complex models. In practice, token replay is often used for a quick, overall fitness check, while alignment-based conformance is preferred when detailed, trace-level diagnostics are needed.
+// END EXMAPLE
 
-Deviations found through conformance checking can point to data quality problems, rare exceptions, policy violations, or even real changes in how the process is carried out over time. Understanding what kinds of deviations occur — and how often — is a central outcome of any conformance checking study.
+Alignment-based conformance provides more precise and detailed diagnostic information than token replay, but it is also more computationally expensive, particularly for long traces and large models. In practice, token replay is often used for a quick overall fitness estimate, while alignment-based conformance is applied when detailed per-trace diagnostics are needed.
 
-== Performance Analysis and Process Intelligence
+Deviations identified through conformance checking may reflect data quality issues, exceptional cases, policy violations, or genuine changes in the process over time. Understanding the nature and frequency of deviations is one of the main outputs of a conformance checking study.
 
-Performance analysis adds a crucial time dimension to the structural insights obtained from process discovery and conformance checking. Because event logs include timestamps, it is possible to measure how long each activity takes, how much time passes between activities, and the overall time it takes to complete a case. By projecting these measurements onto the process model, we can create a performance-annotated view that highlights exactly where time is spent — or lost — in the process.
+== Performance analysis and process intelligence
 
-The *throughput time* of a case $c$ is simply the time between its first and last recorded event:
+Performance analysis adds a time dimension to the structural view produced by process discovery and conformance checking. Because event logs contain timestamps, it is possible to measure the duration of individual activities, the waiting time between activities, and the total throughput time for each case. These measurements can be projected onto the process model to produce a *performance-annotated* view that highlights where time is spent or lost in the process.
 
-$ "TT"(c) = max_(e in c) t(e) - min_(e in c) t(e) $
+// TODO (MR): This is literary not true. For example, in the sepsis
+// log example, the blood work is done evey two days as revealed by
+// timestamps. However, the time to actually do the test is literary
+// in hours. It's not possible to compute the time required to make a
+// transition. What we can get from the log is the time between the
+// timestamps, thus, ectivities but not the duration of the
+// activities. Also, what about the first and the last activity in a
+// trace?
 
-We can also calculate the *waiting time* between two consecutive activities $a_i$ and $a_(i+1)$ in a trace, and the *service time* for an activity (if both its start and end are recorded).
+The *throughput time* of a case $c$ is the elapsed time between the timestamp of its first and last recorded event:
+$ "TT"(c) = max_{e in c} t(e) - min_{e in c} t(e) , $
+where $t(e)$ is the timestamp of the event $e in c$. 
 
-Common summary statistics for throughput time include:
+The *waiting time* between two consecutive activities $a_i$ and $a_(i+1)$ in a trace is the elapsed time between the completion of $a_i$ and the start of $a_(i+1)$. The *service time* of an activity is its own execution duration, measurable when both a start event and a complete event are recorded for the same activity instance.
 
-- *Mean throughput time*: Average duration for all cases.
-- *Median throughput time*: Middle value, less sensitive to outliers.
-- *P95 throughput time*: 95% of cases finish within this time.
-- *Minimum and maximum*: Fastest and slowest observed cases.
-- *Coefficient of variation*: Standard deviation divided by the mean; higher values indicate more variability.
+// TODO (MR): Technically, we can have the to consecutive events with
+// the same activity, different timestamps and different lifecycle
+// attributes (start, completed). It's not common in practice, though.
 
-The coefficient of variation is particularly useful — a low value means cases are fairly consistent, while a high value signals significant variation, which might point to bottlenecks or special cases.
+Several summary statistics are routinely reported to characterize throughput time across all cases in the log:
 
-When these time measurements are mapped onto the process model — tagging each step with statistics like median or mean duration — we get a performance-annotated model. This visualization makes it easy to spot where delays occur. For instance, if two activities are always directly connected in the model but there is a consistent delay between them in the data, this suggests a possible bottleneck.
+#table(
+  columns: 2,
+  align: (left, left),
+  table.header([*KPI*], [*Meaning*]),
+  [Mean throughput time],   [Average case duration across all cases],
+  [Median throughput time], [Middle value — robust to extreme outliers],
+  [P95 throughput time],    [95% of cases complete within this time],
+  [Minimum],                [Fastest observed case duration],
+  [Maximum],                [Slowest observed case duration],
+  [Coefficient of variation], [Standard deviation divided by mean — measures variability],
+)
 
-Process intelligence takes things further by combining process data with forecasting, simulation, and optimization. Once we have established a performance baseline, we can start to predict outcomes for ongoing cases, simulate the effects of potential process changes, or build dashboards that alert managers when a case is likely to exceed a target time. The mathematical concepts introduced in this chapter remain relevant for these more advanced, forward-looking applications — not just for retrospective analysis.
+// TODO (MR): Again, table!
 
-== Event Data Representation in Python
+The coefficient of variation is particularly informative: a low value indicates that most cases complete in a similar time, while a high value indicates high variability, which may point to bottlenecks, resource constraints, or exceptional cases that require special handling.
 
-From an implementation perspective, event data in Python are usually stored as either standard tables (DataFrames) or as more specialized log objects. The simplest approach is a table with three columns: case identifier, activity label, and timestamp. This format works well with the `pandas` library, which is the standard data structure for Python data science.
+When throughput times or waiting times are projected onto the process model — associating each arc or transition with the median or mean duration computed from all cases passing through it — a performance-annotated model is obtained. This visualization immediately shows which transitions have the longest associated waiting times and are therefore candidates for process improvement. For example, if two activities are always directly connected in the model but a consistently long delay is observed between them in the data, this suggests a bottleneck or resource constraint at that point in the process.
 
-Process mining libraries like PM4Py can convert these tables into richer event-log objects that preserve the structure of traces and support various discovery algorithms. In PM4Py, you first use `pm4py.format_dataframe` to specify which columns correspond to the case ID, activity, and timestamp, then `pm4py.convert_to_event_log` to create the internal log object. This object then supports all of PM4Py's discovery, conformance, and performance functions. This conversion is demonstrated in the synthetic example at the start of Chapter 4, where a simple DataFrame is transformed for use with the Inductive Miner.
+// TODO (MR): Usually, for mathematical analysis, we attach a
+// transition duration distribution, for example, a given transition
+// may have a duration given by the exponential distribution with a
+// given intensity.
 
-A more advanced format is the *Object-Centric Event Log (OCEL)*. Unlike traditional logs, where each event is linked to just one case, OCEL allows each event to be associated with multiple objects of different types. For example, a procurement event might relate to a purchase order, an order item, a vendor, and a resource all at once. The OCEL standard defines how to store and handle such logs, and PM4Py provides `pm4py.read_ocel` to read OCEL files in JSON format. This produces an object with separate DataFrames for events and objects, plus metadata about object types and event attributes.
+Process intelligence extends these ideas by connecting process data with forecasting, simulation, and optimization. Once the event log has been analyzed and a performance baseline has been established, it becomes possible to predict future outcomes for running cases, test the effects of proposed process changes through simulation, or build real-time monitoring dashboards that alert managers when a case is projected to exceed a target throughput time. The mathematical foundations introduced in this chapter therefore remain relevant across the full scope of process intelligence, not only for the basic retrospective tasks of discovery and conformance checking.
 
-*Flattening* is the process of turning an OCEL into a classical event log by selecting one object type to serve as the case identifier. In PM4Py, this is done with `pm4py.ocel_flattening(ocel, object_type)`. If an event is linked to multiple objects of that type, it will appear in multiple cases in the flattened log, increasing the case count. If some events are not linked to the selected object type, they may be lost during flattening. Managing these effects is an important preprocessing step before using classical discovery algorithms on object-centric data.
+== Event data representation in Python
 
-In the practical examples in Chapter 4, both representations are used. The introductory example uses the simple tabular format to show the basic conversion process. The BPI Challenge 2019 case study uses the OCEL format, and the flattening step demonstrates the preprocessing needed for classical analysis. Later examples return to the OCEL format directly, computing an object-centric directly-follows graph from the relations table without flattening, so that differences in process behavior by object type can be compared without the distortions introduced by flattening.
+From the implementation point of view, event data are typically represented in Python either as tabular data structures or as specialized log objects. The simplest tabular representation uses three core columns: case identifier, activity label, and timestamp. This format is easy to inspect and manipulate using the `pandas` library, which provides the DataFrame structure used throughout the Python data science ecosystem.
 
-== Exploratory Description of the BPI Challenge 2019 Dataset
+// TODO (MR): Usually, when talking about the XES structure, we have
+// case id, event id, and then attributes e.g., activity, timestamp,
+// cost, resource, and so on. Thus, 4 columns. 
 
-For the real-world case study in this thesis, I use the BPI Challenge 2019 dataset, which is stored in OCEL format. This dataset was collected from the procurement process of a large multinational company and was released as part of the annual BPI Challenge, organized alongside the International Conference on Process Mining. It has become a widely used benchmark in academic research and is a representative example of what large, complex, real-world event logs look like.
+Process mining libraries then convert such tables into richer event-log objects that preserve trace structure and support discovery algorithms. In PM4Py, the conversion is performed by `pm4py.format_dataframe`, which requires the analyst to specify which columns hold the case identifier, activity name, and timestamp, followed by `pm4py.convert_to_event_log` to produce the internal event-log object. The resulting object supports all PM4Py discovery, conformance, and performance functions directly. This conversion step is demonstrated in the introductory synthetic example in Chapter 4, where a plain pandas DataFrame with three columns is transformed into an input suitable for the Inductive Miner#footnote[More information about the XES standard can be found at #link("https://ieeexplore.ieee.org/document/10025658")[#raw("https://ieeexplore.ieee.org/document/10025658")].].
 
-The dataset includes roughly 1.6 million events and over 330,000 objects, which are divided into four types: purchase orders (PO), purchase order items (POItem), resources, and vendors. Each event comes with a timestamp, an activity name, and a rich set of business context attributes — such as company code, document type, item category, spending area, and vendor information. This level of detail makes the dataset valuable not only for analyzing process flows, but also for performance analysis and organizational mining.
+A more advanced representation is the second version of the *Object-Centric Event Log (OCEL)*.#footnote[More information about the OCEL standard can be found at #link("https://www.ocel-standard.org/")[#raw("https://www.ocel-standard.org/")].] Unlike classical event logs, which link each event to a single case, OCEL allows a single event to be associated with multiple objects of different types simultaneously. For example, one event in a procurement process may be related simultaneously to a purchase order, an order item, a vendor, and a resource. The OCEL standard defines a formal data model for storing such logs, and PM4Py provides the `pm4py.read_ocel` function for reading OCEL files in JSON format. The resulting object contains separate DataFrames for events and objects, along with metadata specifying the object type column and event attribute columns.
+
+*Flattening* is the process of converting an OCEL into a classical event log by selecting one object type as the case identifier. In PM4Py, the function `pm4py.ocel_flattening(ocel, object_type)` performs this step. When one event is related to multiple objects of the selected type, that event appears in multiple cases in the flattened log, which inflates the case count. When the selected object type is not directly linked to all events, some events may be lost during flattening. Managing these artifacts is an important preprocessing step before applying classical discovery algorithms to object-centric data.
+
+In the practical examples in Chapter 4, both representations are used. The introductory synthetic example uses the tabular representation to illustrate the basic conversion pipeline. The BPI Challenge 2019 case study uses the OCEL representation, and the flattening step demonstrates how object-centric data must be preprocessed before classical discovery can be applied. Later examples in Chapter 4 return to the OCEL representation directly, computing an object-centric directly-follows graph from the relations table without flattening, in order to compare per-object-type process behavior without the artifacts introduced by the flattening step.
+
+== Exploratory description of the BPI Challenge 2019 dataset
+
+The real-world case study in this thesis uses the BPI Challenge 2019 dataset, stored in OCEL format. The dataset originates from a real procurement process at a large multinational company and was released as part of the annual BPI Challenge competition organized in connection with the International Conference on Process Mining. It has been widely used in academic research on process mining and serves here as a representative example of a large, complex, real-world event log.
+
+The dataset contains approximately 1,595,923 events and 330,685 objects distributed across four object types: purchase orders (PO), purchase order items (POItem), resources (Resource), and vendors (Vendor). Each event carries a timestamp, an activity name, and a set of business context attributes including company code, document type, item category, spending area, and vendor details. These attributes make the dataset suitable not only for control-flow analysis but also for performance analysis and organizational mining.
 
 #table(
   columns: 2,
@@ -394,7 +723,9 @@ The dataset includes roughly 1.6 million events and over 330,000 objects, which 
   [Domain],         [Procurement],
 )
 
-To analyze the process from a case-centric perspective, I flattened the log using the POItem object type, since this is the most common type in the data. After flattening, each case corresponds to a unique POItem. In the full dataset, this results in a very large number of cases; for the practical examples in Chapter 4, I use a sample of 53,198 cases drawn from the flattened log.
+// TODO (MR): Table, again!
+
+After flattening with respect to the POItem object type — selected because it is the most frequent type in the log — the classical event log contains one case per distinct POItem object. The full dataset produces a flattened log with a large number of cases; in the sample used for the practical examples in Chapter 4, the flattened log contains 53,198 cases.
 
 #table(
   columns: 2,
@@ -408,21 +739,23 @@ To analyze the process from a case-centric perspective, I flattened the log usin
   [Maximum],                      [25,670.6 days],
 )
 
-On average, each purchase order item takes about two months from the first to the last recorded event. The 95th percentile — 143 days — shows that while most cases are handled in a predictable time frame, a minority take much longer. The extreme maximum (over 25,000 days) is almost certainly an artifact, perhaps representing an open case that was never formally closed or a data entry error. The distribution of throughput times is skewed to the right, which is typical for procurement processes where most cases finish on schedule but some outliers drag on far longer.
+// TODO (MR): Table, again! Also, refrences to chapters, again!
 
-These statistics highlight several important features of the dataset. First, its size means that efficient tools and careful preprocessing are essential before analysis. Second, having four object types means the process cannot be fully captured with a simple, single-case model — some relational information is inevitably lost if we try. Third, the combination of detailed process data and rich business context makes this dataset suitable for a wide range of process mining tasks, not just process discovery.
+The mean throughput time of 72.3 days and median of 64.3 days indicate that a typical purchase order item takes roughly two months to process from first to last recorded event. The 95th percentile of 143 days shows that a minority of cases take significantly longer. The maximum of over 25,000 days almost certainly represents either an open case that was never formally closed or a data anomaly. The distribution of throughput times is right-skewed, which is typical of procurement processes where the majority of cases are completed within a predictable time range but a small number of exceptions take much longer.
 
-In Chapter 4, I show how to load this dataset using `pm4py.read_ocel`, flatten it to a case-based format, and sample it down to a manageable size before running any discovery algorithms. The theoretical concepts discussed in this chapter — traces, variants, Petri nets, and throughput time — are all put into practice there, connecting the mathematical foundations with real analytical results.
+These basic statistics reveal several important characteristics of the dataset. First, the volume is large enough to require efficient tools and careful preprocessing before any analysis can begin. Second, the presence of four object types means that the process cannot be fully represented as a simple single-case model without losing meaningful relational information. Third, the combination of control-flow data with rich business attributes makes this dataset suitable for a range of process mining tasks beyond simple discovery.
 
-= The Tools Available in Python
+In Chapter 4, the dataset is loaded using `pm4py.read_ocel`, flattened to a case-centric format, and then sampled to a manageable size before discovery algorithms are applied. The theoretical concepts introduced in this chapter — traces, variants, Petri nets, and throughput time — are all used directly in that implementation, connecting the mathematical foundations established here with concrete analytical results.
 
-Over the past decade, the Python ecosystem for process mining and process intelligence has grown rapidly. Today, Python supports a wide range of analytical tasks — from loading and exploring event logs, to discovering process models, checking conformance, predicting future outcomes, and even simulating alternative process designs. This chapter provides a structured overview of the main Python tools available for these purposes. For clarity, the tools are grouped into five categories: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and supporting data processing packages. For each tool, I discuss its primary purpose, the data formats it supports, the main algorithms or methods it implements, and its practical strengths and limitations. At the end of the chapter, there is a comparative summary table for quick reference.
+= The tools available in Python
 
-The selection of tools covered here is based on a review of academic publications (especially from the International Conference on Process Mining), the Python Package Index (PyPI), and active GitHub repositories. The focus is on tools that are actively maintained, widely used in the community, or that represent an important category of functionality. Commercial tools are only included if they provide a Python interface that is accessible to practitioners, such as PyCelonis.
+The Python ecosystem for process mining and process intelligence has grown considerably over the past decade. It now covers a wide range of analytical tasks, from loading and exploring event logs to discovering process models, checking conformance, predicting future outcomes, and simulating alternative process designs. This chapter provides a structured overview of the main Python tools available for these purposes. The tools are organized into five groups: core process mining libraries, predictive and AI-oriented tools, simulation and optimization tools, visualization libraries, and complementary data processing packages. For each tool, the discussion covers its primary purpose, the data formats it supports, the algorithms or methods it implements, and its practical strengths and limitations. The chapter concludes with a comparative summary table.
 
-== Core Process Mining Libraries
+The selection of tools discussed here is based on a review of academic publications from the International Conference on Process Mining (ICPM) and related venues, the Python Package Index (PyPI), and active GitHub repositories related to process mining. The focus is on tools that are either actively maintained, widely cited in the literature, or representative of an important category of functionality. Commercial tools are included only where they provide a Python interface that is accessible to practitioners, as in the case of PyCelonis.
 
-The backbone of Python process mining is formed by a handful of core libraries. These libraries implement the essential workflow: reading in event data, exploring log statistics, discovering process models, checking conformance, and analyzing process performance. In this section, I describe the four main libraries in this category: PM4Py, PM4Py-Streaming, Simod, and PMLab.
+== Core process mining libraries
+
+The most important and widely used tools in the Python process mining ecosystem are the core libraries that implement the fundamental workflow: reading event data, exploring log statistics, discovering process models, checking conformance, and analyzing performance. This section describes the four main libraries in this category: PM4Py, PM4Py-Streaming, Simod, and PMLab.
 
 === PM4Py
 
