@@ -888,7 +888,7 @@ The corresponding Petri net has four places, three transitions, and a simple lin
 
 The implementation begins by constructing a pandas DataFrame with three columns, using PM4Py-standard column names directly. `pm4py.convert_to_event_log()` groups events by case and sorts them by timestamp, returning an EventLog object with three traces. Process discovery is then performed by calling `pm4py.discover_petri_net_inductive()` on the EventLog, producing a Petri net that faithfully captures the process. The result can be visualized using PM4Py's built-in visualization functions.
 
-#includeCode("thesis_code_01_synthetic.py", from: 1, to: 42)
+#includeCode("code/thesis_code_01_synthetic.py", from: 1, to: 42)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -934,7 +934,7 @@ The coefficient of variation of 0.04 --- a very low value --- indicates that all
 
 Examining performance within each case reveals more detail about how time is distributed between activities. The waiting time between "Create order" and "Approve order" is 60 minutes in Case 1, 75 minutes in Case 2, and 65 minutes in Case 3, averaging approximately 67 minutes. The waiting time between "Approve order" and "Send invoice" is 60 minutes in Case 1, 50 minutes in Case 2, and 50 minutes in Case 3, averaging approximately 53 minutes. If these waiting times were projected onto the discovered Petri net --- annotating each arc with the mean waiting time across all cases --- the approval step would appear slightly more time-consuming. In real procurement data, consistently long waiting times before approval could signal a resource bottleneck --- for example, if a single manager is responsible for many approvals and cases queue up. Identifying such bottlenecks is one of the most valuable real-world applications of performance-annotated process models.
 
-#includeCode("thesis_code_01_synthetic.py", from: 44, to: 54)
+#includeCode("code/thesis_code_01_synthetic.py", from: 44, to: 54)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1061,7 +1061,7 @@ Finally, the notebook renders the discovered model using Graphviz (if available)
 
 Below is the code that loads the OCEL file and inspects the resulting structure:
 
-#includeCode("thesis_code_02_bpi2019.py", from: 1, to: 9)
+#includeCode("code/thesis_code_02_bpi2019.py", from: 1, to: 9)
 
 The output confirms the dataset structure:
 
@@ -1121,11 +1121,11 @@ table.header([*Activity*], [*Count*]),
 ] <tab-bpi-activities>
 
 The flattening and sampling steps are executed as follows:
-#includeCode("thesis_code_02_bpi2019.py", from: 11, to: 30)
+#includeCode("code/thesis_code_02_bpi2019.py", from: 11, to: 30)
 
 Process discovery on the training set:
 
-#includeCode("thesis_code_02_bpi2019.py", from: 32, to: 35)
+#includeCode("code/thesis_code_02_bpi2019.py", from: 32, to: 35)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1296,7 +1296,7 @@ The following code blocks implement each step in sequence. Each snippet correspo
 
 *Step 1: Imports, setup, and date filter.*
 
-#includeCode("thesis_code_03_advanced.py", from: 1, to: 19)
+#includeCode("code/thesis_code_03_advanced.py", from: 1, to: 19)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1310,7 +1310,7 @@ Activities : 37
 
 *Step 2: Variant analysis.*
 
-#includeCode("thesis_code_03_advanced.py", from: 21, to: 37)
+#includeCode("code/thesis_code_03_advanced.py", from: 21, to: 37)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1323,11 +1323,11 @@ Top-20 variant coverage : 90.5%
 
 *Step 3: Variant filtering with diagnostic check.*
 
-#includeCode("thesis_code_03_advanced.py", from: 39, to: 47)
+#includeCode("code/thesis_code_03_advanced.py", from: 39, to: 47)
 
 *Step 4: Loop and rework detection.*
 
-#includeCode("thesis_code_03_advanced.py", from: 49, to: 66)
+#includeCode("code/thesis_code_03_advanced.py", from: 49, to: 66)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1345,11 +1345,11 @@ Most repeated activities:
 
 *Step 4b: Rework visualization.*
 
-#includeCode("thesis_code_03_advanced.py", from: 68, to: 81)
+#includeCode("code/thesis_code_03_advanced.py", from: 68, to: 81)
 
 *Step 5a: Throughput time calculation.*
 
-#includeCode("thesis_code_03_advanced.py", from: 83, to: 98)
+#includeCode("code/thesis_code_03_advanced.py", from: 83, to: 98)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1366,7 +1366,7 @@ Max throughput time         : 275.33 days
 
 *Step 5b: KPI summary.*
 
-#includeCode("thesis_code_03_advanced.py", from: 100, to: 116)
+#includeCode("code/thesis_code_03_advanced.py", from: 100, to: 116)
 
 *Output:*
 #block(fill: luma(240), radius: 3pt, inset: (x: 1em, y: 0.7em), width: 100%)[
@@ -1387,15 +1387,15 @@ Max throughput time         : 275.33 days
 
 *Step 6a: Throughput time visualization.*
 
-#includeCode("thesis_code_03_advanced.py", from: 118, to: 139)
+#includeCode("code/thesis_code_03_advanced.py", from: 118, to: 139)
 
 *Step 6b: Throughput by document type.*
 
-#includeCode("thesis_code_03_advanced.py", from: 141, to: 159)
+#includeCode("code/thesis_code_03_advanced.py", from: 141, to: 159)
 
 *Step 7: Variant frequency Pareto chart.*
 
-#includeCode("thesis_code_03_advanced.py", from: 161, to: 181)
+#includeCode("code/thesis_code_03_advanced.py", from: 161, to: 181)
 
 Example code snippets and outputs are included to demonstrate each step and to confirm the analysis results.
 
