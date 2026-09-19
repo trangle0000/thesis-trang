@@ -1,4 +1,3 @@
-#import "@preview/theorion:0.4.1": *
 
 #let sgh_godlo = ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -328,7 +327,7 @@
   /// Kierunek studiów. -> str
   program: "",
   /// Specjalność. Jeśli nie zostanie wskazana w parametrach, to nie pojawi się na stronie tytułowej. -> str
-  specialty: "",
+  specialisation: "",
   /// Rok przygotowania pracy. -> str
   year: "2026",
   /// Język, w jakim jest pisana praca. W tym momencie obsługiwane są wyłącznie języki polski i angielski. Domyślnym językiem jest polski, ale ustawienie jakiegokolwiek innego języka przestawia szablon na język angielski. -> "pl" | "en"
@@ -356,9 +355,9 @@
     #v(0.5cm)
 
     #if studies == "mgr" [
-      #text("Master's Degree Program")
+      #text(loc-pl-en("Studium magisterskie","Master's study"))
     ] else if studies == "lic" [
-      #text("Studium licencjackie") 
+      #text(loc-pl-en("Studium licencjackie","Bacherlor's study")) 
     ] else [ 
       #text(loc-pl-en("Niewłaściwa nazwa studium!","Wrong studies name!"), fill: red)
     ]
@@ -367,13 +366,13 @@
   v(1cm)
 
   if program != "" [
-    #text([Field of Study: #program \ ])
+    #text(loc-pl-en([Kierunek #program \ ],[Field of study: #program \ ]))
   ] else [
       #text(loc-pl-en("Brak kierunku!","Program name missing!"), fill: red)
   ]
 
-  if specialty != "" [
-    #text([Specjalność #specialty \ ])
+  if specialisation != "" [
+    #text(loc-pl-en([Specjalność #specialisation \ ],[Specialisation: #specialisation \ ]))
   ]
   
   v(1cm)
@@ -384,11 +383,11 @@
     ] else [
       #text(loc-pl-en("Brak autora!","Author name missing!"), fill: red)
     ]
-    Number ID :
+    #loc-pl-en("Nr albumu ","Student register No. ") 
     #if student_id != "" [
       #text([#student_id \ ])
     ] else [
-      #text(loc-pl-en([Brak numeru albumu!\ ],[Student ID missing!\ ]), fill: red)
+      #text(loc-pl-en([Brak numeru albumu!\ ],[Student register No. missing!\ ]), fill: red)
     ]
   ]
   v(1cm)
@@ -399,13 +398,13 @@
 
   block(inset: (left: 9cm))[
     #if studies == "mgr" [
-      #text([Master's Thesis\ ])
+      #text(loc-pl-en([Praca magisterska\ ],[Master's thesis\ ]))
     ] else if studies == "lic" [
-      #text([Praca licencjacka\ ])
+      #text(loc-pl-en([Praca licencjacka\ ],[Bacherlor's thesis\ ]))
     ] else [
       #text(loc-pl-en("Niewłaściwa nazwa studium!","Wrong name!"), fill: red)
     ]
-    Under the supervision of\ 
+    #loc-pl-en([pod kierunkiem naukowym\ ],[under the scientific supervision of\ ])
     #if advisor != "" [
       #text([#advisor\ ])
     ] else [
@@ -462,8 +461,15 @@
     ]
   ]
 
-  set-theorion-numbering("1")
-  show: show-theorion
+  // Konfiguracja przecinków w formułach matematycznych
+  show math.equation: it => {
+    // Wszsytkie przecinki są typu "normal" (bez cienkiej spacji)
+    show ",": math.class("normal", ",")
+    // ", " (przecinek + spacja) → wstawia przecinek jako klasę "punctuation" i usuwa spację
+    // (klasa "punctuation" wstawia cienką spację domyślnie)
+    show regex(",\\s"): math.class("punctuation", ",")
+    it
+  }
   
   set ref(supplement: none)
   show ref: it => {
@@ -502,6 +508,7 @@
             target: figure.where(kind: "tabela"),
             title: none
         )
+  }
 }
 
 /// Procedura generująca bibliografię. -> none
@@ -527,65 +534,152 @@
 ///   image("rys1.pdf")
 /// )<rys:diagram>
 /// ```
+// #let sgh_figure(
+//   /// Tytuł rysunku. Tytuł umieszczany jest nad rysunkiem. Nie jest to zgodne z polskimi zwyczajami, ale poprawia czytelność dokumentu. -> str
+//   caption: "",
+//   /// Źródło rysunku. Umieszczanie mniejszym fontem poniżej rysunku. -> str
+//   source: "",
+//   /// Położenie rysunku. Przyjmuje takie same wartości jak parametr `placement` w funkcji `figure`, tj. `none`, `auto`, `top` lub `bottom`. -> none | auto | top | bottom
+//   placement: none,
+//   /// Zawartość, która zostanie podpisana jako rysunek. Może to być rysunek włączony za pomocą funkcji `#image` jak również diagram CeTZ lub inny programowo generowany rysunek. -> content
+//   body
+// ) = {
+//     figure(
+//         caption: caption,
+//         supplement: loc-pl-en("Rysunek","Figure"),
+//         kind: "rysunek",
+//         placement: placement,
+//         [
+//             #body
+//             #align(left)[
+//               #text([#loc-pl-en("Źródło:", "Source:") #source], size: 10pt)
+//             ]
+//             #v(0.5em)
+//         ],
+//     )
+// }
+
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
 #let sgh_figure(
-  /// Tytuł rysunku. Tytuł umieszczany jest nad rysunkiem. Nie jest to zgodne z polskimi zwyczajami, ale poprawia czytelność dokumentu. -> str
   caption: "",
-  /// Źródło rysunku. Umieszczanie mniejszym fontem poniżej rysunku. -> str
   source: "",
-  /// Położenie rysunku. Przyjmuje takie same wartości jak parametr `placement` w funkcji `figure`, tj. `none`, `auto`, `top` lub `bottom`. -> none | auto | top | bottom
   placement: none,
-  /// Zawartość, która zostanie podpisana jako rysunek. Może to być rysunek włączony za pomocą funkcji `#image` jak również diagram CeTZ lub inny programowo generowany rysunek. -> content
   body
 ) = {
-    figure(
-        caption: caption,
-        supplement: loc-pl-en("Rysunek","Figure"),
-        kind: "rysunek",
-        placement: placement,
-        [
-            #body
-            #align(left)[
-              #text([#loc-pl-en("Źródło:", "Source:") #source], size: 10pt)
+  figure(
+    caption: caption, // Passed so outline() picks up the title!
+    supplement: loc-pl-en("Rysunek", "Figure"),
+    kind: "rysunek",
+    placement: placement,
+    block(
+      width: 100%,
+      [
+        #body
+        #v(0.5em)
+        #if caption != "" or source != "" [
+          #align(center)[
+            #block(width: 80%)[
+              #align(left)[
+                #context {
+                  let num = counter(figure.where(kind: "rysunek")).display()
+                  let supp = loc-pl-en("Rysunek", "Figure")
+                  text(weight: "bold")[#supp #num: ]
+                }
+                #caption
+                #if source != "" [
+                  _ #loc-pl-en("Źródło:", "Source:") #source _
+                ]
+              ]
             ]
-            #v(0.5em)
-        ],
+          ]
+        ]
+      ]
     )
+  )
 }
 
-/// Procedura dodająca tabelę. Tak wstawiona tabela pojawi się w spisie tabel. Utworzenie numerowanej tabeli ze wskazanym źródłem, która będzie umieszczan dokładnie tam gdzie jest w kodzie:
-/// ```typst
-/// #sgh_table(
-///   caption: [Diagram.],
-///   source: [Opracowanie własne.],
-///   table(
-///     ...
-///   )
-/// )<rys:diagram>
-/// ```
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+// /// Procedura dodająca tabelę. Tak wstawiona tabela pojawi się w spisie tabel. Utworzenie numerowanej tabeli ze wskazanym źródłem, która będzie umieszczan dokładnie tam gdzie jest w kodzie:
+// /// ```typst
+// /// #sgh_table(
+// ///   caption: [Diagram.],
+// ///   source: [Opracowanie własne.],
+// ///   table(
+// ///     ...
+// ///   )
+// /// )<rys:diagram>
+// /// ```
+// #let sgh_table(
+//   /// Tytuł tabeli. Tytuł umieszczany jest nad tabelą, a źródło poniżej tabeli. -> str
+//   caption: "",
+//   /// Źródło tabeli. Umieszczanie mniejszym fontem poniżej tabeli. -> str
+//   source: "",
+//   /// Położenie tabeli. Przyjmuje takie same wartości jak parametr `placement` w funkcji `figure`, tj. `none`, `auto`, `top` lub `bottom`. -> none | auto | top | bottom  
+//   placement: none,
+//   /// Zawartość, która zostanie podpisana jako tabela. Może to być tabela sformatowana komendą `#table`, ale również rysunek włączony za pomocą funkcji `#image` jak również diagram CeTZ lub inny programowo generowany rysunek. -> content 
+//   body
+// ) = {
+//     figure(
+//         caption: caption,
+//         supplement: loc-pl-en("Tabela","Table"),
+//         kind: "tabela",
+//         placement: placement,
+//         [
+//             #body
+//             #align(left)[
+//               #text([#loc-pl-en("Źródło:", "Source:") #source], size: 10pt)
+//             ]
+//             #v(0.5em)
+//         ]
+//     )
+// }
+
+
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
 #let sgh_table(
-  /// Tytuł tabeli. Tytuł umieszczany jest nad tabelą, a źródło poniżej tabeli. -> str
   caption: "",
-  /// Źródło tabeli. Umieszczanie mniejszym fontem poniżej tabeli. -> str
   source: "",
-  /// Położenie tabeli. Przyjmuje takie same wartości jak parametr `placement` w funkcji `figure`, tj. `none`, `auto`, `top` lub `bottom`. -> none | auto | top | bottom  
   placement: none,
-  /// Zawartość, która zostanie podpisana jako tabela. Może to być tabela sformatowana komendą `#table`, ale również rysunek włączony za pomocą funkcji `#image` jak również diagram CeTZ lub inny programowo generowany rysunek. -> content 
   body
 ) = {
-    figure(
-        caption: caption,
-        supplement: loc-pl-en("Tabela","Table"),
-        kind: "tabela",
-        placement: placement,
-        [
-            #body
-            #align(left)[
-              #text([#loc-pl-en("Źródło:", "Source:") #source], size: 10pt)
+  figure(
+    caption: caption, // Passed so outline() picks up the title!
+    supplement: loc-pl-en("Tabela", "Table"),
+    kind: "tabela",
+    placement: placement,
+    block(
+      breakable: true,
+      width: 100%,
+      [
+        #if caption != "" or source != "" [
+          #align(center)[
+            #block(width: 80%, sticky: true)[
+              #align(left)[
+                #context {
+                  let num = counter(figure.where(kind: "tabela")).display()
+                  let supp = loc-pl-en("Tabela", "Table")
+                  text(weight: "bold")[#supp #num: ]
+                }
+                #caption
+                #if source != "" [
+                  _ #loc-pl-en("Źródło:", "Source:") #source _
+                ]
+              ]
             ]
-            #v(0.5em)
+          ]
+          #v(0.5em)
         ]
+        #body
+      ]
     )
+  )
 }
+
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 
 /// Generuje tytuł streszczenia. Streszczenie nie jest częścią spisu treści. Użycie:
 /// ```typst
